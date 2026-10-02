@@ -14,7 +14,7 @@ path.seen-correct{fill:var(--paleg)}path.seen-wrong{fill:var(--paler)}path.flash
 .ok{color:#158451;font-weight:900}.no{color:#cc3943;font-weight:900}.hidden{display:none}.legend{font-size:11px;color:var(--muted);line-height:1.8}
 @media(max-width:720px){.main{grid-template-columns:1fr}.map{min-height:520px}svg{height:68vh;min-height:520px}.side{display:block}.side>*{margin-bottom:13px}}
 
-.nav{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:11px 0}
+.nav{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:11px 0}
 .nav button{padding:12px 8px;font-size:15px}
 .nav button.active{background:var(--ink);color:#fff;border-color:var(--ink)}
 .panel.hidden{display:none}
@@ -108,7 +108,7 @@ header .note{font-size:10px;margin-top:3px}
 .nav button{position:relative;border:0;background:transparent;border-radius:0;padding:14px 18px 13px;color:#7b8798;font-size:13px;font-weight:850;box-shadow:none}
 .nav button.active{background:transparent;color:var(--blue);border:0}
 .nav button.active:after{content:'';position:absolute;left:18px;right:18px;bottom:-1px;height:2px;background:var(--blue);border-radius:2px 2px 0 0}
-.nav button:nth-child(1):before{content:'◉  '}.nav button:nth-child(2):before{content:'⌖  '}.nav button:nth-child(3):before{content:'▣  '}.nav button:nth-child(4):before{content:'▥  '}.nav button:nth-child(5):before{content:'◒  '}
+.nav button:nth-child(1):before{content:'◉  '}.nav button:nth-child(2):before{content:'⌖  '}.nav button:nth-child(3):before{content:'▣  '}.nav button:nth-child(4):before{content:'▥  '}.nav button:nth-child(5):before{content:'◒  '}.nav button:nth-child(6):before{content:'▦  '}
 .q{padding:20px 22px;margin:0 0 12px;background:#fff}.q .small{font-size:11px}#question{font-size:clamp(24px,4vw,34px);letter-spacing:-1.1px;margin-top:3px}
 select,button,input{transition:border-color .15s ease,background .15s ease,transform .08s ease}button:active{transform:scale(.985)}
 select,button{border-color:#dfe5ee;border-radius:9px}.primary,button.primary{background:linear-gradient(180deg,#3b7df7,#2f6fe9);box-shadow:0 6px 14px rgba(47,115,242,.18)}
@@ -196,8 +196,16 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
 #studyMapg path.study-city-innovation{fill:#2f9e69!important;stroke:#fff!important;stroke-width:1.15!important;opacity:1!important}
 #studyMapg path.study-city-company{fill:#d8892b!important;stroke:#fff!important;stroke-width:1.15!important;opacity:1!important}
 </style>
+
+<style id="v600-industry-style">
+.industry-view-tabs{display:flex;gap:7px;margin:0 0 12px;overflow-x:auto}.industry-view-tabs button.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+.industry-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:12px}.industry-map-card{padding:10px}.industry-map-card svg{width:100%;height:auto;display:block;touch-action:none}.industry-info h2{margin:4px 0 5px}.industry-info h3{margin:8px 0 5px}.industry-note{font-size:11px;color:var(--muted);line-height:1.55}.industry-rank-list{display:flex;flex-direction:column;gap:7px;margin-top:12px}.industry-rank-item{display:grid;grid-template-columns:34px 1fr;gap:9px;align-items:center;border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:#fff}.industry-rank-no{font-weight:950;font-size:16px;color:var(--blue);text-align:center}.industry-rank-name{font-weight:850}.industry-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.industry-chip{border:1px solid #dbe3ef;background:#f7f9fc;border-radius:999px;padding:6px 9px;font-size:11px;font-weight:800}.industry-major-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.industry-major-card{border:1px solid var(--line);border-radius:13px;padding:11px;background:#fff}.industry-major-card b{font-size:14px}.industry-major-card .small{margin-top:5px;line-height:1.55}.industry-controls{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.industry-controls select{border:1px solid #d4dce8;background:#fff;border-radius:11px;padding:10px;font-weight:800}.industry-legend{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0}.industry-legend span{font-size:10px;font-weight:800}.industry-dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}.study-industry-card{border-top:1px solid var(--line);padding-top:13px}.study-industry-title{font-weight:950;font-size:15px}.study-industry-basis{font-size:10px;color:var(--muted);margin:3px 0 9px}.study-industry-row{display:grid;grid-template-columns:76px 1fr;gap:8px;padding:6px 0;border-top:1px solid #edf1f5;font-size:12px}.study-industry-row span:first-child{color:var(--muted);font-weight:800}.study-industry-row b{font-weight:900}
+#industryMapg path{fill:#fbfcfe;stroke:#8e99a8;stroke-width:.8;vector-effect:non-scaling-stroke}.industry-map-selected{stroke:#111!important;stroke-width:2!important}
+@media(max-width:760px){.industry-layout{grid-template-columns:1fr}.industry-major-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:460px){.industry-major-grid{grid-template-columns:1fr}.nav button{font-size:8.5px}}
+</style>
 </head><body><div class="app">
-<header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후</div></div>
+<header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후 · 2023 공업</div></div>
 <div class="stats"><span class="pill">점수 <b id="score">0</b></span><span class="pill">연속 <b id="streak">0</b></span><span class="pill">⏱ <b id="time">0.0</b>s</span></div></header>
 <nav class="nav" aria-label="학습 메뉴">
 <button class="active" data-tab="quiz">퀴즈</button>
@@ -205,6 +213,7 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
 <button data-tab="atlas">지역 도감</button>
 <button data-tab="ranking">인구</button>
 <button data-tab="climateRanking">기후</button>
+<button data-tab="industry">공업</button>
 </nav>
 <div id="quizPanel" class="panel">
 <section class="card studyhead"><div class="study-tools"><div><h2>퀴즈</h2><div class="small">퀴즈 종류를 골라 지도에서 정답 지역을 찾아보세요.</div></div></div><div class="mode-tabs" id="quizModes"><button class="active" data-qmode="location">위치</button><button data-qmode="festival">지역 축제</button><button data-qmode="gi">지리적 표시제</button><button data-qmode="heritage">유산·습지</button><button data-qmode="core">핵심개념</button></div><div id="quizModeNote" class="study-mode-note">지역명이 문제로 나오면 지도에서 위치를 선택합니다.</div></section>
@@ -413,8 +422,13 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
         <div class="climate-basis">1991~2020년 · 기상청 우리나라 기후평년값 · 해당 지역 내부 관측지점만 사용</div>
         <div id="climateContent" class="climate-empty">지도를 눌러 지역을 선택하세요.</div>
       </div>
+      <div id="industryStudyPanel" class="study-industry-card hidden">
+        <div class="study-industry-title">주요 공업</div>
+        <div class="study-industry-basis">2023년 개념서 그래프·사용자 정리 자료 기준 · 순위/주요 업종 중심</div>
+        <div id="industryStudyContent"></div>
+      </div>
       <div class="placeholder">
-        인구는 2024년 12월 주민등록인구, 기후는 1991~2020년 기후평년값을 사용합니다.
+        인구는 2024년 12월 주민등록인구, 기후는 1991~2020년 기후평년값을 사용합니다. 공업은 정리된 지역에만 표시합니다.
       </div>
       <button id="studyToAtlas">이 지역 도감에서 보기</button>
     </aside>
@@ -485,6 +499,18 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
   <div id="climateRankList" class="rank-list"></div>
 </div>
 </div>
+<div id="industryPanel" class="panel hidden">
+  <div class="industry-view-tabs"><button class="active" data-iview="map">업종별 지도</button><button data-iview="major">지역별 주요 공업</button><button data-iview="province">시도별 분포</button></div>
+  <div id="industryMapView">
+    <div class="industry-layout">
+      <section class="card industry-map-card"><div class="industry-controls"><select id="industryType"></select></div><svg id="industryMapSvg" viewBox="0 0 720 900" aria-label="주요 공업 분포 지도"><g id="industryMapg"></g></svg></section>
+      <aside class="card industry-info"><div class="small">2023년 개념서 그래프 참고</div><h2 id="industryTitle">공업 분포</h2><div class="industry-note">정확한 출하액 수치를 역산하지 않고, 자료에 정리된 지역별 순위만 표시합니다.</div><div class="industry-legend" id="industryLegend"></div><div id="industryRankList" class="industry-rank-list"></div></aside>
+    </div>
+  </div>
+  <div id="industryMajorView" class="hidden"><section class="card rankinghead"><h2>지역별 주요 공업</h2><div class="small">출하액 기준으로 정리된 주요 업종만 표시합니다.</div></section><div id="industryMajorGrid" class="industry-major-grid"></div></div>
+  <div id="industryProvinceView" class="hidden"><section class="card rankinghead"><h2>시도별 공업 분포</h2><div class="small">업종별 시도 순위를 비교합니다.</div><div class="industry-controls"><select id="industryProvinceType"></select></div></section><div id="industryProvinceList" class="industry-rank-list"></div></div>
+</div>
+
 <script>
 const BANK=[{"province":"강원특별자치도","provinceShort":"강원","name":"강릉시","display":"강원 강릉시","id":"r0"},{"province":"강원특별자치도","provinceShort":"강원","name":"고성군","display":"강원 고성군","id":"r1"},{"province":"강원특별자치도","provinceShort":"강원","name":"동해시","display":"강원 동해시","id":"r2"},{"province":"강원특별자치도","provinceShort":"강원","name":"삼척시","display":"강원 삼척시","id":"r3"},{"province":"강원특별자치도","provinceShort":"강원","name":"속초시","display":"강원 속초시","id":"r4"},{"province":"강원특별자치도","provinceShort":"강원","name":"양구군","display":"강원 양구군","id":"r5"},{"province":"강원특별자치도","provinceShort":"강원","name":"양양군","display":"강원 양양군","id":"r6"},{"province":"강원특별자치도","provinceShort":"강원","name":"영월군","display":"강원 영월군","id":"r7"},{"province":"강원특별자치도","provinceShort":"강원","name":"원주시","display":"강원 원주시","id":"r8"},{"province":"강원특별자치도","provinceShort":"강원","name":"인제군","display":"강원 인제군","id":"r9"},{"province":"강원특별자치도","provinceShort":"강원","name":"정선군","display":"강원 정선군","id":"r10"},{"province":"강원특별자치도","provinceShort":"강원","name":"철원군","display":"강원 철원군","id":"r11"},{"province":"강원특별자치도","provinceShort":"강원","name":"춘천시","display":"강원 춘천시","id":"r12"},{"province":"강원특별자치도","provinceShort":"강원","name":"태백시","display":"강원 태백시","id":"r13"},{"province":"강원특별자치도","provinceShort":"강원","name":"평창군","display":"강원 평창군","id":"r14"},{"province":"강원특별자치도","provinceShort":"강원","name":"홍천군","display":"강원 홍천군","id":"r15"},{"province":"강원특별자치도","provinceShort":"강원","name":"화천군","display":"강원 화천군","id":"r16"},{"province":"강원특별자치도","provinceShort":"강원","name":"횡성군","display":"강원 횡성군","id":"r17"},{"province":"경기도","provinceShort":"경기","name":"가평군","display":"경기 가평군","id":"r18"},{"province":"경기도","provinceShort":"경기","name":"고양시","display":"경기 고양시","id":"r19"},{"province":"경기도","provinceShort":"경기","name":"과천시","display":"경기 과천시","id":"r20"},{"province":"경기도","provinceShort":"경기","name":"광명시","display":"경기 광명시","id":"r21"},{"province":"경기도","provinceShort":"경기","name":"광주시","display":"경기 광주시","id":"r22"},{"province":"경기도","provinceShort":"경기","name":"구리시","display":"경기 구리시","id":"r23"},{"province":"경기도","provinceShort":"경기","name":"군포시","display":"경기 군포시","id":"r24"},{"province":"경기도","provinceShort":"경기","name":"김포시","display":"경기 김포시","id":"r25"},{"province":"경기도","provinceShort":"경기","name":"남양주시","display":"경기 남양주시","id":"r26"},{"province":"경기도","provinceShort":"경기","name":"동두천시","display":"경기 동두천시","id":"r27"},{"province":"경기도","provinceShort":"경기","name":"부천시","display":"경기 부천시","id":"r28"},{"province":"경기도","provinceShort":"경기","name":"성남시","display":"경기 성남시","id":"r29"},{"province":"경기도","provinceShort":"경기","name":"수원시","display":"경기 수원시","id":"r30"},{"province":"경기도","provinceShort":"경기","name":"시흥시","display":"경기 시흥시","id":"r31"},{"province":"경기도","provinceShort":"경기","name":"안산시","display":"경기 안산시","id":"r32"},{"province":"경기도","provinceShort":"경기","name":"안성시","display":"경기 안성시","id":"r33"},{"province":"경기도","provinceShort":"경기","name":"안양시","display":"경기 안양시","id":"r34"},{"province":"경기도","provinceShort":"경기","name":"양주시","display":"경기 양주시","id":"r35"},{"province":"경기도","provinceShort":"경기","name":"양평군","display":"경기 양평군","id":"r36"},{"province":"경기도","provinceShort":"경기","name":"여주시","display":"경기 여주시","id":"r37"},{"province":"경기도","provinceShort":"경기","name":"연천군","display":"경기 연천군","id":"r38"},{"province":"경기도","provinceShort":"경기","name":"오산시","display":"경기 오산시","id":"r39"},{"province":"경기도","provinceShort":"경기","name":"용인시","display":"경기 용인시","id":"r40"},{"province":"경기도","provinceShort":"경기","name":"의왕시","display":"경기 의왕시","id":"r41"},{"province":"경기도","provinceShort":"경기","name":"의정부시","display":"경기 의정부시","id":"r42"},{"province":"경기도","provinceShort":"경기","name":"이천시","display":"경기 이천시","id":"r43"},{"province":"경기도","provinceShort":"경기","name":"파주시","display":"경기 파주시","id":"r44"},{"province":"경기도","provinceShort":"경기","name":"평택시","display":"경기 평택시","id":"r45"},{"province":"경기도","provinceShort":"경기","name":"포천시","display":"경기 포천시","id":"r46"},{"province":"경기도","provinceShort":"경기","name":"하남시","display":"경기 하남시","id":"r47"},{"province":"경기도","provinceShort":"경기","name":"화성시","display":"경기 화성시","id":"r48"},{"province":"경상남도","provinceShort":"경남","name":"거제시","display":"경남 거제시","id":"r49"},{"province":"경상남도","provinceShort":"경남","name":"거창군","display":"경남 거창군","id":"r50"},{"province":"경상남도","provinceShort":"경남","name":"고성군","display":"경남 고성군","id":"r51"},{"province":"경상남도","provinceShort":"경남","name":"김해시","display":"경남 김해시","id":"r52"},{"province":"경상남도","provinceShort":"경남","name":"남해군","display":"경남 남해군","id":"r53"},{"province":"경상남도","provinceShort":"경남","name":"밀양시","display":"경남 밀양시","id":"r54"},{"province":"경상남도","provinceShort":"경남","name":"사천시","display":"경남 사천시","id":"r55"},{"province":"경상남도","provinceShort":"경남","name":"산청군","display":"경남 산청군","id":"r56"},{"province":"경상남도","provinceShort":"경남","name":"양산시","display":"경남 양산시","id":"r57"},{"province":"경상남도","provinceShort":"경남","name":"의령군","display":"경남 의령군","id":"r58"},{"province":"경상남도","provinceShort":"경남","name":"진주시","display":"경남 진주시","id":"r59"},{"province":"경상남도","provinceShort":"경남","name":"창녕군","display":"경남 창녕군","id":"r60"},{"province":"경상남도","provinceShort":"경남","name":"창원시","display":"경남 창원시","id":"r61"},{"province":"경상남도","provinceShort":"경남","name":"통영시","display":"경남 통영시","id":"r62"},{"province":"경상남도","provinceShort":"경남","name":"하동군","display":"경남 하동군","id":"r63"},{"province":"경상남도","provinceShort":"경남","name":"함안군","display":"경남 함안군","id":"r64"},{"province":"경상남도","provinceShort":"경남","name":"함양군","display":"경남 함양군","id":"r65"},{"province":"경상남도","provinceShort":"경남","name":"합천군","display":"경남 합천군","id":"r66"},{"province":"경상북도","provinceShort":"경북","name":"경산시","display":"경북 경산시","id":"r67"},{"province":"경상북도","provinceShort":"경북","name":"경주시","display":"경북 경주시","id":"r68"},{"province":"경상북도","provinceShort":"경북","name":"고령군","display":"경북 고령군","id":"r69"},{"province":"경상북도","provinceShort":"경북","name":"구미시","display":"경북 구미시","id":"r70"},{"province":"경상북도","provinceShort":"경북","name":"김천시","display":"경북 김천시","id":"r71"},{"province":"경상북도","provinceShort":"경북","name":"문경시","display":"경북 문경시","id":"r72"},{"province":"경상북도","provinceShort":"경북","name":"봉화군","display":"경북 봉화군","id":"r73"},{"province":"경상북도","provinceShort":"경북","name":"상주시","display":"경북 상주시","id":"r74"},{"province":"경상북도","provinceShort":"경북","name":"성주군","display":"경북 성주군","id":"r75"},{"province":"경상북도","provinceShort":"경북","name":"안동시","display":"경북 안동시","id":"r76"},{"province":"경상북도","provinceShort":"경북","name":"영덕군","display":"경북 영덕군","id":"r77"},{"province":"경상북도","provinceShort":"경북","name":"영양군","display":"경북 영양군","id":"r78"},{"province":"경상북도","provinceShort":"경북","name":"영주시","display":"경북 영주시","id":"r79"},{"province":"경상북도","provinceShort":"경북","name":"영천시","display":"경북 영천시","id":"r80"},{"province":"경상북도","provinceShort":"경북","name":"예천군","display":"경북 예천군","id":"r81"},{"province":"경상북도","provinceShort":"경북","name":"울릉군","display":"경북 울릉군","id":"r82"},{"province":"경상북도","provinceShort":"경북","name":"울진군","display":"경북 울진군","id":"r83"},{"province":"경상북도","provinceShort":"경북","name":"의성군","display":"경북 의성군","id":"r84"},{"province":"경상북도","provinceShort":"경북","name":"청도군","display":"경북 청도군","id":"r85"},{"province":"경상북도","provinceShort":"경북","name":"청송군","display":"경북 청송군","id":"r86"},{"province":"경상북도","provinceShort":"경북","name":"칠곡군","display":"경북 칠곡군","id":"r87"},{"province":"경상북도","provinceShort":"경북","name":"포항시","display":"경북 포항시","id":"r88"},{"province":"광주광역시","provinceShort":"광주광역시","name":"광주광역시","display":"광주광역시","id":"r89"},{"province":"대구광역시","provinceShort":"대구광역시","name":"대구광역시","display":"대구광역시","id":"r90"},{"province":"대전광역시","provinceShort":"대전광역시","name":"대전광역시","display":"대전광역시","id":"r91"},{"province":"부산광역시","provinceShort":"부산광역시","name":"부산광역시","display":"부산광역시","id":"r92"},{"province":"서울특별시","provinceShort":"서울특별시","name":"서울특별시","display":"서울특별시","id":"r93"},{"province":"세종특별자치시","provinceShort":"세종특별자치시","name":"세종특별자치시","display":"세종특별자치시","id":"r94"},{"province":"울산광역시","provinceShort":"울산광역시","name":"울산광역시","display":"울산광역시","id":"r95"},{"province":"인천광역시","provinceShort":"인천광역시","name":"인천광역시","display":"인천광역시","id":"r96"},{"province":"전라남도","provinceShort":"전남","name":"강진군","display":"전남 강진군","id":"r97"},{"province":"전라남도","provinceShort":"전남","name":"고흥군","display":"전남 고흥군","id":"r98"},{"province":"전라남도","provinceShort":"전남","name":"곡성군","display":"전남 곡성군","id":"r99"},{"province":"전라남도","provinceShort":"전남","name":"광양시","display":"전남 광양시","id":"r100"},{"province":"전라남도","provinceShort":"전남","name":"구례군","display":"전남 구례군","id":"r101"},{"province":"전라남도","provinceShort":"전남","name":"나주시","display":"전남 나주시","id":"r102"},{"province":"전라남도","provinceShort":"전남","name":"담양군","display":"전남 담양군","id":"r103"},{"province":"전라남도","provinceShort":"전남","name":"목포시","display":"전남 목포시","id":"r104"},{"province":"전라남도","provinceShort":"전남","name":"무안군","display":"전남 무안군","id":"r105"},{"province":"전라남도","provinceShort":"전남","name":"보성군","display":"전남 보성군","id":"r106"},{"province":"전라남도","provinceShort":"전남","name":"순천시","display":"전남 순천시","id":"r107"},{"province":"전라남도","provinceShort":"전남","name":"신안군","display":"전남 신안군","id":"r108"},{"province":"전라남도","provinceShort":"전남","name":"여수시","display":"전남 여수시","id":"r109"},{"province":"전라남도","provinceShort":"전남","name":"영광군","display":"전남 영광군","id":"r110"},{"province":"전라남도","provinceShort":"전남","name":"영암군","display":"전남 영암군","id":"r111"},{"province":"전라남도","provinceShort":"전남","name":"완도군","display":"전남 완도군","id":"r112"},{"province":"전라남도","provinceShort":"전남","name":"장성군","display":"전남 장성군","id":"r113"},{"province":"전라남도","provinceShort":"전남","name":"장흥군","display":"전남 장흥군","id":"r114"},{"province":"전라남도","provinceShort":"전남","name":"진도군","display":"전남 진도군","id":"r115"},{"province":"전라남도","provinceShort":"전남","name":"함평군","display":"전남 함평군","id":"r116"},{"province":"전라남도","provinceShort":"전남","name":"해남군","display":"전남 해남군","id":"r117"},{"province":"전라남도","provinceShort":"전남","name":"화순군","display":"전남 화순군","id":"r118"},{"province":"전북특별자치도","provinceShort":"전북","name":"고창군","display":"전북 고창군","id":"r119"},{"province":"전북특별자치도","provinceShort":"전북","name":"군산시","display":"전북 군산시","id":"r120"},{"province":"전북특별자치도","provinceShort":"전북","name":"김제시","display":"전북 김제시","id":"r121"},{"province":"전북특별자치도","provinceShort":"전북","name":"남원시","display":"전북 남원시","id":"r122"},{"province":"전북특별자치도","provinceShort":"전북","name":"무주군","display":"전북 무주군","id":"r123"},{"province":"전북특별자치도","provinceShort":"전북","name":"부안군","display":"전북 부안군","id":"r124"},{"province":"전북특별자치도","provinceShort":"전북","name":"순창군","display":"전북 순창군","id":"r125"},{"province":"전북특별자치도","provinceShort":"전북","name":"완주군","display":"전북 완주군","id":"r126"},{"province":"전북특별자치도","provinceShort":"전북","name":"익산시","display":"전북 익산시","id":"r127"},{"province":"전북특별자치도","provinceShort":"전북","name":"임실군","display":"전북 임실군","id":"r128"},{"province":"전북특별자치도","provinceShort":"전북","name":"장수군","display":"전북 장수군","id":"r129"},{"province":"전북특별자치도","provinceShort":"전북","name":"전주시","display":"전북 전주시","id":"r130"},{"province":"전북특별자치도","provinceShort":"전북","name":"정읍시","display":"전북 정읍시","id":"r131"},{"province":"전북특별자치도","provinceShort":"전북","name":"진안군","display":"전북 진안군","id":"r132"},{"province":"제주특별자치도","provinceShort":"제주","name":"서귀포시","display":"제주 서귀포시","id":"r133"},{"province":"제주특별자치도","provinceShort":"제주","name":"제주시","display":"제주 제주시","id":"r134"},{"province":"충청남도","provinceShort":"충남","name":"계룡시","display":"충남 계룡시","id":"r135"},{"province":"충청남도","provinceShort":"충남","name":"공주시","display":"충남 공주시","id":"r136"},{"province":"충청남도","provinceShort":"충남","name":"금산군","display":"충남 금산군","id":"r137"},{"province":"충청남도","provinceShort":"충남","name":"논산시","display":"충남 논산시","id":"r138"},{"province":"충청남도","provinceShort":"충남","name":"당진시","display":"충남 당진시","id":"r139"},{"province":"충청남도","provinceShort":"충남","name":"보령시","display":"충남 보령시","id":"r140"},{"province":"충청남도","provinceShort":"충남","name":"부여군","display":"충남 부여군","id":"r141"},{"province":"충청남도","provinceShort":"충남","name":"서산시","display":"충남 서산시","id":"r142"},{"province":"충청남도","provinceShort":"충남","name":"서천군","display":"충남 서천군","id":"r143"},{"province":"충청남도","provinceShort":"충남","name":"아산시","display":"충남 아산시","id":"r144"},{"province":"충청남도","provinceShort":"충남","name":"예산군","display":"충남 예산군","id":"r145"},{"province":"충청남도","provinceShort":"충남","name":"천안시","display":"충남 천안시","id":"r146"},{"province":"충청남도","provinceShort":"충남","name":"청양군","display":"충남 청양군","id":"r147"},{"province":"충청남도","provinceShort":"충남","name":"태안군","display":"충남 태안군","id":"r148"},{"province":"충청남도","provinceShort":"충남","name":"홍성군","display":"충남 홍성군","id":"r149"},{"province":"충청북도","provinceShort":"충북","name":"괴산군","display":"충북 괴산군","id":"r150"},{"province":"충청북도","provinceShort":"충북","name":"단양군","display":"충북 단양군","id":"r151"},{"province":"충청북도","provinceShort":"충북","name":"보은군","display":"충북 보은군","id":"r152"},{"province":"충청북도","provinceShort":"충북","name":"영동군","display":"충북 영동군","id":"r153"},{"province":"충청북도","provinceShort":"충북","name":"옥천군","display":"충북 옥천군","id":"r154"},{"province":"충청북도","provinceShort":"충북","name":"음성군","display":"충북 음성군","id":"r155"},{"province":"충청북도","provinceShort":"충북","name":"제천시","display":"충북 제천시","id":"r156"},{"province":"충청북도","provinceShort":"충북","name":"증평군","display":"충북 증평군","id":"r157"},{"province":"충청북도","provinceShort":"충북","name":"진천군","display":"충북 진천군","id":"r158"},{"province":"충청북도","provinceShort":"충북","name":"청주시","display":"충북 청주시","id":"r159"},{"province":"충청북도","provinceShort":"충북","name":"충주시","display":"충북 충주시","id":"r160"}];let queue=[],idx=0,score=0,streak=0,answer=null,locked=true,t0=0,timer=null,logs=[],logMode='all',quizMode='location';
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
@@ -615,11 +641,12 @@ function renderPopulation(region){
 }
 let selectedStudy=null;
 const tabButtons=[...document.querySelectorAll('.nav button[data-tab]')];
-const panels={quiz:$('#quizPanel'),study:$('#studyPanel'),atlas:$('#atlasPanel'),ranking:$('#rankingPanel'),climateRanking:$('#climateRankingPanel')};
+const panels={quiz:$('#quizPanel'),study:$('#studyPanel'),atlas:$('#atlasPanel'),ranking:$('#rankingPanel'),climateRanking:$('#climateRankingPanel'),industry:$('#industryPanel')};
 
 function openTab(name){
   if(name==='ranking' && typeof renderRanking==='function') renderRanking();
   if(name==='climateRanking' && typeof renderClimateRanking==='function') renderClimateRanking();
+  if(name==='industry' && typeof renderIndustryMap==='function') renderIndustryMap();
   Object.entries(panels).forEach(([k,p])=>p.classList.toggle('hidden',k!==name));
   tabButtons.forEach(b=>b.classList.toggle('active',b.dataset.tab===name));
   window.scrollTo({top:0,behavior:'auto'});
@@ -697,7 +724,7 @@ function selectStudyRegion(region){
   if(p)p.classList.add('study-selected');
   $('#studyName').textContent=region.display;
   $('#studyProvince').textContent=region.province;
-  renderStudyNotes(region);renderPopulation(region);renderClimate(region);applyMemory(region);
+  renderStudyNotes(region);renderPopulation(region);renderClimate(region);renderStudyIndustry(region);applyMemory(region);
 }
 
 function studyHit(ev){
@@ -879,5 +906,51 @@ function renderClimateRanking(){
   });
 }
 initClimateRanking();
+
+
+// v6.0 공업 자료: 사용자가 정리한 2023년 개념서 그래프/스프레드시트 기준.
+const INDUSTRY_CITY_RANK={
+ '정유':['울산','여수','서산','인천','시흥'],
+ '석유 화학':['울산','여수','서산','화성','천안'],
+ '조선':['거제','울산','영암','창원','사천'],
+ '1차 금속':['포항','광양','울산','당진','인천'],
+ '섬유(의복제외)':['대구','구미','부산','서울','울산'],
+ '자동차':['울산','화성','광주(광역시)','아산','인천'],
+ '전자':['화성','아산','구미','이천','평택']
+};
+const INDUSTRY_CITY_EXTRA={'자동차':['부산','서산','광명','경주','창원','대구','평택','군산','완주'],'전자':['수원','용인','청주','파주']};
+const INDUSTRY_PROVINCE_RANK={
+ '정유':['울산','전남','충남','인천','경기'],'석유 화학':['울산','전남','충남','경기','충북'],'조선':['경남','울산','전남','부산','경기'],
+ '1차 금속':['경북','전남','충남','울산','경기'],'섬유(의복제외)':['경기','경북','대구','부산','서울'],'자동차':['울산','경기','충남','광주','경남'],'전자':['경기','충남','경북','충북','인천']
+};
+const INDUSTRY_MAJOR={
+ '서울':['의복'],'인천':['자동차','기타기계','전자'],'부산':['1차 금속','기타기계','자동차'],'대구':['자동차','섬유'],'광주(광역시)':['자동차'],'울산':['정유','자동차','석유 화학','1차 금속','조선'],
+ '화성':['전자','자동차'],'수원':['전자'],'용인':['전자'],'평택':['전자','자동차'],'이천':['전자'],'파주':['전자'],'광명':['자동차'],'서산':['정유','석유 화학','자동차'],'당진':['1차 금속'],'아산':['전자','자동차'],'천안':['전기장비','전자'],'청주':['전자','전기장비'],'진천':['식료품'],'음성':['식료품'],'완주':['자동차'],'익산':['식료품'],'군산':['1차 금속','자동차'],'여수':['정유','석유 화학'],'광양':['1차 금속'],'영암':['조선'],'포항':['1차 금속'],'구미':['전자'],'경주':['자동차'],'창원':['전기장비','기계','자동차'],'영월':['비금속'],'삼척':['비금속'],'동해':['비금속'],'제주':['비금속','식료품']
+};
+function simpleRegionName(r){let n=r.name.replace(/(특별자치시|특별시|광역시|특별자치도|시|군)$/,'');if(['서울','부산','대구','인천','광주','대전','울산','세종'].includes(r.provinceShort)&&r.name===r.province)return r.provinceShort;return n}
+function industryKeyForRegion(r){let n=simpleRegionName(r);if(n==='광주'&&r.provinceShort==='광주')return '광주(광역시)';return n}
+function regionForIndustryName(name){let metro=name==='광주(광역시)'?'광주':name;return BANK.find(r=>{let k=industryKeyForRegion(r);return k===name || (name!=='광주(광역시)'&&simpleRegionName(r)===metro)})}
+function renderStudyIndustry(region){const panel=$('#industryStudyPanel'),box=$('#industryStudyContent'),key=industryKeyForRegion(region),major=INDUSTRY_MAJOR[key];let rows=[];if(major?.length)rows.push(`<div class="study-industry-row"><span>주요 공업</span><b>${major.map(esc).join(' · ')}</b></div>`);let ranks=[];Object.entries(INDUSTRY_CITY_RANK).forEach(([type,list])=>{let i=list.indexOf(key);if(i>=0)ranks.push(`${type} ${i+1}위`)});if(ranks.length)rows.push(`<div class="study-industry-row"><span>시군 분포</span><b>${ranks.map(esc).join(' · ')}</b></div>`);if(rows.length){box.innerHTML=rows.join('');panel.classList.remove('hidden')}else{box.innerHTML='';panel.classList.add('hidden')}}
+
+let industryType='정유';
+const INDUSTRY_COLORS=['#425f92','#6179a7','#7890b7','#94a7c8','#b3c0d6'];
+function initIndustry(){
+ const types=Object.keys(INDUSTRY_CITY_RANK),sel=$('#industryType'),psel=$('#industryProvinceType');if(!sel)return;
+ sel.innerHTML=types.map(x=>`<option>${x}</option>`).join('');psel.innerHTML=sel.innerHTML;
+ const g=$('#industryMapg');$$('#mapg path').forEach(p=>{let c=p.cloneNode(false);c.id='industry_'+p.dataset.id;c.dataset.id=p.dataset.id;g.appendChild(c)});
+ sel.onchange=()=>{industryType=sel.value;psel.value=industryType;renderIndustryMap()};psel.onchange=()=>{industryType=psel.value;sel.value=industryType;renderIndustryProvince()};
+ $$('.industry-view-tabs button').forEach(b=>b.onclick=()=>{let v=b.dataset.iview;$$('.industry-view-tabs button').forEach(x=>x.classList.toggle('active',x===b));$('#industryMapView').classList.toggle('hidden',v!=='map');$('#industryMajorView').classList.toggle('hidden',v!=='major');$('#industryProvinceView').classList.toggle('hidden',v!=='province');if(v==='map')renderIndustryMap();if(v==='major')renderIndustryMajor();if(v==='province')renderIndustryProvince()});
+ renderIndustryMap();renderIndustryMajor();renderIndustryProvince();
+}
+function renderIndustryMap(selectedId){
+ const list=INDUSTRY_CITY_RANK[industryType]||[],extra=INDUSTRY_CITY_EXTRA[industryType]||[];$('#industryTitle').textContent=industryType+' 분포';
+ $$('#industryMapg path').forEach(p=>{p.style.fill='#fbfcfe';p.style.stroke='#8e99a8';p.classList.remove('industry-map-selected')});
+ list.forEach((name,i)=>{let r=regionForIndustryName(name),p=r&&$('#industry_'+r.id);if(p){p.style.fill=INDUSTRY_COLORS[i];p.style.stroke='#fff'}});extra.forEach(name=>{let r=regionForIndustryName(name),p=r&&$('#industry_'+r.id);if(p&&!list.includes(name)){p.style.fill='#d9e0eb';p.style.stroke='#fff'}});if(selectedId)$('#industry_'+selectedId)?.classList.add('industry-map-selected');
+ $('#industryLegend').innerHTML=list.map((_,i)=>`<span><i class="industry-dot" style="background:${INDUSTRY_COLORS[i]}"></i>${i+1}위</span>`).join('')+(extra.length?'<span><i class="industry-dot" style="background:#d9e0eb"></i>기타 주요 지역</span>':'');
+ $('#industryRankList').innerHTML=list.map((name,i)=>`<div class="industry-rank-item"><div class="industry-rank-no">${i+1}</div><div class="industry-rank-name">${esc(name)}</div></div>`).join('')+(extra.length?`<div class="industry-chips">${extra.map(x=>`<span class="industry-chip">${esc(x)}</span>`).join('')}</div>`:'');
+}
+function renderIndustryMajor(){let entries=Object.entries(INDUSTRY_MAJOR);$('#industryMajorGrid').innerHTML=entries.map(([name,items])=>`<button class="industry-major-card" data-iname="${esc(name)}"><b>${esc(name)}</b><div class="small">${items.map((x,i)=>`${i+1}. ${esc(x)}`).join('<br>')}</div></button>`).join('');$$('#industryMajorGrid [data-iname]').forEach(b=>b.onclick=()=>{let r=regionForIndustryName(b.dataset.iname);if(r){openTab('study');selectStudyRegion(r)}})}
+function renderIndustryProvince(){let list=INDUSTRY_PROVINCE_RANK[industryType]||[];$('#industryProvinceList').innerHTML=list.map((name,i)=>`<div class="card industry-rank-item"><div class="industry-rank-no">${i+1}</div><div class="industry-rank-name">${esc(name)}</div></div>`).join('')}
+initIndustry();
 
 </script></body></html>
