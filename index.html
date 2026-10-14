@@ -458,7 +458,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #railPanel .rail-coming{padding:28px 24px;min-height:240px}
 #railPanel .rail-coming h2{margin:0 0 12px;font-size:20px}
 #railPanel .rail-coming p{line-height:1.7}
-</style><style id="rail-v633-touch">#railPanel #railSvg{touch-action:none!important;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}</style>
+</style><style id="rail-v633-touch">#railPanel #railSvg, #roadSvg{touch-action:none!important;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}</style>
 <style id="v634-map-interaction-style">
 /* Zoom gestures are reserved for map surfaces, never surrounding page controls. */
 .main > .map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg {
@@ -485,7 +485,15 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
  background:#eaf2ff!important;color:#2f73d9!important;
 }
 </style>
-<style id="v635-ios-touch">.main>.map, .study-map, .climate-map-card, .industry-map-card, .rail-viewport{overscroll-behavior:contain} .main>.map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg{touch-action:none!important;-webkit-touch-callout:none!important;user-select:none!important;-webkit-user-select:none!important}</style></head><body><div class="app">
+<style id="v635-ios-touch">.main>.map, .study-map, .climate-map-card, .industry-map-card, .rail-viewport{overscroll-behavior:contain} .main>.map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg, #roadSvg{touch-action:none!important;-webkit-touch-callout:none!important;user-select:none!important;-webkit-user-select:none!important}</style><style id="road-v636-css">
+#railPanel #roadSvg{width:100%;height:100%;display:block;touch-action:none!important;user-select:none!important;-webkit-user-select:none!important}
+#railPanel #roadBase path{fill:#f9fbff;stroke:#cad5e2;stroke-width:.75;vector-effect:non-scaling-stroke}
+#railPanel #roadLines path{fill:none;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+#railPanel #roadStops circle{fill:white;stroke-width:2;vector-effect:non-scaling-stroke}
+#railPanel #roadStops text{font-size:12px;font-weight:800;paint-order:stroke;stroke:#fff;stroke-width:3px;stroke-linejoin:round;pointer-events:none}
+#railPanel #roadVehicle{pointer-events:none}
+#railPanel #railRoadContent .rail-head,#railPanel #railRoadContent .rail-layout{width:100%;box-sizing:border-box}
+</style></head><body><div class="app">
 <header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후 · 2023 공업</div></div>
 <div class="stats"><span class="pill">점수 <b id="score">0</b></span><span class="pill">연속 <b id="streak">0</b></span><span class="pill">⏱ <b id="time">0.0</b>s</span></div></header>
 <nav class="nav" aria-label="학습 메뉴">
@@ -495,7 +503,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking">인구</button>
 <button data-tab="climateRanking">기후</button>
 <button data-tab="industry">공업</button>
-</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.3.5</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
+</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.3.7</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
 <div id="quizPanel" class="panel">
 <section class="card studyhead"><div class="study-tools"><div><h2>퀴즈</h2><div class="small">퀴즈 종류를 골라 지도에서 정답 지역을 찾아보세요.</div></div></div><div class="mode-tabs" id="quizModes"><button class="active" data-qmode="location">위치</button><button data-qmode="festival">지역 축제</button><button data-qmode="gi">지리적 표시제</button><button data-qmode="heritage">유산·습지</button><button data-qmode="core">핵심개념</button></div><div id="quizModeNote" class="study-mode-note">지역명이 문제로 나오면 지도에서 위치를 선택합니다.</div></section>
 <section class="card q"><div><div class="small">지도에서 찾아보세요</div><div id="question">새 게임을 눌러주세요</div></div><div class="controls">
@@ -686,7 +694,23 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
   </aside>
  </div>
  </div>
- <section id="railRoadContent" class="card hidden rail-coming"><h2>고속국도</h2><p>고속국도 노선과 주요 경유 지역은 추후 추가할 예정입니다.</p><p class="small">고속철도와 같은 방식으로 지도 학습·퀴즈를 제공할 예정입니다.</p></section>
+ <div id="railRoadContent" class="hidden">
+ <section class="card rail-head"><div><h2>고속국도</h2><div class="small">실제 시·군 경계 지도 위에서 주요 경유 지역을 순서대로 학습합니다.</div></div>
+ <div class="rail-options"><label>학습 방식 <select id="roadMode"><option value="quiz">퀴즈 · 먼저 맞히기</option><option value="study">지도 학습 · 보고 따라 쓰기</option></select></label>
+ <label>노선 <select id="roadRoute"><option value="gyeongbu">경부선</option><option value="jungang">중앙선</option><option value="jungbu">중부선</option><option value="seoulyangyang">서울양양선</option><option value="yeongdong">영동선</option><option value="gyeongin">경인선</option><option value="seohaean">서해안선</option><option value="honam">호남선</option></select></label>
+ <label class="rail-check"><input type="checkbox" id="roadFollow" checked> 카메라 추적</label><label class="rail-check" id="roadOverviewLabel"><input type="checkbox" id="roadOverview"> 전체 노선 보기</label>
+ <button id="roadRestart">처음부터</button></div></section>
+ <div class="rail-layout">
+  <section class="card rail-mapcard"><div class="rail-mapcaption"><span id="roadRouteTitle">경부선</span><span id="roadMapProgress">1 / 8</span></div><div class="rail-viewport"><svg id="roadSvg" viewBox="0 0 720 900" aria-label="고속국도 주요 경유 도시 지도"><g id="roadWorld"><g id="roadBase"></g><g id="roadLines"></g><g id="roadStops"></g><g id="roadVehicle"></g></g></svg></div><div class="rail-mapfoot">기존 시·군 경계 지도 · 주요 경유 도시 간 안내선 (실제 도로 선형 아님)</div><div id="roadLegend" class="rail-legend"></div></section>
+  <aside class="card rail-side"><div class="rail-kicker">현재 지역</div><div id="roadCurrent" class="rail-current">서울</div><div id="roadStation" class="small"></div>
+   <div class="rail-divider"></div><div id="roadPrompt" class="rail-prompt">다음 지역을 입력하세요</div>
+   <form id="roadForm" class="rail-form"><input id="roadInput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="시·군 이름 입력" enterkeyhint="go"><button class="primary" type="submit" id="roadSubmit">확인</button></form>
+   <div id="roadFeedback" class="rail-feedback" aria-live="polite">출발 지역에서 시작합니다.</div><div id="roadVisited" class="rail-visited"></div>
+   <div class="rail-divider"></div><div class="small">행정구역명 우선 · 시·군·광역시의 이름으로 정답 인정</div><div class="small">확정된 8개 고속국도 노선</div>
+   <div class="rail-zoom"><button id="roadZoomIn">확대 +</button><button id="roadZoomOut">축소 −</button><button id="roadFit">전체 보기</button></div>
+  </aside>
+ </div>
+</div>
 </div>
 <div id="studyPanel" class="panel hidden">
   <section class="card studyhead">
@@ -1309,7 +1333,7 @@ initIndustry();
  const comp=document.getElementById('popCompositionView'),rank=document.getElementById('popExistingRanking'),btn1=document.getElementById('popRankViewBtn'),btn2=document.getElementById('popCompositionViewBtn');
  function toggle(compMode){comp.classList.toggle('hidden',!compMode);rank.classList.toggle('hidden',compMode);btn1.classList.toggle('active',!compMode);btn2.classList.toggle('active',compMode);if(compMode)render()}
  btn1.onclick=()=>toggle(false);btn2.onclick=()=>toggle(true);document.querySelectorAll('[data-popunit]').forEach(b=>b.onclick=()=>{unit=b.dataset.popunit;document.querySelectorAll('[data-popunit]').forEach(x=>x.classList.toggle('active',x===b));render()});
- const changes=[['v6.3.5','iPad Safari 지도 영역 핀치 시 웹페이지 전체 확대 방지, 모든 지도에 지도 내부 전용 확대·이동 제스처 적용'],['v6.3.4','모든 지도에서 지도 영역만 손가락 확대·축소/드래그 지원, 교통 소탭을 공통 분할 탭 스타일로 통일'],['v6.3.3','교통 > 고속철도 전체 노선 지도에 손가락 핀치 확대·축소와 드래그 이동 추가, 지도 재그리기 시 확대 상태 유지'],['v6.3.2','전체 노선 보기에서 지도 남쪽 잘림 방지 및 공통 구간 선 굵기를 일반 노선과 통일'],['v6.3.1','고속철도 상위 탭을 교통으로 변경, 고속철도·고속국도 소탭 분리, 기존 퀴즈·지도 학습 소탭의 교통 바로가기 제거'],['v6.3.0','고속철도 탭 레이아웃 정리·노선별 색상 수정·지도 학습 전체 노선 보기·공통 구간 표시 추가'],['v6.2.9','고속철도 5개 노선 타이핑 퀴즈·지도 학습, 정답 후 열차 이동·노선 확장·카메라 추적 추가'],['v6.2.8','권역별 인구 규모 구성 그래프에 서울·인천(수도권), 대전·세종(충청권), 부산·대구·울산(영남권), 광주(호남권) 집계 누락 수정'],['v6.2.7','지도 학습 도농복합시 표시 색상을 기존 지도 학습의 파란색(#3974f6)으로 통일'],['v6.2.6','지도 학습 > 도시 > 도농복합시 54개 추가: 형성 유형·연도·통합 전 행정구역 표시, 퀴즈는 변경 없음'],['v6.2.5','전체 탭의 카드 폭과 시작 위치 통일, 인구 구성 그래프 모든 비율 표시(충남 포함), 좁은 구간 가독성 보완'],['v6.2.1','메인 탭 콘텐츠 시작 위치·여백 통일, 기후형 균등 분할 소탭 전체 적용, 인구 그래프 퍼센트 검정색 통일 및 잘림 보완'],['v6.2.0','인구 규모별 구성 그래프의 좌우 잘림 개선, 막대 구간별 퍼센트 표시, 파란색 명도 5단계로 색상 통일'],['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
+ const changes=[['v6.3.7','인천·여수의 노선 경유 위치를 도서 포함 행정구역 경계 중심 대신 본토 시가지 기준으로 보정(고속철도·고속국도 공통)'],['v6.3.6','교통 > 고속국도 8개 노선 타이핑 퀴즈·지도 학습·전체 노선 보기, 확정 색상과 경유 지역 및 자동차 이동 애니메이션 추가'],['v6.3.5','iPad Safari 지도 영역 핀치 시 웹페이지 전체 확대 방지, 모든 지도에 지도 내부 전용 확대·이동 제스처 적용'],['v6.3.4','모든 지도에서 지도 영역만 손가락 확대·축소/드래그 지원, 교통 소탭을 공통 분할 탭 스타일로 통일'],['v6.3.3','교통 > 고속철도 전체 노선 지도에 손가락 핀치 확대·축소와 드래그 이동 추가, 지도 재그리기 시 확대 상태 유지'],['v6.3.2','전체 노선 보기에서 지도 남쪽 잘림 방지 및 공통 구간 선 굵기를 일반 노선과 통일'],['v6.3.1','고속철도 상위 탭을 교통으로 변경, 고속철도·고속국도 소탭 분리, 기존 퀴즈·지도 학습 소탭의 교통 바로가기 제거'],['v6.3.0','고속철도 탭 레이아웃 정리·노선별 색상 수정·지도 학습 전체 노선 보기·공통 구간 표시 추가'],['v6.2.9','고속철도 5개 노선 타이핑 퀴즈·지도 학습, 정답 후 열차 이동·노선 확장·카메라 추적 추가'],['v6.2.8','권역별 인구 규모 구성 그래프에 서울·인천(수도권), 대전·세종(충청권), 부산·대구·울산(영남권), 광주(호남권) 집계 누락 수정'],['v6.2.7','지도 학습 도농복합시 표시 색상을 기존 지도 학습의 파란색(#3974f6)으로 통일'],['v6.2.6','지도 학습 > 도시 > 도농복합시 54개 추가: 형성 유형·연도·통합 전 행정구역 표시, 퀴즈는 변경 없음'],['v6.2.5','전체 탭의 카드 폭과 시작 위치 통일, 인구 구성 그래프 모든 비율 표시(충남 포함), 좁은 구간 가독성 보완'],['v6.2.1','메인 탭 콘텐츠 시작 위치·여백 통일, 기후형 균등 분할 소탭 전체 적용, 인구 그래프 퍼센트 검정색 통일 및 잘림 보완'],['v6.2.0','인구 규모별 구성 그래프의 좌우 잘림 개선, 막대 구간별 퍼센트 표시, 파란색 명도 5단계로 색상 통일'],['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
  document.getElementById('versionHistoryList').innerHTML=changes.map(([v,d])=>'<details class="version-entry"><summary>'+v+'</summary><p>'+d+'</p></details>').join('');
  document.getElementById('versionTrigger').onclick=()=>{const el=document.getElementById('versionHistory');el.classList.toggle('hidden');if(!el.classList.contains('hidden'))el.scrollIntoView({behavior:'smooth',block:'start'})};
 })();
@@ -1374,7 +1398,13 @@ const DATA={
 };
 const names={'서울':'서울특별시','대전':'대전광역시','대구':'대구광역시','울산':'울산광역시','부산':'부산광역시','광주':'광주광역시'};
 const stations={'아산':'천안아산역','청주':'오송역','서울':'서울역','대전':'대전역','대구':'동대구역','경주':'경주역','울산':'울산역','부산':'부산역','원주':'만종역','단양':'단양역','안동':'안동역','영천':'영천역','횡성':'횡성역','평창':'평창역','강릉':'강릉역','동해':'동해역','익산':'익산역','전주':'전주역','남원':'남원역','여수':'여수엑스포역','정읍':'정읍역','광주':'광주송정역','목포':'목포역'};
-const overrides={}; // Coordinates are read from the actual embedded administrative map.
+// Multi-island administrative regions need a mainland/urban-core marker rather than
+// the center of the entire bounding box (which can fall far out at sea).
+// Coordinates use the same 720 × 900 viewBox as the embedded city/county map.
+const overrides={
+ '인천':{x:207,y:376}, // mainland Incheon, immediately west of Bucheon/Seoul
+ '여수':{x:290,y:698}  // urban Yeosu, south of Suncheon
+};
 const rail=$('railPanel'),svg=$('railSvg'),world=$('railWorld'),lines=$('railLines'),stopsLayer=$('railStops'),vehicle=$('railVehicle');
 if(!rail||!svg)return;
 const base=$('railBase'),src=$('mapg');
@@ -1595,6 +1625,231 @@ reset();
 })();
 </script>
 
+<script id="road-v636-script">
+(function(){
+'use strict';
+const $=id=>document.getElementById(id),NS='http://www.w3.org/2000/svg';
+const DATA={
+ gyeongbu:{name:'경부선',color:'#3974F6',stops:['서울','대전','대구','경주','울산','부산']},
+ jungang:{name:'중앙선',color:'#18A078',stops:['춘천','원주','제천','안동','대구','부산']},
+ jungbu:{name:'중부선',color:'#E76F51',stops:['하남','이천','음성','진천','청주']},
+ seoulyangyang:{name:'서울양양선',color:'#E99A22',stops:['서울','춘천','홍천','인제','양양']},
+ yeongdong:{name:'영동선',color:'#06A6D8',stops:['인천','원주','평창','강릉']},
+ gyeongin:{name:'경인선',color:'#D95B9A',stops:['서울','인천']},
+ seohaean:{name:'서해안선',color:'#B1BE29',stops:['서울','당진','서산','보령','서천','군산','무안','목포']},
+ honam:{name:'호남선',color:'#A05DD7',stops:['논산','익산','전주','광주','순천']}
+};
+const names={'서울':'서울특별시','대전':'대전광역시','대구':'대구광역시','울산':'울산광역시','부산':'부산광역시','광주':'광주광역시','인천':'인천광역시'};
+const stations={'아산':'천안아산역','청주':'오송역','서울':'서울역','대전':'대전역','대구':'동대구역','경주':'경주역','울산':'울산역','부산':'부산역','원주':'만종역','단양':'단양역','안동':'안동역','영천':'영천역','횡성':'횡성역','평창':'평창역','강릉':'강릉역','동해':'동해역','익산':'익산역','전주':'전주역','남원':'남원역','여수':'여수엑스포역','정읍':'정읍역','광주':'광주송정역','목포':'목포역'};
+// Multi-island administrative regions need a mainland/urban-core marker rather than
+// the center of the entire bounding box (which can fall far out at sea).
+// Coordinates use the same 720 × 900 viewBox as the embedded city/county map.
+const overrides={
+ '인천':{x:207,y:376}, // mainland Incheon, immediately west of Bucheon/Seoul
+ '여수':{x:290,y:698}  // urban Yeosu, south of Suncheon
+};
+const rail=$('railRoadContent'),svg=$('roadSvg'),world=$('roadWorld'),lines=$('roadLines'),stopsLayer=$('roadStops'),vehicle=$('roadVehicle');
+if(!rail||!svg)return;
+const base=$('roadBase'),src=$('mapg');
+if(src){src.querySelectorAll('path[data-id]').forEach(p=>{const clone=p.cloneNode(false);clone.removeAttribute('id');base.appendChild(clone)})}
+const centers={};
+if(src){src.querySelectorAll('path[data-id]').forEach(p=>{try{const b=p.getBBox();centers[p.dataset.id]={x:b.x+b.width/2,y:b.y+b.height/2}}catch(e){}})}
+const bank=typeof BANK!=='undefined'?BANK:[];
+function point(name){
+ const key=names[name]||name;
+ const b=bank.find(x=>x.name===key||x.name===key+'시'||x.name===key+'군');
+ const pt=b&&centers[b.id];
+ return overrides[name]||pt||{x:350,y:450};
+}
+const aliases={};
+let index=0,playing=false,raf=0,zoom=1,pan={x:0,y:0},trainPoint=null;
+const el=(tag,attrs={},txt)=>{const e=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(txt!==undefined)e.textContent=txt;return e};
+const route=()=>DATA[$('roadRoute').value],mode=()=>$('roadMode').value;
+function camera(p,instant=false){
+ if(!$('roadFollow').checked||!p)return;
+ const targetZoom=3.1;zoom=targetZoom;
+ pan={x:360-p.x*zoom,y:450-p.y*zoom};
+ world.setAttribute('transform',`translate(${pan.x} ${pan.y}) scale(${zoom})`);
+}
+function transform(){world.setAttribute('transform',`translate(${pan.x} ${pan.y}) scale(${zoom})`)}
+function fit(){
+ zoom=1;pan={x:0,y:0};transform();
+}
+function draw(t){
+ const r=route(),ps=r.stops.map(point);
+ lines.replaceChildren();stopsLayer.replaceChildren();vehicle.replaceChildren();
+ const overview=mode()==='study'&&$('roadOverview').checked;
+ const segments=[];
+ if(overview){
+  const shared=new Map();
+  Object.values(DATA).forEach(rr=>rr.stops.forEach((name,j)=>{
+    if(!j)return;
+    const a=rr.stops[j-1],b=name,key=[a,b].sort().join('|');
+    if(!shared.has(key))shared.set(key,{a,b,routes:[]});
+    shared.get(key).routes.push(rr);
+  }));
+  shared.forEach(seg=>{
+    const a=point(seg.a),b=point(seg.b),multi=seg.routes.length>1;
+    const path=el('path',{d:`M${a.x} ${a.y} L${b.x} ${b.y}`});
+    path.style.setProperty('stroke',multi?'#64748b':seg.routes[0].color,'important');
+    path.style.setProperty('stroke-width','3.6','important');
+    path.style.opacity='.88';lines.appendChild(path);
+  });
+  const unique=new Set(Object.values(DATA).flatMap(rr=>rr.stops));
+  unique.forEach(name=>{const p=point(name);stopsLayer.appendChild(el('circle',{cx:p.x,cy:p.y,r:3.7,stroke:'#64748b'}));});
+ }
+ for(let j=1;j<=index;j++)segments.push([ps[j-1],ps[j]]);
+ if(t&&t.from&&t.to)segments.push([t.from,{x:t.from.x+(t.to.x-t.from.x)*t.frac,y:t.from.y+(t.to.y-t.from.y)*t.frac}]);
+ segments.forEach(([a,b])=>{
+  const path=el('path',{d:`M${a.x} ${a.y} L${b.x} ${b.y}`});
+  path.style.setProperty('stroke',r.color,'important');
+  path.style.setProperty('stroke-width',overview?'3.6':'4.5','important');
+  lines.appendChild(path);
+ });
+ for(let j=0;j<=index;j++){
+   const p=ps[j];stopsLayer.appendChild(el('circle',{cx:p.x,cy:p.y,r:5,stroke:r.color}));
+   stopsLayer.appendChild(el('text',{x:p.x+9,y:p.y-9},r.stops[j]));
+ }
+ const p=t?{x:t.from.x+(t.to.x-t.from.x)*t.frac,y:t.from.y+(t.to.y-t.from.y)*t.frac}:ps[index];
+ trainPoint=p;
+ const g=el('g',{transform:`translate(${p.x} ${p.y})`});
+ g.appendChild(el('circle',{r:13,fill:'#fff',stroke:r.color,'stroke-width':2}));
+ g.appendChild(el('rect',{x:-9,y:-5,width:18,height:11,rx:3,fill:r.color}));
+ g.appendChild(el('rect',{x:-5,y:-3,width:10,height:5,rx:1.5,fill:'#fff'}));
+ g.appendChild(el('circle',{cx:-5,cy:7,r:2.4,fill:'#263447'}));
+ g.appendChild(el('circle',{cx:5,cy:7,r:2.4,fill:'#263447'}));
+ vehicle.appendChild(g);
+ if(overview){transform()}else if($('roadFollow').checked)camera(p);else transform();
+}
+function info(){
+ const r=route(),current=r.stops[index],next=r.stops[index+1],study=mode()==='study';
+ $('roadOverviewLabel').style.display=study?'inline-flex':'none';
+ const legend=$('roadLegend');
+ legend.replaceChildren();
+ const shown=study&&$('roadOverview').checked?Object.values(DATA):[r];
+ shown.forEach(rr=>{const item=document.createElement('span');item.className='rail-legend-item';
+ const sw=document.createElement('i');sw.style.background=rr.color;item.append(sw,document.createTextNode(rr.name));legend.append(item)});
+ if(study&&$('roadOverview').checked){const item=document.createElement('span');item.className='rail-legend-item';const sw=document.createElement('i');sw.style.background='#64748b';item.append(sw,document.createTextNode('공통 구간'));legend.append(item)}
+ 
+ $('roadCurrent').textContent=current;
+ $('roadStation').textContent='경유 지역: '+(names[current]||current);
+ $('roadRouteTitle').textContent=r.name;
+ $('roadRouteTitle').style.color=r.color;
+ $('roadMapProgress').textContent=(index+1)+' / '+r.stops.length;
+ $('roadPrompt').textContent=next?(study?'다음 지역: '+next+' · 따라 입력하세요':'다음 경유 지역은 어디일까요?'):'노선 완주!';
+ $('roadInput').placeholder=study&&next?next+' 입력':'시·군 이름 입력';
+ $('roadInput').disabled=!next||playing;
+ $('roadSubmit').disabled=!next||playing;
+ $('roadVisited').replaceChildren(...r.stops.slice(0,index+1).map(n=>{const span=document.createElement('span');span.textContent=n;return span}));
+}
+function moveNext(){
+ if(playing||index>=route().stops.length-1)return;
+ playing=true;info();
+ const from=point(route().stops[index]),to=point(route().stops[index+1]),start=performance.now();
+ const duration=1600;
+ function tick(now){
+   const u=Math.min(1,(now-start)/duration),smooth=u*u*(3-2*u);
+   draw({from,to,frac:smooth});
+   if(u<1){raf=requestAnimationFrame(tick)}else{
+     index++;playing=false;draw();info();
+     $('roadFeedback').textContent=index===route().stops.length-1?'완주! 전체 주요 경유 지역을 통과했습니다.':'도착! 다음 지역을 입력하세요.';
+     $('roadInput').focus();
+   }
+ }
+ raf=requestAnimationFrame(tick);
+}
+function reset(){
+ cancelAnimationFrame(raf);playing=false;index=0;
+ $('roadInput').value='';$('roadFeedback').textContent=mode()==='quiz'?'다음 경유 지역을 맞혀 차량을 움직여 보세요.':'표시된 다음 지역 이름을 입력해 보세요.';
+ if(mode()==='study'&&$('roadOverview').checked){fit()}else if(!$('roadFollow').checked){fit()}
+ draw();info();
+}
+$('roadForm').addEventListener('submit',e=>{
+ e.preventDefault();if(playing)return;
+ const r=route(),next=r.stops[index+1];if(!next)return;
+ const v=$('roadInput').value.trim().replace(/\s+/g,'');
+ const accepted=aliases[next]||[next,next+'시',next+'군',names[next]];
+ if(!accepted.filter(Boolean).some(x=>x.replace(/\s+/g,'')===v)){
+   $('roadFeedback').textContent='다시 시도해 보세요. 현재 위치에서 이동하지 않습니다.';
+   $('roadInput').select();return;
+ }
+ $('roadFeedback').textContent='정답! '+next+'(으)로 이동 중…';
+ $('roadInput').value='';moveNext();
+});
+$('roadRoute').addEventListener('change',reset);$('roadMode').addEventListener('change',()=>{
+ $('roadOverview').checked=false;reset();
+});
+$('roadOverview').addEventListener('change',()=>{
+ if($('roadOverview').checked){$('roadFollow').checked=false;fit();}
+ draw();info();
+});
+$('roadRestart').addEventListener('click',reset);
+$('roadFollow').addEventListener('change',()=>{if($('roadFollow').checked)camera(trainPoint);else fit()});
+$('roadZoomIn').addEventListener('click',()=>{zoom=Math.min(5,zoom*1.25);pan={x:360-trainPoint.x*zoom,y:450-trainPoint.y*zoom};transform();$('roadFollow').checked=false});
+$('roadZoomOut').addEventListener('click',()=>{zoom=Math.max(.7,zoom/1.25);pan={x:360-trainPoint.x*zoom,y:450-trainPoint.y*zoom};transform();$('roadFollow').checked=false});
+$('roadFit').addEventListener('click',()=>{$('roadFollow').checked=false;fit()});
+
+// v6.3.3: iPad/Safari touch pinch-zoom and drag-pan for railway map.
+const railPointers=new Map();
+let gestureStart=null;
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+function svgPoint(evt){
+ const rect=svg.getBoundingClientRect();
+ return {x:(evt.clientX-rect.left)*720/rect.width,y:(evt.clientY-rect.top)*900/rect.height};
+}
+function pointerMid(){
+ const a=[...railPointers.values()];
+ if(a.length===1)return {x:a[0].x,y:a[0].y};
+ return {x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};
+}
+function pointerDistance(){
+ const a=[...railPointers.values()];
+ return a.length>=2?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0;
+}
+function gestureSnapshot(){
+ if(!railPointers.size){gestureStart=null;return}
+ const mid=pointerMid();
+ gestureStart={mid,dist:pointerDistance(),zoom,pan:{...pan}};
+}
+svg.addEventListener('pointerdown',e=>{
+ if(e.pointerType==='mouse'&&e.button!==0)return;
+ const p=svgPoint(e);railPointers.set(e.pointerId,p);
+ try{svg.setPointerCapture(e.pointerId)}catch(_){}
+ $('roadFollow').checked=false;
+ gestureSnapshot();
+ e.preventDefault();
+},{passive:false});
+svg.addEventListener('pointermove',e=>{
+ if(!railPointers.has(e.pointerId))return;
+ railPointers.set(e.pointerId,svgPoint(e));
+ if(!gestureStart)return;
+ const mid=pointerMid();
+ if(railPointers.size>=2&&gestureStart.dist>0){
+  const z=clamp(gestureStart.zoom*pointerDistance()/gestureStart.dist,.65,7);
+  const worldX=(gestureStart.mid.x-gestureStart.pan.x)/gestureStart.zoom;
+  const worldY=(gestureStart.mid.y-gestureStart.pan.y)/gestureStart.zoom;
+  zoom=z;
+  pan={x:mid.x-worldX*z,y:mid.y-worldY*z};
+ }else{
+  pan={x:gestureStart.pan.x+mid.x-gestureStart.mid.x,y:gestureStart.pan.y+mid.y-gestureStart.mid.y};
+ }
+ transform();e.preventDefault();
+},{passive:false});
+function releasePointer(e){if(railPointers.delete(e.pointerId))gestureSnapshot()}
+svg.addEventListener('pointerup',releasePointer);
+svg.addEventListener('pointercancel',releasePointer);
+svg.addEventListener('lostpointercapture',releasePointer);
+svg.addEventListener('wheel',e=>{
+ const p=svgPoint(e),z=clamp(zoom*Math.exp(-e.deltaY*.0015),.65,7);
+ const wx=(p.x-pan.x)/zoom,wy=(p.y-pan.y)/zoom;
+ zoom=z;pan={x:p.x-wx*z,y:p.y-wy*z};
+ $('roadFollow').checked=false;transform();e.preventDefault();
+},{passive:false});
+
+$('railSubRoad').addEventListener('click',reset);
+reset();
+})();
+</script>
 <script id="v634-all-map-gestures">
 (function(){
 'use strict';
@@ -1692,7 +1947,7 @@ ids.forEach(id=>bind(document.getElementById(id)));
 'use strict';
 // iPad Safari supports native document zoom even when SVG pointer handlers exist.
 // Cancel only touches that originate in a map; preserve ordinary page gestures elsewhere.
-const targets=[...document.querySelectorAll('.main > .map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg')];
+const targets=[...document.querySelectorAll('.main > .map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg, #roadSvg')];
 const active=new Set();
 for(const svg of targets){
  svg.style.touchAction='none';
