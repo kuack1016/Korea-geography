@@ -458,7 +458,34 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #railPanel .rail-coming{padding:28px 24px;min-height:240px}
 #railPanel .rail-coming h2{margin:0 0 12px;font-size:20px}
 #railPanel .rail-coming p{line-height:1.7}
-</style><style id="rail-v633-touch">#railPanel #railSvg{touch-action:none!important;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}</style></head><body><div class="app">
+</style><style id="rail-v633-touch">#railPanel #railSvg{touch-action:none!important;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}</style>
+<style id="v634-map-interaction-style">
+/* Zoom gestures are reserved for map surfaces, never surrounding page controls. */
+.main > .map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg {
+ touch-action:none!important;
+ -webkit-user-select:none!important;user-select:none!important;
+ -webkit-touch-callout:none!important;
+}
+#railPanel .rail-subtabs{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:4px!important;width:100%!important;max-width:100%!important;
+ padding:4px!important;margin:12px 0!important;
+ border:1px solid #dfe5ee!important;border-radius:13px!important;
+ background:#fff!important;box-sizing:border-box!important;
+}
+#railPanel .rail-subtabs button{
+ width:100%!important;min-width:0!important;max-width:100%!important;
+ border:0!important;border-radius:10px!important;
+ padding:12px 5px!important;margin:0!important;
+ background:transparent!important;color:#738197!important;
+ font-size:clamp(10px,1.2vw,13px)!important;font-weight:850!important;
+ box-shadow:none!important;text-align:center!important;
+}
+#railPanel .rail-subtabs button.active{
+ background:#eaf2ff!important;color:#2f73d9!important;
+}
+</style>
+</head><body><div class="app">
 <header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후 · 2023 공업</div></div>
 <div class="stats"><span class="pill">점수 <b id="score">0</b></span><span class="pill">연속 <b id="streak">0</b></span><span class="pill">⏱ <b id="time">0.0</b>s</span></div></header>
 <nav class="nav" aria-label="학습 메뉴">
@@ -468,7 +495,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking">인구</button>
 <button data-tab="climateRanking">기후</button>
 <button data-tab="industry">공업</button>
-</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.3.3</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
+</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.3.4</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
 <div id="quizPanel" class="panel">
 <section class="card studyhead"><div class="study-tools"><div><h2>퀴즈</h2><div class="small">퀴즈 종류를 골라 지도에서 정답 지역을 찾아보세요.</div></div></div><div class="mode-tabs" id="quizModes"><button class="active" data-qmode="location">위치</button><button data-qmode="festival">지역 축제</button><button data-qmode="gi">지리적 표시제</button><button data-qmode="heritage">유산·습지</button><button data-qmode="core">핵심개념</button></div><div id="quizModeNote" class="study-mode-note">지역명이 문제로 나오면 지도에서 위치를 선택합니다.</div></section>
 <section class="card q"><div><div class="small">지도에서 찾아보세요</div><div id="question">새 게임을 눌러주세요</div></div><div class="controls">
@@ -1282,7 +1309,7 @@ initIndustry();
  const comp=document.getElementById('popCompositionView'),rank=document.getElementById('popExistingRanking'),btn1=document.getElementById('popRankViewBtn'),btn2=document.getElementById('popCompositionViewBtn');
  function toggle(compMode){comp.classList.toggle('hidden',!compMode);rank.classList.toggle('hidden',compMode);btn1.classList.toggle('active',!compMode);btn2.classList.toggle('active',compMode);if(compMode)render()}
  btn1.onclick=()=>toggle(false);btn2.onclick=()=>toggle(true);document.querySelectorAll('[data-popunit]').forEach(b=>b.onclick=()=>{unit=b.dataset.popunit;document.querySelectorAll('[data-popunit]').forEach(x=>x.classList.toggle('active',x===b));render()});
- const changes=[['v6.3.3','교통 > 고속철도 전체 노선 지도에 손가락 핀치 확대·축소와 드래그 이동 추가, 지도 재그리기 시 확대 상태 유지'],['v6.3.2','전체 노선 보기에서 지도 남쪽 잘림 방지 및 공통 구간 선 굵기를 일반 노선과 통일'],['v6.3.1','고속철도 상위 탭을 교통으로 변경, 고속철도·고속국도 소탭 분리, 기존 퀴즈·지도 학습 소탭의 교통 바로가기 제거'],['v6.3.0','고속철도 탭 레이아웃 정리·노선별 색상 수정·지도 학습 전체 노선 보기·공통 구간 표시 추가'],['v6.2.9','고속철도 5개 노선 타이핑 퀴즈·지도 학습, 정답 후 열차 이동·노선 확장·카메라 추적 추가'],['v6.2.8','권역별 인구 규모 구성 그래프에 서울·인천(수도권), 대전·세종(충청권), 부산·대구·울산(영남권), 광주(호남권) 집계 누락 수정'],['v6.2.7','지도 학습 도농복합시 표시 색상을 기존 지도 학습의 파란색(#3974f6)으로 통일'],['v6.2.6','지도 학습 > 도시 > 도농복합시 54개 추가: 형성 유형·연도·통합 전 행정구역 표시, 퀴즈는 변경 없음'],['v6.2.5','전체 탭의 카드 폭과 시작 위치 통일, 인구 구성 그래프 모든 비율 표시(충남 포함), 좁은 구간 가독성 보완'],['v6.2.1','메인 탭 콘텐츠 시작 위치·여백 통일, 기후형 균등 분할 소탭 전체 적용, 인구 그래프 퍼센트 검정색 통일 및 잘림 보완'],['v6.2.0','인구 규모별 구성 그래프의 좌우 잘림 개선, 막대 구간별 퍼센트 표시, 파란색 명도 5단계로 색상 통일'],['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
+ const changes=[['v6.3.4','모든 지도에서 지도 영역만 손가락 확대·축소/드래그 지원, 교통 소탭을 공통 분할 탭 스타일로 통일'],['v6.3.3','교통 > 고속철도 전체 노선 지도에 손가락 핀치 확대·축소와 드래그 이동 추가, 지도 재그리기 시 확대 상태 유지'],['v6.3.2','전체 노선 보기에서 지도 남쪽 잘림 방지 및 공통 구간 선 굵기를 일반 노선과 통일'],['v6.3.1','고속철도 상위 탭을 교통으로 변경, 고속철도·고속국도 소탭 분리, 기존 퀴즈·지도 학습 소탭의 교통 바로가기 제거'],['v6.3.0','고속철도 탭 레이아웃 정리·노선별 색상 수정·지도 학습 전체 노선 보기·공통 구간 표시 추가'],['v6.2.9','고속철도 5개 노선 타이핑 퀴즈·지도 학습, 정답 후 열차 이동·노선 확장·카메라 추적 추가'],['v6.2.8','권역별 인구 규모 구성 그래프에 서울·인천(수도권), 대전·세종(충청권), 부산·대구·울산(영남권), 광주(호남권) 집계 누락 수정'],['v6.2.7','지도 학습 도농복합시 표시 색상을 기존 지도 학습의 파란색(#3974f6)으로 통일'],['v6.2.6','지도 학습 > 도시 > 도농복합시 54개 추가: 형성 유형·연도·통합 전 행정구역 표시, 퀴즈는 변경 없음'],['v6.2.5','전체 탭의 카드 폭과 시작 위치 통일, 인구 구성 그래프 모든 비율 표시(충남 포함), 좁은 구간 가독성 보완'],['v6.2.1','메인 탭 콘텐츠 시작 위치·여백 통일, 기후형 균등 분할 소탭 전체 적용, 인구 그래프 퍼센트 검정색 통일 및 잘림 보완'],['v6.2.0','인구 규모별 구성 그래프의 좌우 잘림 개선, 막대 구간별 퍼센트 표시, 파란색 명도 5단계로 색상 통일'],['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
  document.getElementById('versionHistoryList').innerHTML=changes.map(([v,d])=>'<details class="version-entry"><summary>'+v+'</summary><p>'+d+'</p></details>').join('');
  document.getElementById('versionTrigger').onclick=()=>{const el=document.getElementById('versionHistory');el.classList.toggle('hidden');if(!el.classList.contains('hidden'))el.scrollIntoView({behavior:'smooth',block:'start'})};
 })();
@@ -1565,6 +1592,99 @@ navButton?.addEventListener('click',()=>{
 });
 document.querySelectorAll('.nav button[data-tab]:not([data-tab="rail"])').forEach(b=>b.addEventListener('click',()=>rail.classList.add('hidden')));
 reset();
+})();
+</script>
+
+<script id="v634-all-map-gestures">
+(function(){
+'use strict';
+// Preserve the original SVG coordinates and existing map selection listeners.
+// SVG viewBox manipulation keeps the rest of the document at exactly the same size.
+const ids=['studySvg','climateMapSvg','industryMapSvg','industryProvinceMapSvg'];
+const quiz=document.querySelector('.main > .map svg');
+if(quiz&&!quiz.id)quiz.id='quizMapSvg';
+ids.unshift('quizMapSvg');
+function bind(svg){
+ if(!svg||svg.dataset.mapGestureBound)return;
+ svg.dataset.mapGestureBound='1';
+ const base=svg.viewBox.baseVal;
+ const original={x:base.x,y:base.y,w:base.width||720,h:base.height||900};
+ let view={...original},initial=null,moved=false;
+ const touches=new Map();
+ const bound=(v)=>{
+  const minW=original.w/8,maxW=original.w*1.15;
+  v.w=Math.max(minW,Math.min(maxW,v.w));
+  v.h=v.w*original.h/original.w;
+  // Leave a small margin beyond the base map for comfortable dragging.
+  v.x=Math.max(original.x-v.w*.65,Math.min(original.x+original.w-v.w*.35,v.x));
+  v.y=Math.max(original.y-v.h*.65,Math.min(original.y+original.h-v.h*.35,v.y));
+  return v;
+ };
+ function render(){svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`)}
+ function coords(e){
+  const r=svg.getBoundingClientRect();
+  return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+ }
+ function center(){
+  const a=[...touches.values()];
+  if(a.length===1)return a[0];
+  return{x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};
+ }
+ function dist(){
+  const a=[...touches.values()];
+  return a.length>1?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0;
+ }
+ function snapshot(){
+  if(!touches.size){initial=null;return}
+  initial={center:center(),dist:dist(),view:{...view}};
+ }
+ svg.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  touches.set(e.pointerId,coords(e));
+  try{svg.setPointerCapture(e.pointerId)}catch(_){}
+  snapshot();moved=false;
+  if(e.pointerType==='touch')e.preventDefault();
+ },{passive:false});
+ svg.addEventListener('pointermove',e=>{
+  if(!touches.has(e.pointerId)||!initial)return;
+  touches.set(e.pointerId,coords(e));
+  const c=center(),v=initial.view;
+  let w=v.w,h=v.h;
+  if(touches.size>1&&initial.dist>0){
+   w=v.w*initial.dist/Math.max(.001,dist());h=w*original.h/original.w;
+  }
+  view=bound({
+   x:v.x+initial.center.x*v.w-c.x*w,
+   y:v.y+initial.center.y*v.h-c.y*h,w,h
+  });
+  if(Math.hypot(c.x-initial.center.x,c.y-initial.center.y)>0.008||touches.size>1)moved=true;
+  render();e.preventDefault();
+ },{passive:false});
+ function up(e){
+  if(!touches.has(e.pointerId))return;
+  touches.delete(e.pointerId);snapshot();
+ }
+ svg.addEventListener('pointerup',e=>{
+  if(moved&&touches.has(e.pointerId)){e.stopImmediatePropagation();e.preventDefault()}
+ },true);
+ svg.addEventListener('pointerup',up);
+ svg.addEventListener('pointercancel',up);
+ svg.addEventListener('lostpointercapture',up);
+ // Suppress accidental region selections at the end of a drag, but preserve normal taps.
+ svg.addEventListener('click',e=>{if(moved){e.stopImmediatePropagation();e.preventDefault();moved=false}},true);
+ svg.addEventListener('wheel',e=>{
+  const c=coords(e),scale=Math.exp(e.deltaY*.0015);
+  const w=view.w*scale,h=view.h*scale;
+  view=bound({x:view.x+c.x*(view.w-w),y:view.y+c.y*(view.h-h),w,h});
+  render();e.preventDefault();
+ },{passive:false});
+ svg.addEventListener('dblclick',e=>{
+  const c=coords(e),w=view.w/1.5,h=view.h/1.5;
+  view=bound({x:view.x+c.x*(view.w-w),y:view.y+c.y*(view.h-h),w,h});
+  render();e.preventDefault();
+ });
+}
+ids.forEach(id=>bind(document.getElementById(id)));
 })();
 </script>
 </body></html>
