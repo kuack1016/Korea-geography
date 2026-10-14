@@ -354,7 +354,9 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
   .industry-major-card{padding:13px 15px!important;}
 }
 </style>
-</head><body><div class="app">
+<style id="v619-styles">
+.pop-compare-switch,.pop-compare-units{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.pop-compare-switch button,.pop-compare-units button,.version-trigger{padding:9px 14px;border:1px solid #d7e0eb;background:#f3f6fa;color:#50647d;border-radius:9px;font-weight:700;cursor:pointer}.pop-compare-switch button.active,.pop-compare-units button.active{background:#e7f0ff;color:#2864ce;border-color:#abc9ff}.pop-chart-row{display:grid;grid-template-columns:85px 1fr 48px;gap:9px;align-items:center;margin:13px 0}.pop-chart-bar{display:flex;height:27px;overflow:hidden;border-radius:5px;background:#eef2f7}.pop-chart-segment{height:100%;cursor:pointer;min-width:0}.pop-chart-label{font-weight:700;font-size:13px}.pop-chart-percent{font-size:12px;color:#64748b;text-align:right}.pop-chart-legend{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0}.pop-chart-legend span{font-size:12px;color:#526175}.pop-chart-legend i{display:inline-block;width:11px;height:11px;margin-right:4px;border-radius:2px}.pop-chart-detail{margin-top:15px;padding:14px;background:#f5f8fc;border-radius:9px;line-height:1.7;font-size:13px}.version-trigger{margin:8px 0 0}.version-entry{padding:13px 0;border-bottom:1px solid #e4e9ef}.version-entry summary{font-weight:750;cursor:pointer}.version-entry p{color:#526175;margin:7px 0 0;line-height:1.65}.pop-chart-note{font-size:12px;color:#68788b;line-height:1.6;margin-top:12px}
+</style></head><body><div class="app">
 <header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후 · 2023 공업</div></div>
 <div class="stats"><span class="pill">점수 <b id="score">0</b></span><span class="pill">연속 <b id="streak">0</b></span><span class="pill">⏱ <b id="time">0.0</b>s</span></div></header>
 <nav class="nav" aria-label="학습 메뉴">
@@ -364,7 +366,7 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
 <button data-tab="ranking">인구</button>
 <button data-tab="climateRanking">기후</button>
 <button data-tab="industry">공업</button>
-</nav>
+</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.1.9</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
 <div id="quizPanel" class="panel">
 <section class="card studyhead"><div class="study-tools"><div><h2>퀴즈</h2><div class="small">퀴즈 종류를 골라 지도에서 정답 지역을 찾아보세요.</div></div></div><div class="mode-tabs" id="quizModes"><button class="active" data-qmode="location">위치</button><button data-qmode="festival">지역 축제</button><button data-qmode="gi">지리적 표시제</button><button data-qmode="heritage">유산·습지</button><button data-qmode="core">핵심개념</button></div><div id="quizModeNote" class="study-mode-note">지역명이 문제로 나오면 지도에서 위치를 선택합니다.</div></section>
 <section class="card q"><div><div class="small">지도에서 찾아보세요</div><div id="question">새 게임을 눌러주세요</div></div><div class="controls">
@@ -603,9 +605,9 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
   </section>
 
 </div>
-<div id="rankingPanel" class="panel hidden"><section class="card rankinghead"><h2>인구 랭킹</h2><div class="small">2024년 12월 기준 · 지역 간 상대적 위치를 비교해보세요.</div><div class="metric-tabs" id="metricTabs"><button class="active" data-metric="population">총인구</button><button data-metric="sexHigh">성비 높은 순</button><button data-metric="sexLow">성비 낮은 순</button><button data-metric="youth">유소년층 비율</button><button data-metric="adult">청장년층 비율</button><button data-metric="old">노년층 비율</button></div><div class="rank-tools"><select id="rankProvince"></select><input id="rankSearch" type="search" placeholder="지역 검색 (예: 무안, 수원)"></div><div id="rankNote" class="rank-note"></div><div id="rankCount" class="rank-count"></div></section><div id="rankList" class="rank-list"></div></div>
+<div id="rankingPanel" class="panel hidden"><section class="card" id="popCompareHead"><div class="pop-compare-switch"><button id="popRankViewBtn" class="active">인구 랭킹</button><button id="popCompositionViewBtn">인구 규모별 구성</button></div><div id="popCompositionView" class="hidden"><h2>인구 규모별 시·군 구성</h2><div class="small">2024년 12월 주민등록인구 · 지역 수 기준 100% 누적 막대그래프</div><div class="pop-compare-units"><button data-popunit="province" class="active">도별 9개</button><button data-popunit="region">권역별 6개</button></div><div class="pop-chart-legend" id="popChartLegend"></div><div id="popChartRows"></div><div id="popChartDetail" class="pop-chart-detail">막대의 구간을 누르면 해당 시·군 목록을 볼 수 있습니다.</div><div class="pop-chart-note">비율은 인구수 합계가 아닌 해당 인구 규모에 속하는 시·군 지역의 개수 비율입니다. 특별시·광역시·세종시는 사이트의 161개 지역 체계에 따라 각각 하나의 도시 단위로 집계합니다.</div></div></section><div id="popExistingRanking"><section class="card rankinghead"><h2>인구 랭킹</h2><div class="small">2024년 12월 기준 · 지역 간 상대적 위치를 비교해보세요.</div><div class="metric-tabs" id="metricTabs"><button class="active" data-metric="population">총인구</button><button data-metric="sexHigh">성비 높은 순</button><button data-metric="sexLow">성비 낮은 순</button><button data-metric="youth">유소년층 비율</button><button data-metric="adult">청장년층 비율</button><button data-metric="old">노년층 비율</button></div><div class="rank-tools"><select id="rankProvince"></select><input id="rankSearch" type="search" placeholder="지역 검색 (예: 무안, 수원)"></div><div id="rankNote" class="rank-note"></div><div id="rankCount" class="rank-count"></div></section><div id="rankList" class="rank-list"></div></div>
 
-<div id="climateRankingPanel" class="panel hidden">
+</div><div id="climateRankingPanel" class="panel hidden">
   <div class="climate-view-tabs"><button id="climateMapViewBtn" class="active">기후 지도</button><button id="climateRankViewBtn">기후 랭킹</button></div>
   <div id="climateMapView">
     <div class="climate-map-layout">
@@ -1137,4 +1139,23 @@ if(industryMemoryToggle)industryMemoryToggle.onclick=()=>{industryMemoryMode=!in
 if(industryItemToggle)industryItemToggle.onclick=()=>{industryItemMemoryMode=!industryItemMemoryMode;if(industryItemMemoryMode&&industryMemoryMode){industryMemoryMode=false;$('#industryPanel').classList.remove('industry-memory');industryMemoryToggle?.classList.remove('active');if(industryMemoryToggle)industryMemoryToggle.textContent='이름 가리기'}$('#industryPanel').classList.toggle('industry-item-memory',industryItemMemoryMode);industryItemToggle.classList.toggle('active',industryItemMemoryMode);industryItemToggle.textContent=industryItemMemoryMode?'항목 가리기 ON':'항목 가리기';};
 initIndustry();
 
+
+// v6.1.9: population size distribution and version history
+(function(){
+ const colors=['#3b65aa','#7c9bc7','#a8b9d4','#d0dae9','#475569'];
+ const labels=['100만 명 이상 시 지역','50만~100만 명 미만 시 지역','20만~50만 명 미만 시 지역','20만 명 미만 시 지역','군 지역'];
+ const provinces=['경기','강원','충북','충남','전북','전남','경북','경남','제주'];
+ const regions={수도권:['서울','인천','경기'],강원권:['강원'],충청권:['대전','세종','충북','충남'],호남권:['광주','전북','전남'],영남권:['부산','대구','울산','경북','경남'],제주권:['제주']};
+ let unit='province';
+ const fmt=n=>n.toLocaleString('ko-KR');
+ function bucket(b){const n=POP2024[b.id]?.total||0;if(b.name.endsWith('군'))return 4;return n>=1000000?0:n>=500000?1:n>=200000?2:3}
+ function showDetail(title,idx,arr){const matches=arr.filter(b=>bucket(b)===idx);document.getElementById('popChartDetail').innerHTML='<b>'+title+' · '+labels[idx]+' ('+matches.length+'개)</b><div>'+ (matches.length?matches.map(b=>b.display+' '+fmt(POP2024[b.id].total)+'명').join(' · '):'해당 지역 없음')+'</div>'}
+ function render(){const groups=unit==='province'?provinces.map(p=>[p,BANK.filter(b=>b.provinceShort===p)]):Object.entries(regions).map(([name,ps])=>[name,BANK.filter(b=>ps.includes(b.provinceShort))]);document.getElementById('popChartLegend').innerHTML=labels.map((l,i)=>'<span><i style="background:'+colors[i]+'"></i>'+l+'</span>').join('');const rows=document.getElementById('popChartRows');rows.innerHTML='';groups.forEach(([name,arr])=>{const counts=labels.map((_,i)=>arr.filter(b=>bucket(b)===i).length);const row=document.createElement('div');row.className='pop-chart-row';const label=document.createElement('span');label.className='pop-chart-label';label.textContent=name;row.append(label);const bar=document.createElement('div');bar.className='pop-chart-bar';counts.forEach((count,i)=>{if(!count)return;const seg=document.createElement('div');seg.className='pop-chart-segment';seg.style.width=(count/arr.length*100)+'%';seg.style.background=colors[i];seg.title=labels[i]+': '+count+'개 ('+(count/arr.length*100).toFixed(1)+'%)';seg.onclick=()=>showDetail(name,i,arr);bar.append(seg)});row.append(bar);const total=document.createElement('span');total.className='pop-chart-percent';total.textContent=arr.length+'개';row.append(total);rows.append(row)});document.getElementById('popChartDetail').textContent='막대의 구간을 누르면 해당 시·군 목록을 볼 수 있습니다.'}
+ const comp=document.getElementById('popCompositionView'),rank=document.getElementById('popExistingRanking'),btn1=document.getElementById('popRankViewBtn'),btn2=document.getElementById('popCompositionViewBtn');
+ function toggle(compMode){comp.classList.toggle('hidden',!compMode);rank.classList.toggle('hidden',compMode);btn1.classList.toggle('active',!compMode);btn2.classList.toggle('active',compMode);if(compMode)render()}
+ btn1.onclick=()=>toggle(false);btn2.onclick=()=>toggle(true);document.querySelectorAll('[data-popunit]').forEach(b=>b.onclick=()=>{unit=b.dataset.popunit;document.querySelectorAll('[data-popunit]').forEach(x=>x.classList.toggle('active',x===b));render()});
+ const changes=[['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
+ document.getElementById('versionHistoryList').innerHTML=changes.map(([v,d])=>'<details class="version-entry"><summary>'+v+'</summary><p>'+d+'</p></details>').join('');
+ document.getElementById('versionTrigger').onclick=()=>{const el=document.getElementById('versionHistory');el.classList.toggle('hidden');if(!el.classList.contains('hidden'))el.scrollIntoView({behavior:'smooth',block:'start'})};
+})();
 </script></body></html>
