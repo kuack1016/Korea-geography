@@ -451,17 +451,24 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
  #railPanel .rail-head{align-items:flex-start}
 }
 </style>
-</head><body><div class="app">
+<style id="transport-v631-css">
+#railPanel .rail-subtabs{display:flex;gap:8px;align-items:center;border-bottom:1px solid #dbe3ee;margin:0 0 14px;padding:0 2px 9px}
+#railPanel .rail-subtabs button{border:1px solid #dbe3ee;background:#fff;border-radius:9px;padding:10px 19px;font-size:14px;font-weight:700;color:#52647e;cursor:pointer}
+#railPanel .rail-subtabs button.active{background:#3974f6;border-color:#3974f6;color:#fff}
+#railPanel .rail-coming{padding:28px 24px;min-height:240px}
+#railPanel .rail-coming h2{margin:0 0 12px;font-size:20px}
+#railPanel .rail-coming p{line-height:1.7}
+</style></head><body><div class="app">
 <header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후 · 2023 공업</div></div>
 <div class="stats"><span class="pill">점수 <b id="score">0</b></span><span class="pill">연속 <b id="streak">0</b></span><span class="pill">⏱ <b id="time">0.0</b>s</span></div></header>
 <nav class="nav" aria-label="학습 메뉴">
 <button class="active" data-tab="quiz">퀴즈</button>
 <button data-tab="study">지도 학습</button>
-<button data-tab="rail">고속철도</button><button data-tab="atlas">지역 도감</button>
+<button data-tab="rail">교통</button><button data-tab="atlas">지역 도감</button>
 <button data-tab="ranking">인구</button>
 <button data-tab="climateRanking">기후</button>
 <button data-tab="industry">공업</button>
-</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.3.0</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
+</nav><div style="text-align:right;margin:5px 0 12px"><button id="versionTrigger" class="version-trigger">업데이트 내역 · v6.3.1</button></div><section id="versionHistory" class="card hidden" style="margin-bottom:15px"><h2>업데이트 내역</h2><div class="small">확인 가능한 주요 변경 사항을 버전별로 정리했습니다.</div><div id="versionHistoryList"></div></section>
 <div id="quizPanel" class="panel">
 <section class="card studyhead"><div class="study-tools"><div><h2>퀴즈</h2><div class="small">퀴즈 종류를 골라 지도에서 정답 지역을 찾아보세요.</div></div></div><div class="mode-tabs" id="quizModes"><button class="active" data-qmode="location">위치</button><button data-qmode="festival">지역 축제</button><button data-qmode="gi">지리적 표시제</button><button data-qmode="heritage">유산·습지</button><button data-qmode="core">핵심개념</button></div><div id="quizModeNote" class="study-mode-note">지역명이 문제로 나오면 지도에서 위치를 선택합니다.</div></section>
 <section class="card q"><div><div class="small">지도에서 찾아보세요</div><div id="question">새 게임을 눌러주세요</div></div><div class="controls">
@@ -634,6 +641,8 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 </div>
 
 <div id="railPanel" class="panel hidden">
+ <div class="rail-subtabs" role="tablist" aria-label="교통 종류"><button type="button" class="active" id="railSubTrain" aria-selected="true">고속철도</button><button type="button" id="railSubRoad" aria-selected="false">고속국도</button></div>
+ <div id="railTrainContent">
  <section class="card rail-head"><div><h2>고속철도</h2><div class="small">실제 시·군 경계 지도 위에서 주요 경유 지역을 순서대로 학습합니다.</div></div>
  <div class="rail-options"><label>학습 방식 <select id="railMode"><option value="quiz">퀴즈 · 먼저 맞히기</option><option value="study">지도 학습 · 보고 따라 쓰기</option></select></label>
  <label>노선 <select id="railRoute"><option value="gyeongbu">경부선</option><option value="jungang">중앙선</option><option value="gangneung">강릉선</option><option value="jeolla">전라선</option><option value="honam">호남선</option></select></label>
@@ -649,6 +658,8 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
    <div class="rail-zoom"><button id="railZoomIn">확대 +</button><button id="railZoomOut">축소 −</button><button id="railFit">전체 보기</button></div>
   </aside>
  </div>
+ </div>
+ <section id="railRoadContent" class="card hidden rail-coming"><h2>고속국도</h2><p>고속국도 노선과 주요 경유 지역은 추후 추가할 예정입니다.</p><p class="small">고속철도와 같은 방식으로 지도 학습·퀴즈를 제공할 예정입니다.</p></section>
 </div>
 <div id="studyPanel" class="panel hidden">
   <section class="card studyhead">
@@ -1271,7 +1282,7 @@ initIndustry();
  const comp=document.getElementById('popCompositionView'),rank=document.getElementById('popExistingRanking'),btn1=document.getElementById('popRankViewBtn'),btn2=document.getElementById('popCompositionViewBtn');
  function toggle(compMode){comp.classList.toggle('hidden',!compMode);rank.classList.toggle('hidden',compMode);btn1.classList.toggle('active',!compMode);btn2.classList.toggle('active',compMode);if(compMode)render()}
  btn1.onclick=()=>toggle(false);btn2.onclick=()=>toggle(true);document.querySelectorAll('[data-popunit]').forEach(b=>b.onclick=()=>{unit=b.dataset.popunit;document.querySelectorAll('[data-popunit]').forEach(x=>x.classList.toggle('active',x===b));render()});
- const changes=[['v6.3.0','고속철도 탭 레이아웃 정리·노선별 색상 수정·지도 학습 전체 노선 보기·공통 구간 표시 추가'],['v6.2.9','고속철도 5개 노선 타이핑 퀴즈·지도 학습, 정답 후 열차 이동·노선 확장·카메라 추적 추가'],['v6.2.8','권역별 인구 규모 구성 그래프에 서울·인천(수도권), 대전·세종(충청권), 부산·대구·울산(영남권), 광주(호남권) 집계 누락 수정'],['v6.2.7','지도 학습 도농복합시 표시 색상을 기존 지도 학습의 파란색(#3974f6)으로 통일'],['v6.2.6','지도 학습 > 도시 > 도농복합시 54개 추가: 형성 유형·연도·통합 전 행정구역 표시, 퀴즈는 변경 없음'],['v6.2.5','전체 탭의 카드 폭과 시작 위치 통일, 인구 구성 그래프 모든 비율 표시(충남 포함), 좁은 구간 가독성 보완'],['v6.2.1','메인 탭 콘텐츠 시작 위치·여백 통일, 기후형 균등 분할 소탭 전체 적용, 인구 그래프 퍼센트 검정색 통일 및 잘림 보완'],['v6.2.0','인구 규모별 구성 그래프의 좌우 잘림 개선, 막대 구간별 퍼센트 표시, 파란색 명도 5단계로 색상 통일'],['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
+ const changes=[['v6.3.1','고속철도 상위 탭을 교통으로 변경, 고속철도·고속국도 소탭 분리, 기존 퀴즈·지도 학습 소탭의 교통 바로가기 제거'],['v6.3.0','고속철도 탭 레이아웃 정리·노선별 색상 수정·지도 학습 전체 노선 보기·공통 구간 표시 추가'],['v6.2.9','고속철도 5개 노선 타이핑 퀴즈·지도 학습, 정답 후 열차 이동·노선 확장·카메라 추적 추가'],['v6.2.8','권역별 인구 규모 구성 그래프에 서울·인천(수도권), 대전·세종(충청권), 부산·대구·울산(영남권), 광주(호남권) 집계 누락 수정'],['v6.2.7','지도 학습 도농복합시 표시 색상을 기존 지도 학습의 파란색(#3974f6)으로 통일'],['v6.2.6','지도 학습 > 도시 > 도농복합시 54개 추가: 형성 유형·연도·통합 전 행정구역 표시, 퀴즈는 변경 없음'],['v6.2.5','전체 탭의 카드 폭과 시작 위치 통일, 인구 구성 그래프 모든 비율 표시(충남 포함), 좁은 구간 가독성 보완'],['v6.2.1','메인 탭 콘텐츠 시작 위치·여백 통일, 기후형 균등 분할 소탭 전체 적용, 인구 그래프 퍼센트 검정색 통일 및 잘림 보완'],['v6.2.0','인구 규모별 구성 그래프의 좌우 잘림 개선, 막대 구간별 퍼센트 표시, 파란색 명도 5단계로 색상 통일'],['v6.1.9','도별 9개·권역별 6개 인구 규모별 구성 그래프, 구간별 지역 목록, 업데이트 내역 보기 추가'],['v6.1.8','1·2기 신도시 핵심개념 퀴즈에서 기수 단위로 출제·정답 인정; 지역 도감의 세부 지명 보존'],['v6.1.7','핵심개념 퀴즈에서 공업 관련 내용 제외; 공업 탭과 도감은 유지'],['v6.1.6','경제자유구역 표현과 오타 수정'],['v6.1.4~v6.1.5','핵심개념·유산·축제 데이터 및 오답 판정 수정 작업'],['v6.1.3','순천 지역 축제 명칭 정리'],['v6.1.2','도시 하위 탭 표시 조건 및 공업 지역별 화면 정렬 수정'],['v6.1.1','퀴즈·지도 학습·공업 탭 UI 통일'],['v6.1.0','지도 학습의 선택 색상·경계선·범례 시각화 개선'],['v6.0.9','지도 테두리·배경 시각화 정리'],['v6.0.8','공업 시·도 경계선 및 모바일 확대·축소 수정'],['v6.0.x','공업 탭 추가, 업종별 지도·지역별 주요 공업·공업 랭킹 구현'],['이전 주요 개발','161개 시·군 지도 퀴즈, 지역 도감, 2024 인구·연령별 통계, 1991~2020 기후 지도·랭킹 추가']];
  document.getElementById('versionHistoryList').innerHTML=changes.map(([v,d])=>'<details class="version-entry"><summary>'+v+'</summary><p>'+d+'</p></details>').join('');
  document.getElementById('versionTrigger').onclick=()=>{const el=document.getElementById('versionHistory');el.classList.toggle('hidden');if(!el.classList.contains('hidden'))el.scrollIntoView({behavior:'smooth',block:'start'})};
 })();
@@ -1476,16 +1487,24 @@ $('railFollow').addEventListener('change',()=>{if($('railFollow').checked)camera
 $('railZoomIn').addEventListener('click',()=>{zoom=Math.min(5,zoom*1.25);pan={x:360-trainPoint.x*zoom,y:450-trainPoint.y*zoom};transform();$('railFollow').checked=false});
 $('railZoomOut').addEventListener('click',()=>{zoom=Math.max(.7,zoom/1.25);pan={x:360-trainPoint.x*zoom,y:450-trainPoint.y*zoom};transform();$('railFollow').checked=false});
 $('railFit').addEventListener('click',()=>{$('railFollow').checked=false;fit()});
-const btn=document.createElement('button');btn.textContent='고속철도';btn.type='button';btn.className='rail-entry';
-const quizModes=$('quizModes'),studyModes=$('studyModes');
-if(quizModes){const b=btn.cloneNode(true);b.onclick=()=>{document.querySelector('.nav button[data-tab="rail"]')?.click();$('railMode').value='quiz';reset()};quizModes.appendChild(b)}
-if(studyModes){const b=btn.cloneNode(true);b.onclick=()=>{document.querySelector('.nav button[data-tab="rail"]')?.click();$('railMode').value='study';reset()};studyModes.appendChild(b)}
+// Traffic has its own top-level tab; do not insert shortcuts in quiz/study subtabs.
+const subTrain=$('railSubTrain'),subRoad=$('railSubRoad');
+function selectTransport(kind){
+ const train=kind==='train';
+ $('railTrainContent').classList.toggle('hidden',!train);
+ $('railRoadContent').classList.toggle('hidden',train);
+ subTrain.classList.toggle('active',train);subRoad.classList.toggle('active',!train);
+ subTrain.setAttribute('aria-selected',String(train));subRoad.setAttribute('aria-selected',String(!train));
+ if(train)reset();
+}
+subTrain.addEventListener('click',()=>selectTransport('train'));
+subRoad.addEventListener('click',()=>selectTransport('road'));
 // Add a dedicated panel without changing existing tab handlers or quiz logic.
 const navButton=document.querySelector('.nav button[data-tab="rail"]');
 navButton?.addEventListener('click',()=>{
  document.querySelectorAll('.app > .panel').forEach(p=>p.classList.toggle('hidden',p!==rail));
  document.querySelectorAll('.nav button[data-tab]').forEach(b=>b.classList.toggle('active',b===navButton));
- reset();
+ if(!$('railTrainContent').classList.contains('hidden'))reset();
 });
 document.querySelectorAll('.nav button[data-tab]:not([data-tab="rail"])').forEach(b=>b.addEventListener('click',()=>rail.classList.add('hidden')));
 reset();
