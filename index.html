@@ -606,7 +606,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.0</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.1</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -924,7 +924,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
    </div>
    <details class="clq-settings" id="clqSettings"><summary>출제 지역 커스텀 설정 (지역 추가)</summary>
      <div class="clq-note" style="margin-top:9px">기본 출제 지역은 유지되며, 선택한 추가 지역이 해당 유형의 문제에 포함됩니다. 추가 설정은 이 기기에 저장됩니다.</div>
-     <div class="clq-settings-tools"><input id="clqSearch" type="search" placeholder="추가할 지역 검색"><button id="clqClear">추가 지역 초기화</button></div>
+     <div class="clq-settings-tools"><input id="clqSearch" type="search" placeholder="추가할 지역 검색"><button id="clqSelectAll" type="button">전체 선택</button><button id="clqClear">추가 지역 초기화</button></div>
      <div id="clqOptions" class="clq-options"></div><div id="clqSettingsStatus" class="clq-status"></div>
    </details>
  </section>
@@ -1361,6 +1361,11 @@ function initClimateQuiz(){
  clqLoad();clqUpdateSummary();clqRenderOptions();
  $('#clqMetric').onchange=()=>{clqRunning=false;clqQueue=[];$('#clqQuestion').textContent='새 게임을 눌러 시작하세요.';$('#clqProgress').textContent='유형을 변경했습니다.';$('#clqFeedback').textContent='';$('#clqInput').disabled=true;$('#clqSubmit').disabled=true;$('#clqNext').disabled=true;$('#clqSearch').value='';clqUpdateSummary();clqRenderOptions()};
  $('#clqSearch').oninput=clqRenderOptions;
+ $('#clqSelectAll').onclick=()=>{
+  const key=$('#clqMetric').value,defaults=new Set(CLQ_DEFAULTS[key]);
+  clqExtra[key]=BANK.filter(r=>Number.isFinite(CLIMATE1991_2020[r.id]?.[key])&&!defaults.has(r.id)).map(r=>r.id);
+  clqSave();clqRenderOptions();clqUpdateSummary();
+ };
  $('#clqClear').onclick=()=>{clqExtra[$('#clqMetric').value]=[];clqSave();clqRenderOptions();clqUpdateSummary()};
  $('#clqNew').onclick=clqStart;$('#clqSubmit').onclick=clqCheck;
  $('#clqInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clqAnswered?$('#clqNext').click():clqCheck()}});
