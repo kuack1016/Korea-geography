@@ -584,7 +584,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.4.7</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.4.8</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -864,7 +864,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
   <section id="atlasDetail" class="card atlas-detail hidden">
     <div class="atlas-detail-top"><div><div id="atlasDetailName" class="atlas-detail-name"></div><div id="atlasDetailProvince" class="atlas-detail-province"></div></div><button id="atlasDetailClose" class="atlas-detail-close">닫기</button></div>
     <div id="atlasDetailSections" class="atlas-detail-sections"></div>
-    <section class="kg-core-card" id="kgCoreCard"><div class="kg-core-head"><b>공동 핵심개념</b><button id="kgCoreEdit" type="button" hidden>편집</button></div><div class="small" id="kgCoreInfo">기존 핵심개념을 표시합니다. 서버 연결 시 변경사항이 자동 반영됩니다.</div><div id="kgCoreEditor" hidden><p class="small">한 줄에 개념 하나씩 입력하세요. 비운 상태로 저장하면 해당 지역의 핵심개념이 모두 삭제됩니다.</p><textarea id="kgCoreInput" rows="7" maxlength="10000"></textarea><div class="kg-editor-actions"><button id="kgCoreSave" type="button" class="primary">변경 저장</button><button id="kgCoreCancel" type="button">취소</button></div></div><div id="kgCoreMessage" class="small" role="status"></div><details id="kgCoreHistoryDetails"><summary>최근 편집 기록</summary><div id="kgCoreHistory" class="small">지역을 선택하면 표시됩니다.</div></details></section>
+    <section class="kg-core-card" id="kgCoreCard"><div class="kg-core-head"><b>핵심개념 편집 · 기록</b><button id="kgCoreEdit" type="button" hidden>편집</button></div><div class="small" id="kgCoreInfo">기존 핵심개념도 직접 수정할 수 있습니다. 변경 내용은 실시간 공유됩니다.</div><div id="kgCoreEditor" hidden><p class="small">한 줄에 개념 하나씩 입력하세요. 비운 상태로 저장하면 해당 지역의 핵심개념이 모두 삭제됩니다.</p><textarea id="kgCoreInput" rows="7" maxlength="10000"></textarea><div class="kg-editor-actions"><button id="kgCoreSave" type="button" class="primary">변경 저장</button><button id="kgCoreCancel" type="button">취소</button></div></div><div id="kgCoreMessage" class="small" role="status"></div><details id="kgCoreHistoryDetails"><summary>최근 편집 기록</summary><div id="kgCoreHistory" class="small">지역을 선택하면 표시됩니다.</div></details></section>
     <div class="atlas-detail-actions"><button id="atlasDetailMap" class="atlas-map-btn">지도에서 보기</button></div>
   </section>
 
@@ -1177,14 +1177,14 @@ let atlasSelected=null;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function showAtlasDetail(b){
  atlasSelected=b;const n=ATLAS_NOTES[b.id]||{};$('#atlasDetailName').textContent=b.name;$('#atlasDetailProvince').textContent=b.province;
- let parts=[];if(n.core?.length)parts.push(`<div class="atlas-section"><h3>핵심 개념</h3><ul>${n.core.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`);
+ let parts=[];parts.push(`<div class="atlas-section kg-core-section"><h3>핵심 개념</h3><div id="atlasCoreMount"></div><ul>${(n.core||[]).map(x=>`<li>${esc(x)}</li>`).join('')||'<li class="small">등록된 핵심개념이 없습니다.</li>'}</ul></div>`);
  if(n.festival)parts.push(`<div class="atlas-section"><h3>지역 축제</h3><div class="single">${esc(n.festival)}</div></div>`);
  if(n.gi)parts.push(`<div class="atlas-section"><h3>지리적 표시제</h3><div class="single">${esc(n.gi)}</div></div>`);
  if(n.heritage)parts.push(`<div class="atlas-section"><h3>세계문화유산</h3><div class="single">${esc(n.heritage)}</div></div>`);
  if(n.naturalHeritage)parts.push(`<div class="atlas-section"><h3>세계자연유산</h3><div class="single">${esc(n.naturalHeritage)}</div></div>`);
  if(n.ramsar)parts.push(`<div class="atlas-section"><h3>람사르협약 등재 습지</h3><div class="single">${esc(n.ramsar)}</div></div>`);
  if(!parts.length)parts.push('<div class="atlas-section"><h3>지역 핵심 내용</h3><div class="small">아직 정리된 내용이 없습니다.</div></div>');
- $('#atlasDetailSections').innerHTML=parts.join('');window.KGCore?.selectRegion(b.id);$('#atlasDetail').classList.remove('hidden');$('#atlasDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
+ const coreCard=$('#kgCoreCard');if(coreCard)$('#atlasDetail').appendChild(coreCard);$('#atlasDetailSections').innerHTML=parts.join('');if(coreCard)$('#atlasCoreMount').appendChild(coreCard);window.KGCore?.selectRegion(b.id);$('#atlasDetail').classList.remove('hidden');$('#atlasDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 $('#atlasDetailClose').onclick=()=>$('#atlasDetail').classList.add('hidden');
 $('#atlasDetailMap').onclick=()=>{if(atlasSelected){selectStudyRegion(atlasSelected);openTab('study')}};
@@ -2120,7 +2120,7 @@ el('kgCoreSave').onclick=async()=>{
 };
 let initializeDone=false;
 try{
- const [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut},{getFirestore,doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn}]=await Promise.all([
+ const [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut},{getFirestore,getDoc,doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn}]=await Promise.all([
  import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js')]);
  ({doc,collection,query,where,limit,onSnapshot,runTransaction,serverTimestamp,setDoc,updateDoc}={doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn});
  const app=initializeApp(config);auth=getAuth(app);db=getFirestore(app);initializeDone=true;
@@ -2141,8 +2141,19 @@ try{
   login.hidden=!!user;logout.hidden=!user;uidLabel.hidden=!user;uidLabel.textContent=user?'UID: '+user.uid:'';
   if(!user){status.textContent='로그인하지 않음 · 학습 기능 이용 가능';reflect();return;}
   status.textContent='편집 권한 확인 중…';
-  unsubMember=onSnapshot(doc(db,'members',user.uid),snap=>{member=snap.exists()?snap.data():null;reflect();watchMembers();},e=>{member=null;status.textContent='권한 확인 실패: '+e.code;reflect();});
+  let received=false;
+  const myRef=doc(db,'members',user.uid);
+  unsubMember=onSnapshot(myRef,snap=>{if(auth.currentUser?.uid!==user.uid)return;received=true;member=snap.exists()?snap.data():null;reflect();watchMembers();},e=>{if(auth.currentUser?.uid!==user.uid)return;received=true;member=null;reflect();status.textContent='권한 확인 실패: '+(e.code||e.message);});
+  // Retry a direct member read if a snapshot listener is delayed (e.g. iPad Safari networking).
+  getDoc(myRef).then(snap=>{if(received||auth.currentUser?.uid!==user.uid)return;member=snap.exists()?snap.data():null;reflect();watchMembers();}).catch(e=>{if(received||auth.currentUser?.uid!==user.uid)return;reflect();status.textContent='권한 확인 실패: '+(e.code||e.message);});
+  setTimeout(()=>{if(!received&&auth.currentUser?.uid===user.uid&&!member)status.textContent='권한 확인 지연 · 네트워크/Firestore 규칙 확인 필요 (새로고침 후 재시도)';},8000);
  },e=>status.textContent='로그인 확인 실패: '+e.code);
  getRedirectResult(auth).catch(e=>status.textContent='로그인 결과 오류: '+e.code);
 }catch(e){status.textContent='Firebase 초기화 실패: '+(e.code||e.message);coreInfo.textContent='기존 학습 자료는 계속 이용할 수 있어.';login.hidden=false;}
-</script></body></html>
+</script><style id="v648-core-unified">
+#atlasDetailSections .kg-core-section{grid-column:1/-1}
+#atlasDetailSections .kg-core-section .kg-core-card{margin:0 0 12px;padding:0;border:0;background:transparent}
+#atlasDetailSections .kg-core-section .kg-core-head{align-items:center}
+#atlasDetailSections .kg-core-section ul{margin-top:7px}
+#atlasDetailSections .kg-core-section .kg-core-card details{margin-top:8px}
+</style></body></html>
