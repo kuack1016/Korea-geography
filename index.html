@@ -612,7 +612,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.8</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.9</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -1146,14 +1146,18 @@ function renderStudyNotes(region){
   const panel=$('#studyNotesPanel'),box=$('#studyNotesContent'),n=ATLAS_NOTES[region.id]||{};
   let parts=[];
   const tags=[];
-  if(studyMode==='city'){const ci=cityStudyLabels(region.id);if(ci.length)tags.push([CITY_STUDY[cityStudyMode].label,ci.map(esc).join('<br>')]);}
+  // Show every applicable urban classification together, independent of the map-study submode.
+  for(const key of ['first','second','innovation','company','donong']){
+    const cfg=CITY_STUDY[key], labels=cfg.items[region.id]||[];
+    if(labels.length)tags.push([cfg.label,labels.map(esc).join('<br>')]);
+  }
   if(n.core?.length)tags.push(['핵심 개념',n.core.map(esc).join('<br>')]);
   if(n.festival)tags.push(['지역 축제',n.festival]);
   if(n.gi)tags.push(['지리적 표시제',n.gi]);
   if(n.heritage)tags.push(['세계문화유산',n.heritage]);
   if(n.naturalHeritage)tags.push(['세계자연유산',n.naturalHeritage]);
   if(n.ramsar)tags.push(['람사르협약 등재 습지',n.ramsar]);
-  if(tags.length)parts.push(`<div class="study-note-tags">${tags.map(([a,b])=>`<div class="study-note-row"><span class="study-note-label">${esc(a)}</span><span class="study-note-value">${(a==='핵심 개념'||a==='도농복합시')?b:esc(b)}</span></div>`).join('')}</div>`);
+  if(tags.length)parts.push(`<div class="study-note-tags">${tags.map(([a,b])=>`<div class="study-note-row"><span class="study-note-label">${esc(a)}</span><span class="study-note-value">${(a==='핵심 개념'||Object.values(CITY_STUDY).some(c=>c.label===a))?b:esc(b)}</span></div>`).join('')}</div>`);
   if(parts.length){box.innerHTML=parts.join('');panel.classList.remove('hidden')}else{box.innerHTML='';panel.classList.remove('hidden')}
   const edit=document.createElement('button');edit.type='button';edit.id='kgStudyEdit';edit.className='kg-study-edit';edit.textContent='핵심개념 편집 · 기록';edit.onclick=()=>window.KGCore?.openStudy(region.id);box.appendChild(edit);
   if(document.getElementById('kgCoreCard')?.parentElement===panel){window.KGCore?.selectRegion(region.id);} 
