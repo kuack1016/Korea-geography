@@ -145,6 +145,12 @@ svg path{stroke:#9aa9bd;stroke-width:.72}.study-map #studyMapg path{stroke:#9aa9
 #studyMapg path.study-dim{fill:#f7f9fc!important;opacity:.38}#studyMapg path.study-theme{fill:#4f8fd8;stroke:#fff!important;stroke-width:1.15!important}#studyMapg path.study-cultural{fill:#d95f5f;stroke:#fff!important;stroke-width:1.15!important}#studyMapg path.study-natural{fill:#3f9b73;stroke:#fff!important;stroke-width:1.15!important}#studyOverlayg path{fill:url(#ramsarStripe);stroke:none;pointer-events:none;fill-rule:evenodd}#studyMapg path.study-selected{fill:#8fb3ff!important;stroke:#245bd8!important;stroke-width:1.5!important;filter:none}
 @media(max-width:640px){.mode-tabs{gap:5px}.mode-tabs button{padding:8px 9px;font-size:11px}.study-tools{align-items:flex-start}}
 </style>
+<style id="v652-climate-quiz-logs">
+.clq-log-section{margin-top:16px;border:1px solid var(--line);background:#fff;border-radius:12px;padding:15px}
+.clq-log-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.clq-log-head b{font-size:14px}.clq-log-section .tabs{margin:9px 0}.clq-log-section .tabs button.active{background:#eaf2ff;color:#2f73d9;border-color:#adc9f7}
+.clq-log-section .logbox{max-height:300px}.clq-log-section .quiz-answers{margin-left:20px;line-height:1.5}
+</style>
 <style id="v583-map-palette-override">
 /* v5.8.3 final thematic map palette override */
 #studyMapg path.study-theme{fill:#3b82f6!important;stroke:#ffffff!important;stroke-width:1.15!important;opacity:1!important}
@@ -606,7 +612,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.1</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.2</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -922,6 +928,11 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
      <div class="clq-answer"><input id="clqInput" type="number" step="0.1" inputmode="decimal" placeholder="예: -3.5" aria-label="기온 정답 입력" disabled><span class="clq-unit">℃</span><button id="clqSubmit" class="primary" disabled>정답 확인</button></div>
      <div id="clqFeedback" class="clq-feedback" aria-live="polite"></div><div class="clq-actions"><button id="clqNext" disabled>다음 문제</button></div>
    </div>
+   <section class="clq-log-section" aria-label="기후 퀴즈 정오 로그">
+     <div class="clq-log-head"><b>정오 로그</b><span id="clqLogCount" class="clq-status">정답 0개 · 오답 0개</span></div>
+     <div class="tabs"><button id="clqAllLog" type="button" class="active">전체 로그</button><button id="clqWrongLog" type="button">오답만</button></div>
+     <div id="clqLog" class="logbox" aria-live="polite"><div class="small">아직 기록이 없습니다.</div></div>
+   </section>
    <details class="clq-settings" id="clqSettings"><summary>출제 지역 커스텀 설정 (지역 추가)</summary>
      <div class="clq-note" style="margin-top:9px">기본 출제 지역은 유지되며, 선택한 추가 지역이 해당 유형의 문제에 포함됩니다. 추가 설정은 이 기기에 저장됩니다.</div>
      <div class="clq-settings-tools"><input id="clqSearch" type="search" placeholder="추가할 지역 검색"><button id="clqSelectAll" type="button">전체 선택</button><button id="clqClear">추가 지역 초기화</button></div>
@@ -1309,6 +1320,14 @@ const CLQ_DEFAULTS={
 };
 const CLQ_STORAGE='korea-geography-climate-quiz-extra-v1';
 let clqExtra={jan:[],aug:[],range:[]},clqQueue=[],clqIndex=0,clqCorrect=0,clqAnswered=false,clqRunning=false;
+let clqLogs=[],clqLogMode='all';
+function clqRenderLog(){
+ const rows=clqLogMode==='wrong'?clqLogs.filter(x=>!x.ok):clqLogs;
+ $('#clqLog').innerHTML=rows.length?rows.map(x=>`<div class="logrow"><span class="${x.ok?'ok':'no'}">${x.ok?'✓':'✕'}</span> <b>${esc(x.region)}</b> · ${esc(x.metric)}<div class="quiz-answers">내 답: ${x.entered.toFixed(1)}℃ · 기준값: ${x.correct.toFixed(1)}℃</div></div>`).join(''):'<div class="small">기록이 없습니다.</div>';
+ $('#clqLogCount').textContent=`정답 ${clqLogs.filter(x=>x.ok).length}개 · 오답 ${clqLogs.filter(x=>!x.ok).length}개`;
+ $('#clqAllLog').classList.toggle('active',clqLogMode==='all');
+ $('#clqWrongLog').classList.toggle('active',clqLogMode==='wrong');
+}
 function clqPool(metric){
  const ids=new Set([...CLQ_DEFAULTS[metric],...(clqExtra[metric]||[])]);
  return [...ids].filter(id=>Number.isFinite(CLIMATE1991_2020[id]?.[metric]) && BANK.some(r=>r.id===id));
@@ -1342,7 +1361,7 @@ function clqShowQuestion(){
 function clqStart(){
  const key=$('#clqMetric').value,pool=clqPool(key);
  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
- clqQueue=pool;clqIndex=0;clqCorrect=0;clqRunning=pool.length>0;
+ clqQueue=pool;clqIndex=0;clqCorrect=0;clqRunning=pool.length>0;clqLogs=[];clqLogMode='all';clqRenderLog();
  if(!clqRunning){$('#clqQuestion').textContent='출제할 지역이 없습니다.';return;}
  clqShowQuestion();
 }
@@ -1352,14 +1371,19 @@ function clqCheck(){
  const key=$('#clqMetric').value,correct=Number(CLIMATE1991_2020[clqQueue[clqIndex]][key]);
  const userValue=Number(input.value),pass=Math.abs(userValue-correct)<=1+1e-9;
  if(pass)clqCorrect++;
+ const region=BANK.find(r=>r.id===clqQueue[clqIndex]);
+ clqLogs.push({ok:pass,region:region?.display||clqQueue[clqIndex],metric:CLIMATE_MAP_METRICS[key].label,entered:userValue,correct});
+ clqRenderLog();
  clqAnswered=true;input.disabled=true;$('#clqSubmit').disabled=true;$('#clqNext').disabled=false;
  $('#clqFeedback').textContent=`${pass?'정답!':'오답'} · 기준값 ${correct.toFixed(1)}℃ · 입력값 ${userValue}℃ · 허용 오차 ±1.0℃`;
  $('#clqProgress').textContent=`${clqIndex+1}/${clqQueue.length}번 · 정답 ${clqCorrect}개`;
  $('#clqNext').textContent=clqIndex===clqQueue.length-1?'결과 보기':'다음 문제';
 }
 function initClimateQuiz(){
- clqLoad();clqUpdateSummary();clqRenderOptions();
- $('#clqMetric').onchange=()=>{clqRunning=false;clqQueue=[];$('#clqQuestion').textContent='새 게임을 눌러 시작하세요.';$('#clqProgress').textContent='유형을 변경했습니다.';$('#clqFeedback').textContent='';$('#clqInput').disabled=true;$('#clqSubmit').disabled=true;$('#clqNext').disabled=true;$('#clqSearch').value='';clqUpdateSummary();clqRenderOptions()};
+ clqLoad();clqUpdateSummary();clqRenderOptions();clqRenderLog();
+ $('#clqAllLog').onclick=()=>{clqLogMode='all';clqRenderLog()};
+ $('#clqWrongLog').onclick=()=>{clqLogMode='wrong';clqRenderLog()};
+ $('#clqMetric').onchange=()=>{clqRunning=false;clqQueue=[];$('#clqQuestion').textContent='새 게임을 눌러 시작하세요.';$('#clqProgress').textContent='유형을 변경했습니다.';$('#clqFeedback').textContent='';$('#clqInput').disabled=true;$('#clqSubmit').disabled=true;$('#clqNext').disabled=true;$('#clqSearch').value='';clqLogs=[];clqLogMode='all';clqRenderLog();clqUpdateSummary();clqRenderOptions()};
  $('#clqSearch').oninput=clqRenderOptions;
  $('#clqSelectAll').onclick=()=>{
   const key=$('#clqMetric').value,defaults=new Set(CLQ_DEFAULTS[key]);
