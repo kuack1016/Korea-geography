@@ -574,6 +574,28 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #kgCoreInput{width:100%;resize:vertical;min-height:130px;box-sizing:border-box;border:1px solid #ccd7e7;border-radius:9px;padding:10px;font:14px/1.6 inherit}
 .kg-editor-actions{display:flex;gap:7px;margin:8px 0}.kg-core-card details{border-top:1px solid #e4eaf2;padding-top:11px;margin-top:10px}.kg-core-card summary{cursor:pointer;font-size:12px;font-weight:800}
 .kg-history-item{padding:9px 0;border-bottom:1px solid #e8edf4;overflow-wrap:anywhere}.kg-history-item b{color:#315ea8}.kg-history-change{font-size:11px;white-space:pre-wrap;color:var(--muted)}
+</style><style id="v650-climate-quiz-style">
+/* 기후 지도: 선택 시의 연한 강조는 유지하고 경계선 변경은 제거 */
+#climateMapg path:hover{opacity:.78!important;stroke:#fff!important;stroke-width:.55!important}
+#climateMapg path:focus{outline:none!important;stroke:#fff!important;stroke-width:.55!important}
+.clq-wrap{padding:20px;max-width:100%}.clq-wrap h2{margin:0 0 5px;font-size:21px}.clq-note{font-size:12px;color:var(--muted);line-height:1.65}
+.clq-top{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:14px 0}
+.clq-top label{font-weight:850;font-size:13px}.clq-top select{min-width:170px;flex:1}
+.clq-card{background:#f8faff;border:1px solid #dfe8f5;border-radius:13px;padding:18px;margin-top:14px}
+.clq-question{font-size:clamp(19px,3vw,25px);font-weight:900;margin:8px 0 16px}
+.clq-answer{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.clq-answer input{font-size:19px;border:1px solid #d4dce8;border-radius:10px;padding:10px 12px;width:180px;max-width:100%;background:#fff}
+.clq-answer .clq-unit{font-weight:800}.clq-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.clq-feedback{min-height:23px;margin-top:12px;font-size:14px;line-height:1.6;font-weight:750}
+.clq-progress{font-size:12px;color:var(--muted);margin-top:10px}
+.clq-settings{margin-top:17px;border:1px solid var(--line);border-radius:12px;background:#fff;padding:15px}
+.clq-settings summary{cursor:pointer;font-size:14px;font-weight:900;color:#315ea8}
+.clq-options{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;max-height:260px;overflow:auto;padding:8px 2px}
+.clq-options label{display:flex;align-items:center;gap:6px;font-size:12px;border:1px solid #e3e9f2;border-radius:8px;padding:9px;cursor:pointer}
+.clq-options input{accent-color:var(--blue)}
+.clq-settings-tools{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0}.clq-settings-tools input{padding:10px;border:1px solid #d4dce8;border-radius:9px;flex:1;min-width:150px}
+.clq-status{font-size:12px;color:var(--muted);margin:7px 0}
+@media(max-width:720px){.clq-wrap{padding:14px}.clq-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
 </style></head><body><div class="app">
 <header><div><h1>Korea-geography</h1><div class="note">수능 한국지리 학습도구 · 2026-04-01 행정구역 · 2024 인구 · 1991~2020 기후 · 2023 공업</div></div>
 <div class="stats"><span class="pill">점수 <b id="score">0</b></span><span class="pill">연속 <b id="streak">0</b></span><span class="pill">⏱ <b id="time">0.0</b>s</span></div></header>
@@ -584,7 +606,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.4.9</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.0</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -872,7 +894,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <div id="rankingPanel" class="panel hidden"><section class="card" id="popCompareHead"><div class="pop-compare-switch"><button id="popRankViewBtn" class="active">인구 랭킹</button><button id="popCompositionViewBtn">인구 규모별 구성</button></div><div id="popCompositionView" class="hidden"><h2>인구 규모별 시·군 구성</h2><div class="small">2024년 12월 주민등록인구 · 지역 수 기준 100% 누적 막대그래프</div><div class="pop-compare-units"><button data-popunit="province" class="active">도별 9개</button><button data-popunit="region">권역별 6개</button></div><div class="pop-chart-legend" id="popChartLegend"></div><div id="popChartRows"></div><div id="popChartDetail" class="pop-chart-detail">막대의 구간을 누르면 해당 시·군 목록을 볼 수 있습니다.</div><div class="pop-chart-note">비율은 인구수 합계가 아닌 해당 인구 규모에 속하는 시·군 지역의 개수 비율입니다. 특별시·광역시·세종시는 사이트의 161개 지역 체계에 따라 각각 하나의 도시 단위로 집계합니다.</div></div></section><div id="popExistingRanking"><section class="card rankinghead"><h2>인구 랭킹</h2><div class="small">2024년 12월 기준 · 지역 간 상대적 위치를 비교해보세요.</div><div class="metric-tabs" id="metricTabs"><button class="active" data-metric="population">총인구</button><button data-metric="sexHigh">성비 높은 순</button><button data-metric="sexLow">성비 낮은 순</button><button data-metric="youth">유소년층 비율</button><button data-metric="adult">청장년층 비율</button><button data-metric="old">노년층 비율</button></div><div class="rank-tools"><select id="rankProvince"></select><input id="rankSearch" type="search" placeholder="지역 검색 (예: 무안, 수원)"></div><div id="rankNote" class="rank-note"></div><div id="rankCount" class="rank-count"></div></section><div id="rankList" class="rank-list"></div></div>
 
 </div><div id="climateRankingPanel" class="panel hidden">
-  <div class="climate-view-tabs"><button id="climateMapViewBtn" class="active">기후 지도</button><button id="climateRankViewBtn">기후 랭킹</button></div>
+  <div class="climate-view-tabs"><button id="climateMapViewBtn" class="active">기후 지도</button><button id="climateRankViewBtn">기후 랭킹</button><button id="climateQuizViewBtn">기후 퀴즈</button></div>
   <div id="climateMapView">
     <div class="climate-map-layout">
       <section class="card climate-map-card">
@@ -891,6 +913,22 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
       </aside>
     </div>
   </div>
+<div id="climateQuizView" class="hidden">
+ <section class="card clq-wrap">
+   <h2>기후 퀴즈</h2><div class="clq-note">1991~2020년 기후평년값 · 지정 지역만 출제 · 정답 오차 ±1.0℃ 허용</div>
+   <div class="clq-top"><label for="clqMetric">문제 유형</label><select id="clqMetric"><option value="jan">1월 평균기온</option><option value="aug">8월 평균기온</option><option value="range">기온 연교차</option></select><button id="clqNew" class="primary">새 게임</button></div>
+   <div id="clqPoolSummary" class="clq-status"></div>
+   <div class="clq-card"><div id="clqProgress" class="clq-progress">새 게임을 누르면 시작합니다.</div><div id="clqQuestion" class="clq-question">출제 유형과 지역을 설정해 주세요.</div>
+     <div class="clq-answer"><input id="clqInput" type="number" step="0.1" inputmode="decimal" placeholder="예: -3.5" aria-label="기온 정답 입력" disabled><span class="clq-unit">℃</span><button id="clqSubmit" class="primary" disabled>정답 확인</button></div>
+     <div id="clqFeedback" class="clq-feedback" aria-live="polite"></div><div class="clq-actions"><button id="clqNext" disabled>다음 문제</button></div>
+   </div>
+   <details class="clq-settings" id="clqSettings"><summary>출제 지역 커스텀 설정 (지역 추가)</summary>
+     <div class="clq-note" style="margin-top:9px">기본 출제 지역은 유지되며, 선택한 추가 지역이 해당 유형의 문제에 포함됩니다. 추가 설정은 이 기기에 저장됩니다.</div>
+     <div class="clq-settings-tools"><input id="clqSearch" type="search" placeholder="추가할 지역 검색"><button id="clqClear">추가 지역 초기화</button></div>
+     <div id="clqOptions" class="clq-options"></div><div id="clqSettingsStatus" class="clq-status"></div>
+   </details>
+ </section>
+</div>
   <div id="climateRankView" class="hidden">
   <section class="card rankinghead">
     <h2>기후 랭킹</h2>
@@ -1262,12 +1300,87 @@ function renderClimateMap(selectedId){
  $('#climateLegend').innerHTML=cfg.palette.map((c,i)=>{let lo=b.cuts[i],hi=b.cuts[i+1],unit=cfg.unit;let f=x=>unit==='mm'?Math.round(x).toLocaleString('ko-KR'):x.toFixed(1);return `<div class="climate-legend-row"><span class="climate-swatch" style="background:${c}"></span><span>${f(lo)} ~ ${f(hi)} ${unit}</span></div>`}).join('');
  if(selectedId){let r=BANK.find(x=>x.id===selectedId),d=CLIMATE1991_2020[selectedId],v=d&&d[climateMapMetric];$('#climateMapSelected').innerHTML=`<hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><b>${r.display}</b>${v===null||v===undefined?'<div class="climate-map-value">자료 없음</div>':`<div class="climate-map-value">${fmtClimateValue(v,cfg.unit)}</div><div class="climate-map-station">관측지점 ${d.station} · ${d.stationNo}</div>`}`}
 }
+
+// v6.5.0 기후 퀴즈: 기존 지역별 1991~2020 평년값을 직접 사용
+const CLQ_DEFAULTS={
+ jan:['r133','r82','r14','r104','r92','r120','r88','r96','r0','r129','r90','r15'],
+ aug:['r14','r13','r73','r129'],
+ range:['r133','r134','r15','r12','r82']
+};
+const CLQ_STORAGE='korea-geography-climate-quiz-extra-v1';
+let clqExtra={jan:[],aug:[],range:[]},clqQueue=[],clqIndex=0,clqCorrect=0,clqAnswered=false,clqRunning=false;
+function clqPool(metric){
+ const ids=new Set([...CLQ_DEFAULTS[metric],...(clqExtra[metric]||[])]);
+ return [...ids].filter(id=>Number.isFinite(CLIMATE1991_2020[id]?.[metric]) && BANK.some(r=>r.id===id));
+}
+function clqSave(){try{localStorage.setItem(CLQ_STORAGE,JSON.stringify(clqExtra))}catch(e){}}
+function clqLoad(){try{const x=JSON.parse(localStorage.getItem(CLQ_STORAGE)||'{}');for(const key of ['jan','aug','range'])clqExtra[key]=Array.isArray(x[key])?x[key].filter(id=>typeof id==='string'):[]}catch(e){}}
+function clqUpdateSummary(){const key=$('#clqMetric').value,base=CLQ_DEFAULTS[key].length,extra=clqPool(key).length-base;
+ $('#clqPoolSummary').textContent=`기본 ${base}개 지역 + 추가 ${Math.max(0,extra)}개 지역 · 총 ${clqPool(key).length}개 출제 가능`;
+}
+function clqRenderOptions(){
+ const key=$('#clqMetric').value,search=$('#clqSearch').value.trim().toLowerCase(),defaults=new Set(CLQ_DEFAULTS[key]);
+ const available=BANK.filter(r=>Number.isFinite(CLIMATE1991_2020[r.id]?.[key])&&!defaults.has(r.id))
+  .filter(r=>(r.name+' '+r.display+' '+r.province+' '+CLIMATE1991_2020[r.id].station).toLowerCase().includes(search));
+ $('#clqOptions').innerHTML=available.map(r=>`<label><input type="checkbox" data-id="${r.id}" ${clqExtra[key].includes(r.id)?'checked':''}>${r.display}</label>`).join('') || '<span class="clq-note">추가 가능한 지역이 없습니다.</span>';
+ $$('#clqOptions input').forEach(input=>input.onchange=()=>{
+  let old=new Set(clqExtra[key]);input.checked?old.add(input.dataset.id):old.delete(input.dataset.id);
+  clqExtra[key]=[...old];clqSave();clqUpdateSummary();clqRenderStatus();
+ });
+ clqRenderStatus();
+}
+function clqRenderStatus(){const key=$('#clqMetric').value;$('#clqSettingsStatus').textContent=`추가 선택 ${clqExtra[key].filter(id=>!CLQ_DEFAULTS[key].includes(id)&&clqPool(key).includes(id)).length}개 · 기본 출제 지역은 항상 포함됩니다.`}
+function clqShowQuestion(){
+ const progress=$('#clqProgress'),question=$('#clqQuestion'),input=$('#clqInput');
+ $('#clqFeedback').textContent='';$('#clqNext').disabled=true;
+ if(clqIndex>=clqQueue.length){clqRunning=false;question.textContent='게임 종료';progress.textContent=`최종 점수 ${clqCorrect}/${clqQueue.length}`;input.disabled=true;$('#clqSubmit').disabled=true;return;}
+ const r=BANK.find(r=>r.id===clqQueue[clqIndex]);const kind=$('#clqMetric').value;
+ progress.textContent=`${clqIndex+1}/${clqQueue.length}번 · 정답 ${clqCorrect}개`;
+ question.textContent=`${r.display}의 ${CLIMATE_MAP_METRICS[kind].label}은?`;
+ input.value='';input.disabled=false;$('#clqSubmit').disabled=false;clqAnswered=false;input.focus();
+}
+function clqStart(){
+ const key=$('#clqMetric').value,pool=clqPool(key);
+ for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+ clqQueue=pool;clqIndex=0;clqCorrect=0;clqRunning=pool.length>0;
+ if(!clqRunning){$('#clqQuestion').textContent='출제할 지역이 없습니다.';return;}
+ clqShowQuestion();
+}
+function clqCheck(){
+ if(!clqRunning||clqAnswered)return;
+ const input=$('#clqInput');if(input.value.trim()===''||!Number.isFinite(Number(input.value))){$('#clqFeedback').textContent='숫자를 입력해 주세요.';return;}
+ const key=$('#clqMetric').value,correct=Number(CLIMATE1991_2020[clqQueue[clqIndex]][key]);
+ const userValue=Number(input.value),pass=Math.abs(userValue-correct)<=1+1e-9;
+ if(pass)clqCorrect++;
+ clqAnswered=true;input.disabled=true;$('#clqSubmit').disabled=true;$('#clqNext').disabled=false;
+ $('#clqFeedback').textContent=`${pass?'정답!':'오답'} · 기준값 ${correct.toFixed(1)}℃ · 입력값 ${userValue}℃ · 허용 오차 ±1.0℃`;
+ $('#clqProgress').textContent=`${clqIndex+1}/${clqQueue.length}번 · 정답 ${clqCorrect}개`;
+ $('#clqNext').textContent=clqIndex===clqQueue.length-1?'결과 보기':'다음 문제';
+}
+function initClimateQuiz(){
+ clqLoad();clqUpdateSummary();clqRenderOptions();
+ $('#clqMetric').onchange=()=>{clqRunning=false;clqQueue=[];$('#clqQuestion').textContent='새 게임을 눌러 시작하세요.';$('#clqProgress').textContent='유형을 변경했습니다.';$('#clqFeedback').textContent='';$('#clqInput').disabled=true;$('#clqSubmit').disabled=true;$('#clqNext').disabled=true;$('#clqSearch').value='';clqUpdateSummary();clqRenderOptions()};
+ $('#clqSearch').oninput=clqRenderOptions;
+ $('#clqClear').onclick=()=>{clqExtra[$('#clqMetric').value]=[];clqSave();clqRenderOptions();clqUpdateSummary()};
+ $('#clqNew').onclick=clqStart;$('#clqSubmit').onclick=clqCheck;
+ $('#clqInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();clqAnswered?$('#clqNext').click():clqCheck()}});
+ $('#clqNext').onclick=()=>{if(!clqAnswered)return;clqIndex++;clqShowQuestion()};
+}
+
 function initClimateMap(){
+ initClimateQuiz();
  const g=$('#climateMapg'); if(!g)return; $$('#mapg path').forEach(p=>{let c=p.cloneNode(false);c.id='climate_'+p.dataset.id;c.dataset.id=p.dataset.id;g.appendChild(c)});
  $('#climateMapMetric').onchange=e=>{climateMapMetric=e.target.value;renderClimateMap()};
  bindTap($('#climateMapSvg'),ev=>{let q=svgPoint(ev),hits=BANK.filter(b=>regionHas(b.id,q.x,q.y));if(hits.length)renderClimateMap(hits[0].id)}); renderClimateMap();
- $('#climateMapViewBtn').onclick=()=>{$('#climateMapView').classList.remove('hidden');$('#climateRankView').classList.add('hidden');$('#climateMapViewBtn').classList.add('active');$('#climateRankViewBtn').classList.remove('active')};
- $('#climateRankViewBtn').onclick=()=>{$('#climateMapView').classList.add('hidden');$('#climateRankView').classList.remove('hidden');$('#climateMapViewBtn').classList.remove('active');$('#climateRankViewBtn').classList.add('active');renderClimateRanking()};
+ const selectClimateSubView=(view)=>{
+   for(const [kind,btn,section] of [['map','#climateMapViewBtn','#climateMapView'],['rank','#climateRankViewBtn','#climateRankView'],['quiz','#climateQuizViewBtn','#climateQuizView']]){
+     $(btn).classList.toggle('active',kind===view);$(section).classList.toggle('hidden',kind!==view);
+   }
+   if(view==='rank')renderClimateRanking();
+ };
+ $('#climateMapViewBtn').onclick=()=>selectClimateSubView('map');
+ $('#climateRankViewBtn').onclick=()=>selectClimateSubView('rank');
+ $('#climateQuizViewBtn').onclick=()=>selectClimateSubView('quiz');
 }
 initClimateMap();
 
