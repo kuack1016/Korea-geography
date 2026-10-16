@@ -612,7 +612,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.5</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.6</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -1038,7 +1038,15 @@ function hitCoord(ev){
   if(!clicked){$('#feedback').textContent='지도 영역 안쪽을 눌러주세요.';return}
   locked=true;finish($('#'+clicked.id),answer.ids.includes(clicked.id),clicked.display);
 }
-document.querySelector('svg').addEventListener('pointerup',hitCoord);
+// Keep the location quiz independent of map pan/zoom pointer capture.
+// Use pointerup on modern browsers and a click fallback for iPad/Safari.
+const locationQuizSvg=document.querySelector('#quizPanel .map svg');
+let lastQuizSelectionAt=0;
+locationQuizSvg.addEventListener('pointerup',ev=>{lastQuizSelectionAt=Date.now();hitCoord(ev)});
+locationQuizSvg.addEventListener('click',ev=>{
+  if(Date.now()-lastQuizSelectionAt<600)return;
+  hitCoord(ev);
+});
 $('#start').onclick=start;
 $('#otherCoreHint').onclick=()=>{if(quizMode!=='core'||!answer)return;const hs=answer.hints||[];if(!hs.length){$('#feedback').textContent='다른 힌트가 없는 지역입니다.';return}if(answer.hintIndex>=hs.length)return;const shown=hs.slice(0,++answer.hintIndex);$('#feedback').innerHTML=`<b>다른 힌트</b><div style="margin-top:6px;display:grid;gap:4px">${shown.map((h,i)=>`<div>${i+1}. ${esc(h)}</div>`).join('')}</div>${answer.duplicated?'<div style="margin-top:8px">처음 제시된 개념은 여러 지역에 공통이므로, 위 힌트까지 함께 보고 한 지역을 선택하세요.</div>':''}`;};
 $('#skip').onclick=()=>{if(locked||!answer)return;locked=true;logs.push({ok:false,q:answer.label,clicked:'정답 보기',answers:answerNames(answer),mode:quizMode});renderLog();answer.ids.forEach(id=>$('#'+id)?.classList.add('flash-answer'));streak=0;$('#feedback').innerHTML='정답: '+answerNames(answer).map(esc).join(' · ');setTimeout(()=>{clearFlash();answer.ids.forEach(id=>$('#'+id)?.classList.add('seen-wrong'));idx++;locked=false;next()},900)};
@@ -2034,7 +2042,7 @@ reset();
 const ids=['studySvg','climateMapSvg','industryMapSvg','industryProvinceMapSvg'];
 const quiz=document.querySelector('.main > .map svg');
 if(quiz&&!quiz.id)quiz.id='quizMapSvg';
-ids.unshift('quizMapSvg');
+// Quiz uses its own region picker; do not attach gesture pointer-capture to it.
 function bind(svg){
  if(!svg||svg.dataset.mapGestureBound)return;
  svg.dataset.mapGestureBound='1';
@@ -2128,7 +2136,7 @@ ids.forEach(id=>bind(document.getElementById(id)));
 'use strict';
 // iPad Safari supports native document zoom even when SVG pointer handlers exist.
 // Cancel only touches that originate in a map; preserve ordinary page gestures elsewhere.
-const targets=[...document.querySelectorAll('.main > .map svg, #studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg, #roadSvg')];
+const targets=[...document.querySelectorAll('#studySvg, #climateMapSvg, #industryMapSvg, #industryProvinceMapSvg, #railSvg, #roadSvg')];
 const active=new Set();
 for(const svg of targets){
  svg.style.touchAction='none';
