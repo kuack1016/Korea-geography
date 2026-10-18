@@ -1,5 +1,5 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<!-- v6.5.17 광역자치단체 시군모드 값 복구 및 지도학습 그래프 연동 안정화 -->
+<!-- v6.5.18 광역자치단체 시군모드 값 복구 및 지도학습 그래프 연동 안정화 -->
 <title>수능 한국지리 학습도구</title><style>
 :root{--bg:#f4f7fb;--ink:#172033;--muted:#697386;--blue:#3974f6;--green:#20a464;--red:#e64a52;--yellow:#ffd54a;--paleg:#cfeedd;--paler:#f5cfd2}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif}.app{max-width:1050px;margin:auto;padding:12px}
@@ -635,7 +635,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 <button data-tab="ranking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20V12h4v8M10 20V7h4v13M16 20V3h4v17"/><path d="M2 20h20"/></svg><span>인구</span></button>
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
-</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.17</span></div>
+</nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v6.5.18</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -2445,11 +2445,23 @@ function findSite(name,province){
 }
 function findFromSiteRegion(region){
  if(!region)return null;
- let result=findSite(region.display||region.name||'',region.province||'');
- if(result)return result;
- const code=String(region.id||'');
- // The website and history map use different internal IDs; compare display names, not numeric suffixes.
- return DATA.municipalities.find(x=>x.name===region.display)||null;
+ // Both datasets share BANK r0..r160 identifiers: use the exact ID first.
+ const id=String(region.id||'');
+ const byCode=byId.get(id);
+ if(byCode && (!region.name||byCode.name===region.name))return byCode;
+ // BANK.display contains the province prefix (e.g. "강원 강릉시"); BANK.name does not.
+ const province=region.provinceShort||region.province||'';
+ return findSite(region.name||'',province)||findSite(region.display||'',province);
+}
+function resolveStudyDisplay(){
+ const n=document.getElementById('studyName'),p=document.getElementById('studyProvince');
+ if(!n)return null;
+ const label=n.textContent.trim();
+ // Match the rendered label to the canonical BANK record rather than guessing from displayed text.
+ const record=(typeof BANK!=='undefined' && Array.isArray(BANK))
+   ?BANK.find(r=>r.display===label && (!p?.textContent.trim()||r.province===p.textContent.trim()))
+   :null;
+ return record?findFromSiteRegion(record):findSite(label,p?.textContent.trim()||'');
 }
 function renderStudySelected(item){
  const host=document.getElementById('populationPanel');if(!host)return;
@@ -2462,8 +2474,8 @@ function renderStudySelected(item){
  chart.innerHTML='<h3>인구 추이 (1970~2025)</h3><div class="pop-history-desc">당시 행정구역 기준의 인구총조사 참고값 · 5년 간격</div><div class="ph-inline"></div><div class="pop-history-flag">과거 행정구역 연결 후보(미검증). 점을 누르거나 길게 눌러 출처를 확인하세요. 인구 변화와 행정구역 변경 효과가 섞일 수 있습니다.</div>';
  draw(chart.querySelector('.ph-inline'),[item],true);
 }
-function updateStudy(){const n=document.getElementById('studyName'),p=document.getElementById('studyProvince');if(!n)return;renderStudySelected(findSite(n.textContent.trim(),p?.textContent.trim()||''));}
-function updateAtlas(){const detail=document.getElementById('atlasDetail'),n=document.getElementById('atlasDetailName'),p=document.getElementById('atlasDetailProvince');if(!detail||!n)return;let chart=document.getElementById('popHistoryAtlas');if(!chart){chart=document.createElement('div');chart.className='pop-history-box small-chart';chart.id='popHistoryAtlas';detail.insertBefore(chart,detail.querySelector('.atlas-detail-actions'))}const item=findSite(n.textContent.trim(),p?.textContent.trim()||'');if(!item||detail.classList.contains('hidden')){chart.style.display='none';return}chart.style.display='block';chart.innerHTML='<h3>인구 추이 (1970~2025)</h3><div class="pop-history-desc">행정구역 변천을 고려한 참고용 후보값 · 5년 간격</div><div class="ph-inline"></div><div class="pop-history-flag">당시 행정구역 연결 후보(미검증). 현재 지역 경계와 동일한 시계열로 해석하지 마세요.</div>';draw(chart.querySelector('.ph-inline'),[item],true)}
+function updateStudy(){renderStudySelected(resolveStudyDisplay());}
+function updateAtlas(){const detail=document.getElementById('atlasDetail'),n=document.getElementById('atlasDetailName'),p=document.getElementById('atlasDetailProvince');if(!detail||!n)return;let chart=document.getElementById('popHistoryAtlas');if(!chart){chart=document.createElement('div');chart.className='pop-history-box small-chart';chart.id='popHistoryAtlas';detail.insertBefore(chart,detail.querySelector('.atlas-detail-actions'))}const label=n.textContent.trim(),prov=p?.textContent.trim()||'';const atlasRegion=(typeof BANK!=='undefined'&&Array.isArray(BANK))?BANK.find(r=>(r.display===label||r.name===label)&&(!prov||r.province===prov||r.provinceShort===prov)):null;const item=atlasRegion?findFromSiteRegion(atlasRegion):findSite(label,prov);if(!item||detail.classList.contains('hidden')){chart.style.display='none';return}chart.style.display='block';chart.innerHTML='<h3>인구 추이 (1970~2025)</h3><div class="pop-history-desc">행정구역 변천을 고려한 참고용 후보값 · 5년 간격</div><div class="ph-inline"></div><div class="pop-history-flag">당시 행정구역 연결 후보(미검증). 현재 지역 경계와 동일한 시계열로 해석하지 마세요.</div>';draw(chart.querySelector('.ph-inline'),[item],true)}
 const observer=new MutationObserver(()=>{requestAnimationFrame(()=>{updateStudy();updateAtlas()})});
 for(const id of ['studyName','studyProvince','atlasDetailName','atlasDetailProvince','atlasDetail']){const el=document.getElementById(id);if(el)observer.observe(el,{childList:true,characterData:true,subtree:id!=='atlasDetail',attributes:id==='atlasDetail',attributeFilter:id==='atlasDetail'?['class']:undefined})}
 window.addEventListener('pop-history-study-select',ev=>{const region=ev.detail?.region;const item=findFromSiteRegion(region);renderStudySelected(item);});
