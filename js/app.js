@@ -144,7 +144,17 @@ function renderPopulation(region){
 }
 let selectedStudy=null;
 const tabButtons=[...document.querySelectorAll('.nav button[data-tab]')];
-const panels={quiz:$('#quizPanel'),study:$('#studyPanel'),atlas:$('#atlasPanel'),ranking:$('#rankingPanel'),climateRanking:$('#climateRankingPanel'),industry:$('#industryPanel')};
+
+const panels = {
+  quiz: $('#quizPanel'),
+  study: $('#studyPanel'),
+  atlas: $('#atlasPanel'),
+  ranking: $('#rankingPanel'),
+  climateRanking: $('#climateRankingPanel'),
+  industry: $('#industryPanel'),
+  notes: $('#notesPanel')
+};
+
 
 function openTab(name){
   if(name==='ranking' && typeof renderRanking==='function') renderRanking();
