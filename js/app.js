@@ -152,6 +152,7 @@ const panels = {
   ranking: $('#rankingPanel'),
   climateRanking: $('#climateRankingPanel'),
   industry: $('#industryPanel'),
+  energy: $('#energyPanel'),
   notes: $('#notesPanel')
 };
 
