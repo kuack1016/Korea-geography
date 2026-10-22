@@ -7,10 +7,11 @@ const DATA={
  jungang:{name:'중앙선',color:'#18a078',stops:['서울','원주','단양','안동','영천','경주','울산','부산']},
  gangneung:{name:'강릉선',color:'#06a6d8',stops:['서울','원주','횡성','평창','강릉','동해']},
  jeolla:{name:'전라선',color:'#e99a22',stops:['서울','아산','청주','익산','전주','남원','여수']},
- honam:{name:'호남선',color:'#a05dd7',stops:['서울','아산','청주','익산','정읍','광주','목포']}
+ honam:{name:'호남선',color:'#a05dd7',stops:['서울','아산','청주','익산','정읍','광주','목포']},
+ gtxa:{name:'GTX-A',color:'#e53935',stops:['파주','고양','서울','성남','용인','화성']}
 };
 const names={'서울':'서울특별시','대전':'대전광역시','대구':'대구광역시','울산':'울산광역시','부산':'부산광역시','광주':'광주광역시'};
-const stations={'아산':'천안아산역','청주':'오송역','서울':'서울역','대전':'대전역','대구':'동대구역','경주':'경주역','울산':'울산역','부산':'부산역','원주':'만종역','단양':'단양역','안동':'안동역','영천':'영천역','횡성':'횡성역','평창':'평창역','강릉':'강릉역','동해':'동해역','익산':'익산역','전주':'전주역','남원':'남원역','여수':'여수엑스포역','정읍':'정읍역','광주':'광주송정역','목포':'목포역'};
+const stations={'아산':'천안아산역','청주':'오송역','서울':'서울역','대전':'대전역','대구':'동대구역','경주':'경주역','울산':'울산역','부산':'부산역','원주':'만종역','단양':'단양역','안동':'안동역','영천':'영천역','횡성':'횡성역','평창':'평창역','강릉':'강릉역','동해':'동해역','익산':'익산역','전주':'전주역','남원':'남원역','여수':'여수엑스포역','정읍':'정읍역','광주':'광주송정역','목포':'목포역','파주':'운정중앙역','고양':'킨텍스역·대곡역','성남':'성남역','용인':'구성역','화성':'동탄역'};
 // Multi-island administrative regions need a mainland/urban-core marker rather than
 // the center of the entire bounding box (which can fall far out at sea).
 // Coordinates use the same 720 × 900 viewBox as the embedded city/county map.
@@ -31,7 +32,7 @@ function point(name){
  const pt=b&&centers[b.id];
  return overrides[name]||pt||{x:350,y:450};
 }
-const aliases={아산:['아산','아산시','천안아산','천안아산역'],청주:['청주','청주시','오송','오송역']};
+const aliases={파주:['파주','파주시'],고양:['고양','고양시'],서울:['서울','서울특별시'],성남:['성남','성남시'],용인:['용인','용인시'],화성:['화성','화성시'],아산:['아산','아산시','천안아산','천안아산역'],청주:['청주','청주시','오송','오송역']};
 let index=0,playing=false,raf=0,zoom=1,pan={x:0,y:0},trainPoint=null;
 const el=(tag,attrs={},txt)=>{const e=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,v));if(txt!==undefined)e.textContent=txt;return e};
 const route=()=>DATA[$('railRoute').value],mode=()=>$('railMode').value;
