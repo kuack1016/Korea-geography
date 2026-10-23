@@ -889,3 +889,11 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 /* Union outline is computed from the alpha of the entire district, never from individual dong paths. */
 #innerCityPanel .inner-city-district{filter:url(#cityDistrictEdge)!important}
 #innerCityPanel .inner-city-district>path{stroke:none!important}
+
+/* Inner-city viewport gestures and concept editor */
+#innerCityPanel #innerCitySvg{touch-action:none!important;user-select:none;-webkit-user-select:none}
+#innerCityPanel #innerCityConceptInput{box-sizing:border-box;display:block;width:100%;min-height:145px;margin-top:10px;padding:11px;border:1px solid #d4dce8;border-radius:10px;background:#fff;color:var(--ink);font:inherit;font-size:14px;line-height:1.6;resize:vertical}
+#innerCityPanel #innerCityConceptInput:disabled{background:#f7f9fc}
+#innerCityPanel .inner-city-concept-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+#innerCityPanel #innerCityConceptSave{border:0;border-radius:9px;padding:9px 16px;background:#3974f6;color:white;font-weight:700;cursor:pointer}
+#innerCityPanel #innerCityConceptSave:disabled{opacity:.45;cursor:default}
