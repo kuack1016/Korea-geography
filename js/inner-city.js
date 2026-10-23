@@ -4,16 +4,40 @@ if(!root||!modes)return;
 const original=root.querySelector('.study-layout'),note=document.getElementById('studyModeNote');
 const tab=document.getElementById('innerCityTab');if(!tab)return;
 const panel=document.createElement('div');panel.id='innerCityPanel';panel.className='study-layout';panel.hidden=true;
-panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div><div class="study-notes-card"><b>핵심개념</b><p class="small" id="innerCityConceptHint">구·군을 선택하면 핵심개념을 작성할 수 있습니다.</p><textarea id="innerCityConceptInput" rows="7" placeholder="핵심개념을 한 줄에 하나씩 입력하세요." disabled></textarea><div class="inner-city-concept-actions"><button type="button" id="innerCityConceptSave" disabled>저장</button><span id="innerCityConceptMessage" class="small" aria-live="polite"></span></div><p class="small">이 기기의 브라우저에 저장됩니다.</p></div></aside>`;
+panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div><div class="study-notes-card"><b>핵심개념</b><p class="small" id="innerCityConceptHint">구·군을 선택하면 핵심개념을 작성할 수 있습니다.</p><textarea id="innerCityConceptInput" rows="7" placeholder="핵심개념을 한 줄에 하나씩 입력하세요." disabled></textarea><div class="inner-city-concept-actions"><button type="button" id="innerCityConceptSave" disabled>저장</button><span id="innerCityConceptMessage" class="small" aria-live="polite"></span></div><p class="small">Firebase에 저장되어 승인된 편집자들과 공유됩니다.</p></div></aside>`;
 original.insertAdjacentElement('beforebegin',panel);
 const svg=panel.querySelector('svg'),g=panel.querySelector('#innerCityShapes'),status=panel.querySelector('#innerCityStatus'),name=panel.querySelector('#innerCityName'),province=panel.querySelector('#innerCityProvince');
 const cities={서울:{prefix:'11',label:'서울특별시',count:25,names:'종로구 중구 용산구 성동구 광진구 동대문구 중랑구 성북구 강북구 도봉구 노원구 은평구 서대문구 마포구 양천구 강서구 구로구 금천구 영등포구 동작구 관악구 서초구 강남구 송파구 강동구'.split(' ')},부산:{prefix:'26',label:'부산광역시',count:16,names:'중구 서구 동구 영도구 부산진구 동래구 남구 북구 해운대구 사하구 금정구 강서구 연제구 수영구 사상구 기장군'.split(' ')},대구:{prefix:'27',label:'대구광역시',count:9,names:'중구 동구 서구 남구 북구 수성구 달서구 달성군 군위군'.split(' ')}};
-let city='서울',features=null,selected=null,request=null,selectedDistrict=null;
-const conceptInput=panel.querySelector('#innerCityConceptInput'),conceptSave=panel.querySelector('#innerCityConceptSave'),conceptMessage=panel.querySelector('#innerCityConceptMessage');
-function conceptKey(){return 'kg-inner-city-concept-v1:'+city+':'+selectedDistrict}
-function showConcept(label){selectedDistrict=label;conceptInput.disabled=false;conceptSave.disabled=false;conceptMessage.textContent='';try{conceptInput.value=localStorage.getItem(conceptKey())||''}catch(_){conceptInput.value='';conceptMessage.textContent='이 브라우저에서 저장소를 사용할 수 없습니다.'}}
-conceptSave.addEventListener('click',()=>{if(!selectedDistrict)return;try{localStorage.setItem(conceptKey(),conceptInput.value);conceptMessage.textContent='이 브라우저에 저장했습니다.'}catch(_){conceptMessage.textContent='저장하지 못했습니다.'}});
-function resetConcept(){selectedDistrict=null;conceptInput.value='';conceptInput.disabled=true;conceptSave.disabled=true;conceptMessage.textContent=''}
+let city='서울',features=null,selected=null,request=null,selectedDistrict=null,unsubscribeConcept=null,conceptDirty=false;
+const conceptInput=panel.querySelector('#innerCityConceptInput'),conceptSave=panel.querySelector('#innerCityConceptSave'),conceptMessage=panel.querySelector('#innerCityConceptMessage'),conceptHint=panel.querySelector('#innerCityConceptHint');
+const conceptCard=conceptInput.closest('.study-notes-card');
+conceptCard.hidden=false;
+function conceptApi(){return window.KGCityConcepts}
+function syncConceptPermissions(){const edit=!!conceptApi()?.canEdit();conceptInput.disabled=!selectedDistrict||!edit;conceptSave.disabled=!selectedDistrict||!edit;if(selectedDistrict)conceptHint.textContent=edit?'핵심개념을 한 줄에 하나씩 입력하세요.':'읽기 전용 · 작성하려면 승인된 편집자로 로그인하세요.'}
+function stopConcept(){if(unsubscribeConcept){unsubscribeConcept();unsubscribeConcept=null}}
+function showConcept(label){
+ stopConcept();selectedDistrict=label;conceptDirty=false;conceptInput.value='';conceptMessage.textContent='Firebase에서 핵심개념을 불러오는 중…';syncConceptPermissions();
+ if(!conceptApi()){conceptMessage.textContent='Firebase 연결 대기 중…';return}
+ const requestedCity=city,requestedDistrict=label;
+ unsubscribeConcept=conceptApi().subscribe(requestedCity,requestedDistrict,data=>{
+  if(city!==requestedCity||selectedDistrict!==requestedDistrict)return;
+  if(data.error){conceptMessage.textContent='Firebase 읽기 실패: '+data.error+' · Firestore 규칙을 확인하세요.';return}
+  if(!conceptDirty)conceptInput.value=(data.core||[]).join('\n');
+  conceptMessage.textContent='Firebase 공동 편집 · 자동 동기화됨';syncConceptPermissions();
+ });
+}
+conceptInput.addEventListener('input',()=>{conceptDirty=true;conceptMessage.textContent='변경사항이 저장되지 않았습니다.'});
+conceptSave.addEventListener('click',async()=>{
+ if(!selectedDistrict||!conceptApi())return;
+ const district=selectedDistrict,cityAtSave=city,lines=conceptInput.value.split(/\r?\n/);
+ conceptSave.disabled=true;conceptMessage.textContent='Firebase에 저장 중…';
+ try{await conceptApi().save(cityAtSave,district,lines);if(city===cityAtSave&&selectedDistrict===district){conceptDirty=false;conceptMessage.textContent='Firebase에 저장했습니다.'}}
+ catch(e){conceptMessage.textContent='저장 실패: '+(e.code||e.message)+' · Firestore 규칙 확인 필요'}
+ finally{syncConceptPermissions()}
+});
+function resetConcept(){stopConcept();selectedDistrict=null;conceptDirty=false;conceptInput.value='';conceptInput.disabled=true;conceptSave.disabled=true;conceptMessage.textContent='';conceptHint.textContent='구·군을 선택하면 핵심개념이 표시됩니다.'}
+window.addEventListener('kg-city-firebase-ready',()=>{if(selectedDistrict)showConcept(selectedDistrict)});
+window.addEventListener('kg-city-auth-changed',syncConceptPermissions);
 function points(geometry){const out=[];function visit(x){if(!Array.isArray(x))return;if(typeof x[0]==='number'&&typeof x[1]==='number'){out.push(x);return}x.forEach(visit)}visit(geometry.coordinates);return out}
 function geomPath(geometry,project){const polys=geometry.type==='Polygon'?[geometry.coordinates]:geometry.coordinates;return polys.map(poly=>poly.map(r=>r.map((p,i)=>(i?'L':'M')+project(p).map(n=>n.toFixed(2)).join(',')).join('')+'Z').join('')).join('')}
 function regionName(f){return String((f.properties||{}).SIG_KOR_NM||'').trim()}
