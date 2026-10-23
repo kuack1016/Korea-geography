@@ -849,3 +849,6 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 
 /* 도시 내부 구조: 기존 지도학습 카드·탭 디자인 계승 */
 #innerCityPanel[hidden]{display:none!important}#innerCityPanel .inner-city-toolbar{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-bottom:10px;font-weight:800}#innerCityPanel .inner-city-toolbar select{min-width:105px}#innerCitySvg{display:block;width:100%;height:auto;max-height:70vh;touch-action:manipulation}#innerCityShapes .inner-city-region{fill:#e5edf8;stroke:#8ea2bb;stroke-width:1.1;vector-effect:non-scaling-stroke;cursor:pointer;outline:none}#innerCityShapes .inner-city-region:hover,#innerCityShapes .inner-city-region:focus{fill:#c5d9fb}#innerCityShapes .inner-city-region.selected{fill:#3974f6}#innerCityPanel .inner-city-credit{margin-top:8px}#innerCityPanel .study-notes-card{margin-top:15px}
+
+/* City districts: merge administrative-dong geometry visually without internal borders */
+#innerCityShapes .inner-city-region{stroke:none!important;filter:url(#innerCityOutline)!important;fill-rule:evenodd}#innerCityPanel .inner-city-toolbar{padding:10px 12px 0}#innerCityPanel .study-map{overflow:hidden}#innerCitySvg{max-height:540px;touch-action:pan-y}#innerCityPanel .inner-city-credit{padding:0 12px 10px}#innerCityPanel .study-info{align-self:start}
