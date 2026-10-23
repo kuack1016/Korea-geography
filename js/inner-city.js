@@ -8,7 +8,7 @@ panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class=
 original.insertAdjacentElement('beforebegin',panel);
 const svg=panel.querySelector('svg'),g=panel.querySelector('#innerCityShapes'),status=panel.querySelector('#innerCityStatus'),name=panel.querySelector('#innerCityName'),province=panel.querySelector('#innerCityProvince');
 const cities={서울:{prefix:'11',label:'서울특별시',count:25,names:'종로구 중구 용산구 성동구 광진구 동대문구 중랑구 성북구 강북구 도봉구 노원구 은평구 서대문구 마포구 양천구 강서구 구로구 금천구 영등포구 동작구 관악구 서초구 강남구 송파구 강동구'.split(' ')},부산:{prefix:'26',label:'부산광역시',count:16,names:'중구 서구 동구 영도구 부산진구 동래구 남구 북구 해운대구 사하구 금정구 강서구 연제구 수영구 사상구 기장군'.split(' ')},대구:{prefix:'27',label:'대구광역시',count:9,names:'중구 동구 서구 남구 북구 수성구 달서구 달성군 군위군'.split(' ')}};
-let city='서울',features=null,selected=null,request=null,selectedDistrict=null,unsubscribeConcept=null,conceptDirty=false;
+let city='서울',features=null,selected=null,request=null,selectedDistrict=null,unsubscribeConcept=null,unsubscribeHistory=null,conceptDirty=false;
 const conceptInput=panel.querySelector('#innerCityConceptInput'),conceptSave=panel.querySelector('#innerCityConceptSave'),conceptMessage=panel.querySelector('#innerCityConceptMessage'),conceptHint=panel.querySelector('#innerCityConceptHint');
 const conceptCard=conceptInput.closest('.study-notes-card'),conceptEditor=panel.querySelector('#innerCityConceptEditor'),conceptDisplay=panel.querySelector('#innerCityConceptDisplay'),conceptHistory=panel.querySelector('#innerCityConceptHistory');
 const editButton=panel.querySelector('#innerCityConceptEdit');
@@ -16,11 +16,25 @@ editButton.addEventListener('click',()=>{conceptEditor.hidden=false;syncConceptP
 panel.querySelector('#innerCityConceptCancel').addEventListener('click',()=>{conceptEditor.hidden=true;conceptDirty=false;showConcept(selectedDistrict)});
 function conceptApi(){return window.KGCityConcepts}
 function syncConceptPermissions(){const edit=!!conceptApi()?.canEdit();conceptInput.disabled=!selectedDistrict||!edit;conceptSave.disabled=!selectedDistrict||!edit;if(selectedDistrict)conceptHint.textContent=edit?'핵심개념을 한 줄에 하나씩 입력하세요.':'읽기 전용 · 작성하려면 승인된 편집자로 로그인하세요.'}
-function stopConcept(){if(unsubscribeConcept){unsubscribeConcept();unsubscribeConcept=null}}
+function stopConcept(){if(unsubscribeConcept){unsubscribeConcept();unsubscribeConcept=null}if(unsubscribeHistory){unsubscribeHistory();unsubscribeHistory=null}}
 function showConcept(label){
  stopConcept();selectedDistrict=label;conceptCard.hidden=false;conceptEditor.hidden=true;conceptDirty=false;conceptInput.value='';conceptDisplay.textContent='불러오는 중…';conceptMessage.textContent='Firebase에서 핵심개념을 불러오는 중…';syncConceptPermissions();
  if(!conceptApi()){conceptMessage.textContent='Firebase 연결 대기 중…';return}
  const requestedCity=city,requestedDistrict=label;
+ conceptHistory.textContent='편집 기록을 불러오는 중…';
+ unsubscribeHistory=conceptApi().subscribeHistory(requestedCity,requestedDistrict,data=>{
+  if(city!==requestedCity||selectedDistrict!==requestedDistrict)return;
+  conceptHistory.replaceChildren();
+  if(data.error){conceptHistory.textContent='기록 조회 실패: '+data.error;return}
+  if(!data.rows.length){conceptHistory.textContent='아직 편집 기록이 없습니다.';return}
+  for(const item of data.rows){
+   const row=document.createElement('div');row.className='kg-history-item';
+   const who=document.createElement('b');who.textContent=item.nickname||'편집자';
+   const when=document.createElement('span');when.textContent=' · '+(item.at?.toDate?.()?.toLocaleString('ko-KR')||'시간 확인 중');
+   const change=document.createElement('div');change.className='kg-history-change';change.textContent='이전: '+(item.before||[]).join(' / ')+'\n변경: '+(item.after||[]).join(' / ');
+   row.append(who,when,change);conceptHistory.append(row);
+  }
+ });
  unsubscribeConcept=conceptApi().subscribe(requestedCity,requestedDistrict,data=>{
   if(city!==requestedCity||selectedDistrict!==requestedDistrict)return;
   if(data.error){conceptMessage.textContent='Firebase 읽기 실패: '+data.error+' · Firestore 규칙을 확인하세요.';return}
