@@ -897,3 +897,12 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel .inner-city-concept-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
 #innerCityPanel #innerCityConceptSave{border:0;border-radius:9px;padding:9px 16px;background:#3974f6;color:white;font-weight:700;cursor:pointer}
 #innerCityPanel #innerCityConceptSave:disabled{opacity:.45;cursor:default}
+
+/* Match the original map study notes: compact rows, editor only on request */
+#innerCityPanel #innerCityConceptCard[hidden],#innerCityPanel #innerCityConceptEditor[hidden]{display:none!important}
+#innerCityPanel #innerCityConceptCard{padding:16px 18px!important}
+#innerCityPanel #innerCityConceptDisplay{white-space:pre-line;overflow-wrap:anywhere}
+#innerCityPanel #innerCityConceptEdit{margin-top:14px}
+#innerCityPanel #innerCityConceptEditor{margin-top:12px;border-top:1px solid #dce4ef;padding-top:12px}
+#innerCityPanel #innerCityConceptHistoryDetails{margin-top:10px;font-size:12px}
+#innerCityPanel #innerCityConceptMessage:empty{display:none}
