@@ -906,3 +906,8 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel #innerCityConceptEditor{margin-top:12px;border-top:1px solid #dce4ef;padding-top:12px}
 #innerCityPanel #innerCityConceptHistoryDetails{margin-top:10px;font-size:12px}
 #innerCityPanel #innerCityConceptMessage:empty{display:none}
+
+/* City SVG paths should behave exactly like the established study map: no iPad focus rectangle. */
+#innerCityPanel #innerCitySvg path,#innerCityPanel #innerCitySvg path:focus,#innerCityPanel #innerCitySvg path:active{outline:none!important;box-shadow:none!important;filter:none!important;-webkit-tap-highlight-color:transparent!important}
+#innerCityPanel #innerCitySvg,#innerCityPanel #innerCityShapes{-webkit-tap-highlight-color:transparent!important}
+#innerCityPanel #innerCitySvg path:focus-visible{outline:none!important}
