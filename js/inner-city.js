@@ -11,22 +11,39 @@ const cities={서울:{prefix:'11',label:'서울특별시',count:25,names:'종로
 let city='서울',features=null,selected=null,request=null;
 function points(geometry){const out=[];function visit(x){if(!Array.isArray(x))return;if(typeof x[0]==='number'&&typeof x[1]==='number'){out.push(x);return}x.forEach(visit)}visit(geometry.coordinates);return out}
 function geomPath(geometry,project){const polys=geometry.type==='Polygon'?[geometry.coordinates]:geometry.coordinates;return polys.map(poly=>poly.map(r=>r.map((p,i)=>(i?'L':'M')+project(p).map(n=>n.toFixed(2)).join(',')).join('')+'Z').join('')).join('')}
-function regionName(f){const p=f.properties||{};const full=String(p.adm_nm||p.adm_nm_full||'').trim();const tokens=full.split(/\s+/);const short=String(p.sggnm||p.SIG_KOR_NM||tokens[1]||'').trim();return short}
-function render(){if(!features)return;const cfg=cities[city];selected=null;name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
-const groups=new Map(cfg.names.map(n=>[n,[]]));
-for(const f of features){const p=f.properties||{};const fullname=String(p.adm_nm||'');const code=String(p.adm_cd||p.adm_cd8||'');if(!fullname.startsWith(cfg.label+' '))continue;const nm=regionName(f);if(groups.has(nm))groups.get(nm).push(f)}
-const present=[...groups].filter(([,fs])=>fs.length);
-if(!present.length){status.textContent='행정구역 자료를 읽지 못했습니다. 다시 시도해 주세요.';return}
-const all=[];for(const [,fs] of present)for(const f of fs)for(const point of points(f.geometry))all.push(point);
-let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
-for(const p of all){if(p[0]<minx)minx=p[0];if(p[0]>maxx)maxx=p[0];if(p[1]<miny)miny=p[1];if(p[1]>maxy)maxy=p[1]}
-if(!all.length||!Number.isFinite(minx)||maxx===minx||maxy===miny){status.textContent='경계 좌표를 확인할 수 없습니다.';return}
-const w=690,h=480,scale=Math.min(w/(maxx-minx),h/(maxy-miny)),left=(720-(maxx-minx)*scale)/2,top=(510-(maxy-miny)*scale)/2;
-const project=p=>[left+(p[0]-minx)*scale,top+(maxy-p[1])*scale];
-for(const [label,fs] of present){const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.setAttribute('class','inner-city-district');group.setAttribute('role','button');group.setAttribute('tabindex','0');group.setAttribute('aria-label',label);const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',fs.map(f=>geomPath(f.geometry,project)).join(' '));path.setAttribute('fill-rule','nonzero');group.appendChild(path);const pick=()=>{if(selected)selected.classList.remove('selected');selected=group;group.classList.add('selected');name.textContent=label;province.textContent=cfg.label};group.addEventListener('click',pick);group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});g.appendChild(group)}
-status.textContent=present.length+'개 구·군 · 지도를 눌러 선택하세요.'+(present.length!==cfg.count?' (일부 구·군 경계 확인 필요)':'');
+function regionName(f){return String((f.properties||{}).SIG_KOR_NM||'').trim()}
+function render(){
+ if(!features)return;
+ const cfg=cities[city];selected=null;name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
+ const present=features.filter(f=>String((f.properties||{}).SIG_CD||'').startsWith(cfg.prefix)&&cfg.names.includes(regionName(f)));
+ if(present.length!==cfg.count){status.textContent='경계 자료 확인 필요: '+present.length+'/'+cfg.count+'개 구·군';console.warn('City district count mismatch',city,present.map(regionName));}
+ if(!present.length)return;
+ let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
+ for(const f of present)for(const p of points(f.geometry)){minx=Math.min(minx,p[0]);maxx=Math.max(maxx,p[0]);miny=Math.min(miny,p[1]);maxy=Math.max(maxy,p[1]);}
+ if(!Number.isFinite(minx)||maxx===minx||maxy===miny){status.textContent='경계 좌표 오류';return}
+ const w=650,h=450,scale=Math.min(w/(maxx-minx),h/(maxy-miny)),left=(720-(maxx-minx)*scale)/2,top=(510-(maxy-miny)*scale)/2;
+ const project=p=>[left+(p[0]-minx)*scale,top+(maxy-p[1])*scale];
+ for(const f of present){
+  const label=regionName(f),path=document.createElementNS('http://www.w3.org/2000/svg','path');
+  path.setAttribute('class','inner-city-region');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');
+  path.setAttribute('role','button');path.setAttribute('tabindex','0');path.setAttribute('aria-label',label);
+  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label};
+  path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
+  g.appendChild(path);
+ }
+ if(present.length===cfg.count)status.textContent=present.length+'개 구·군 · 지도를 눌러 선택하세요.';
 }
-async function load(){if(features){render();return}if(request)return request;status.textContent='경계 자료를 불러오는 중…';request=(async()=>{try{const response=await fetch('https://raw.githubusercontent.com/vuski/admdongkor/master/ver20261001/HangJeongDong_ver20261001.geojson');if(!response.ok)throw Error('HTTP '+response.status);const json=await response.json();if(!Array.isArray(json.features))throw Error('Invalid GeoJSON');features=json.features;render()}catch(err){status.textContent='경계 자료 로딩 실패. 탭을 다시 눌러 재시도해 주세요.';console.error('city boundary',err)}finally{request=null}})();return request}
+async function load(){
+ if(features){render();return}if(request)return request;
+ status.textContent='시·군·구 경계 자료를 불러오는 중…';
+ request=(async()=>{try{
+  const response=await fetch('https://raw.githubusercontent.com/KnellBalm/kr-admin-geojson/main/sig.geojson');
+  if(!response.ok)throw Error('HTTP '+response.status);
+  const json=await response.json();if(!Array.isArray(json.features))throw Error('Invalid GeoJSON');
+  features=json.features;render();
+ }catch(err){status.textContent='구·군 경계 자료 로딩 실패. 다시 시도해 주세요.';console.error('city district boundary',err)}
+ finally{request=null}})();return request;
+}
 function activate(on){root.classList.toggle('inner-city-active',on);original.style.setProperty('display',on?'none':'grid','important');panel.hidden=!on;tab.classList.toggle('active',on);const memory=document.getElementById('memoryToggle');if(memory)memory.style.visibility=on?'hidden':'';if(on){original.setAttribute('aria-hidden','true');modes.querySelectorAll('button').forEach(x=>{if(x!==tab)x.classList.remove('active')});['citySubModes','cityLegend','heritageLegend'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'});note.textContent='서울·부산·대구의 구·군 경계를 선택해 학습합니다.';load()}else{original.removeAttribute('aria-hidden')}}
 tab.addEventListener('click',()=>activate(true));
 modes.querySelectorAll('button').forEach(btn=>{if(btn!==tab)btn.addEventListener('click',()=>activate(false))});
