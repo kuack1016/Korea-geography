@@ -911,3 +911,6 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel #innerCitySvg path,#innerCityPanel #innerCitySvg path:focus,#innerCityPanel #innerCitySvg path:active{outline:none!important;box-shadow:none!important;filter:none!important;-webkit-tap-highlight-color:transparent!important}
 #innerCityPanel #innerCitySvg,#innerCityPanel #innerCityShapes{-webkit-tap-highlight-color:transparent!important}
 #innerCityPanel #innerCitySvg path:focus-visible{outline:none!important}
+
+/* Touch devices must not retain hover-blue district styling after a tap. */
+@media(hover:none){#innerCityPanel .inner-city-region:hover:not(.selected){fill:#fbfcfe!important}}
