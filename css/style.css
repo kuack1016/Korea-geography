@@ -864,3 +864,12 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel #innerCitySvg{width:100%;height:auto;max-height:450px;display:block;touch-action:manipulation}
 #innerCityPanel .inner-city-credit{padding:0 12px 10px;margin:0}
 #innerCityPanel .study-info{align-self:start}
+
+/* City map parity with existing study map, override earlier experimental styles */
+#studyPanel.inner-city-active .study-layout:not(#innerCityPanel){display:none!important}
+#innerCityPanel .inner-city-region{fill:#fbfcfe!important;stroke:#9aa9bd!important;stroke-width:.58!important;vector-effect:non-scaling-stroke!important;filter:none!important}
+#innerCityPanel .inner-city-region.selected{fill:#3974f6!important;stroke:#9aa9bd!important;stroke-width:.58!important}
+#innerCityPanel .inner-city-region:hover:not(.selected){fill:#edf3fc!important}
+#innerCityPanel .study-map{background:#fff!important}
+#innerCityPanel .inner-city-toolbar{padding:12px 12px 0!important}
+#innerCityPanel #innerCitySvg{max-height:510px!important}
