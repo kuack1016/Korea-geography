@@ -4,62 +4,17 @@ if(!root||!modes)return;
 const original=root.querySelector('.study-layout'),note=document.getElementById('studyModeNote');
 const tab=document.getElementById('innerCityTab');if(!tab)return;
 const panel=document.createElement('div');panel.id='innerCityPanel';panel.className='study-layout';panel.hidden=true;
-panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div><div class="study-notes-card inner-city-concepts" id="innerCityConceptCard" hidden><div class="study-note-tags"><div class="study-note-row"><span class="study-note-label">핵심 개념</span><span class="study-note-value" id="innerCityConceptDisplay">등록된 핵심개념이 없습니다.</span></div></div><button type="button" class="kg-study-edit" id="innerCityConceptEdit">핵심개념 편집 · 기록</button><div id="innerCityConceptEditor" hidden><p class="small" id="innerCityConceptHint">핵심개념을 한 줄에 하나씩 입력하세요.</p><textarea id="innerCityConceptInput" rows="7" placeholder="핵심개념을 한 줄에 하나씩 입력하세요." disabled></textarea><div class="inner-city-concept-actions"><button type="button" id="innerCityConceptSave" disabled>변경 저장</button><button type="button" id="innerCityConceptCancel">취소</button></div></div><div id="innerCityConceptMessage" class="small" aria-live="polite"></div><details id="innerCityConceptHistoryDetails"><summary>최근 편집 기록</summary><div id="innerCityConceptHistory" class="small">지역을 선택하면 표시됩니다.</div></details></div></aside>`;
+panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div></aside>`;
 original.insertAdjacentElement('beforebegin',panel);
 const svg=panel.querySelector('svg'),g=panel.querySelector('#innerCityShapes'),status=panel.querySelector('#innerCityStatus'),name=panel.querySelector('#innerCityName'),province=panel.querySelector('#innerCityProvince');
 const cities={서울:{prefix:'11',label:'서울특별시',count:25,names:'종로구 중구 용산구 성동구 광진구 동대문구 중랑구 성북구 강북구 도봉구 노원구 은평구 서대문구 마포구 양천구 강서구 구로구 금천구 영등포구 동작구 관악구 서초구 강남구 송파구 강동구'.split(' ')},부산:{prefix:'26',label:'부산광역시',count:16,names:'중구 서구 동구 영도구 부산진구 동래구 남구 북구 해운대구 사하구 금정구 강서구 연제구 수영구 사상구 기장군'.split(' ')},대구:{prefix:'27',label:'대구광역시',count:9,names:'중구 동구 서구 남구 북구 수성구 달서구 달성군 군위군'.split(' ')}};
-let city='서울',features=null,selected=null,request=null,selectedDistrict=null,unsubscribeConcept=null,unsubscribeHistory=null,conceptDirty=false;
-const conceptInput=panel.querySelector('#innerCityConceptInput'),conceptSave=panel.querySelector('#innerCityConceptSave'),conceptMessage=panel.querySelector('#innerCityConceptMessage'),conceptHint=panel.querySelector('#innerCityConceptHint');
-const conceptCard=conceptInput.closest('.study-notes-card'),conceptEditor=panel.querySelector('#innerCityConceptEditor'),conceptDisplay=panel.querySelector('#innerCityConceptDisplay'),conceptHistory=panel.querySelector('#innerCityConceptHistory');
-const editButton=panel.querySelector('#innerCityConceptEdit');
-editButton.addEventListener('click',()=>{conceptEditor.hidden=false;syncConceptPermissions()});
-panel.querySelector('#innerCityConceptCancel').addEventListener('click',()=>{conceptEditor.hidden=true;conceptDirty=false;showConcept(selectedDistrict)});
-function conceptApi(){return window.KGCityConcepts}
-function syncConceptPermissions(){const edit=!!conceptApi()?.canEdit();conceptInput.disabled=!selectedDistrict||!edit;conceptSave.disabled=!selectedDistrict||!edit;if(selectedDistrict)conceptHint.textContent=edit?'핵심개념을 한 줄에 하나씩 입력하세요.':'읽기 전용 · 작성하려면 승인된 편집자로 로그인하세요.'}
-function stopConcept(){if(unsubscribeConcept){unsubscribeConcept();unsubscribeConcept=null}if(unsubscribeHistory){unsubscribeHistory();unsubscribeHistory=null}}
-function showConcept(label){
- stopConcept();selectedDistrict=label;conceptCard.hidden=false;conceptEditor.hidden=true;conceptDirty=false;conceptInput.value='';conceptDisplay.textContent='불러오는 중…';conceptMessage.textContent='Firebase에서 핵심개념을 불러오는 중…';syncConceptPermissions();
- if(!conceptApi()){conceptMessage.textContent='Firebase 연결 대기 중…';return}
- const requestedCity=city,requestedDistrict=label;
- conceptHistory.textContent='편집 기록을 불러오는 중…';
- unsubscribeHistory=conceptApi().subscribeHistory(requestedCity,requestedDistrict,data=>{
-  if(city!==requestedCity||selectedDistrict!==requestedDistrict)return;
-  conceptHistory.replaceChildren();
-  if(data.error){conceptHistory.textContent='기록 조회 실패: '+data.error;return}
-  if(!data.rows.length){conceptHistory.textContent='아직 편집 기록이 없습니다.';return}
-  for(const item of data.rows){
-   const row=document.createElement('div');row.className='kg-history-item';
-   const who=document.createElement('b');who.textContent=item.nickname||'편집자';
-   const when=document.createElement('span');when.textContent=' · '+(item.at?.toDate?.()?.toLocaleString('ko-KR')||'시간 확인 중');
-   const change=document.createElement('div');change.className='kg-history-change';change.textContent='이전: '+(item.before||[]).join(' / ')+'\n변경: '+(item.after||[]).join(' / ');
-   row.append(who,when,change);conceptHistory.append(row);
-  }
- });
- unsubscribeConcept=conceptApi().subscribe(requestedCity,requestedDistrict,data=>{
-  if(city!==requestedCity||selectedDistrict!==requestedDistrict)return;
-  if(data.error){conceptMessage.textContent='Firebase 읽기 실패: '+data.error+' · Firestore 규칙을 확인하세요.';return}
-  if(!conceptDirty)conceptInput.value=(data.core||[]).join('\n');conceptDisplay.textContent=(data.core||[]).join('\n')||'등록된 핵심개념이 없습니다.';
-  conceptMessage.textContent='Firebase 공동 편집 · 자동 동기화됨';syncConceptPermissions();
- });
-}
-conceptInput.addEventListener('input',()=>{conceptDirty=true;conceptMessage.textContent='변경사항이 저장되지 않았습니다.'});
-conceptSave.addEventListener('click',async()=>{
- if(!selectedDistrict||!conceptApi())return;
- const district=selectedDistrict,cityAtSave=city,lines=conceptInput.value.split(/\r?\n/);
- conceptSave.disabled=true;conceptMessage.textContent='Firebase에 저장 중…';
- try{await conceptApi().save(cityAtSave,district,lines);if(city===cityAtSave&&selectedDistrict===district){conceptDirty=false;conceptMessage.textContent='Firebase에 저장했습니다.'}}
- catch(e){conceptMessage.textContent='저장 실패: '+(e.code||e.message)+' · Firestore 규칙 확인 필요'}
- finally{syncConceptPermissions()}
-});
-function resetConcept(){stopConcept();conceptCard.hidden=true;conceptEditor.hidden=true;selectedDistrict=null;conceptDirty=false;conceptInput.value='';conceptInput.disabled=true;conceptSave.disabled=true;conceptMessage.textContent='';conceptHint.textContent='구·군을 선택하면 핵심개념이 표시됩니다.'}
-window.addEventListener('kg-city-firebase-ready',()=>{if(selectedDistrict)showConcept(selectedDistrict)});
-window.addEventListener('kg-city-auth-changed',syncConceptPermissions);
+let city='서울',features=null,selected=null,request=null;
 function points(geometry){const out=[];function visit(x){if(!Array.isArray(x))return;if(typeof x[0]==='number'&&typeof x[1]==='number'){out.push(x);return}x.forEach(visit)}visit(geometry.coordinates);return out}
 function geomPath(geometry,project){const polys=geometry.type==='Polygon'?[geometry.coordinates]:geometry.coordinates;return polys.map(poly=>poly.map(r=>r.map((p,i)=>(i?'L':'M')+project(p).map(n=>n.toFixed(2)).join(',')).join('')+'Z').join('')).join('')}
 function regionName(f){return String((f.properties||{}).SIG_KOR_NM||'').trim()}
 function render(){
  if(!features)return;
- const cfg=cities[city];resetView();selected=null;resetConcept();name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
+ const cfg=cities[city];resetView();selected=null;name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
  const present=features.filter(f=>String((f.properties||{}).SIG_CD||'').startsWith(cfg.prefix)&&cfg.names.includes(regionName(f)));
  if(present.length!==cfg.count){status.textContent='경계 자료 확인 필요: '+present.length+'/'+cfg.count+'개 구·군';console.warn('City district count mismatch',city,present.map(regionName));}
  if(!present.length)return;
@@ -71,24 +26,24 @@ function render(){
  for(const f of present){
   const label=regionName(f),path=document.createElementNS('http://www.w3.org/2000/svg','path');
   path.setAttribute('class','inner-city-region');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');
-  path.setAttribute('aria-label',label);
-  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;showConcept(label)};
-  path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
+  path.setAttribute('aria-label',label);path.dataset.district=label;
+  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label};
+  path.__cityPick=pick;path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
   g.appendChild(path);
  }
  if(present.length===cfg.count)status.textContent=present.length+'개 구·군 · 지도를 눌러 선택하세요.';
 }
 // Independent SVG viewport gestures: only the map zooms, never the page or the information card.
 const originalView={x:0,y:0,w:720,h:510};let view={...originalView},start=null,dragged=false,suppressClick=false;
-const pointers=new Map();
+const pointers=new Map();let tapTarget=null;
 function drawView(){svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '))}
 function clampView(v){v.w=Math.max(90,Math.min(720,v.w));v.h=v.w*510/720;v.x=Math.max(-v.w*.4,Math.min(720-v.w*.6,v.x));v.y=Math.max(-v.h*.4,Math.min(510-v.h*.6,v.y));return v}
 function relative(e){const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
 function gesture(){const a=[...pointers.values()];const center=a.length===1?a[0]:{x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};return{center,dist:a.length>1?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0,view:{...view}}}
 function zoomAt(p,factor){const w=view.w*factor,h=view.h*factor;view=clampView({x:view.x+p.x*(view.w-w),y:view.y+p.y*(view.h-h),w,h});drawView()}
-svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointers.set(e.pointerId,relative(e));try{svg.setPointerCapture(e.pointerId)}catch(_){}start=gesture();dragged=false;if(e.pointerType==='touch')e.preventDefault()},{passive:false});
+svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointers.set(e.pointerId,relative(e));tapTarget=e.target.closest?.('.inner-city-region')||null;try{svg.setPointerCapture(e.pointerId)}catch(_){}start=gesture();dragged=false;if(e.pointerType==='touch')e.preventDefault()},{passive:false});
 svg.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId)||!start)return;pointers.set(e.pointerId,relative(e));const now=gesture(),rect=svg.getBoundingClientRect(),distance=Math.hypot((now.center.x-start.center.x)*rect.width,(now.center.y-start.center.y)*rect.height);if(pointers.size>1||distance>8)dragged=true;if(!dragged)return;const factor=pointers.size>1&&start.dist>0?start.dist/Math.max(.001,now.dist):1;const w=start.view.w*factor,h=start.view.h*factor;view=clampView({x:start.view.x+start.center.x*start.view.w-now.center.x*w,y:start.view.y+start.center.y*start.view.h-now.center.y*h,w,h});drawView();e.preventDefault()},{passive:false});
-function pointerEnd(e){if(!pointers.has(e.pointerId))return;if(dragged)suppressClick=true;pointers.delete(e.pointerId);start=pointers.size?gesture():null;if(!pointers.size)dragged=false}
+function pointerEnd(e){if(!pointers.has(e.pointerId))return;const wasDragged=dragged;const target=tapTarget;pointers.delete(e.pointerId);if(!wasDragged&&e.type==='pointerup'&&target&&pointers.size===0){target.__cityPick?.();suppressClick=true}else if(wasDragged){suppressClick=true}start=pointers.size?gesture():null;if(!pointers.size){dragged=false;tapTarget=null}}
 svg.addEventListener('pointerup',pointerEnd);svg.addEventListener('pointercancel',pointerEnd);svg.addEventListener('lostpointercapture',pointerEnd);
 svg.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation();suppressClick=false}},true);
 svg.addEventListener('wheel',e=>{zoomAt(relative(e),Math.exp(e.deltaY*.0015));e.preventDefault()},{passive:false});
