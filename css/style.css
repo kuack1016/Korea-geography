@@ -919,3 +919,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel #innerCityShapes .inner-city-region:not(.selected){fill:#fbfcfe!important}
 @media(hover:hover) and (pointer:fine){#innerCityPanel #innerCityShapes .inner-city-region:hover:not(.selected){fill:#edf3fc!important}}
 #innerCityPanel #innerCityShapes .inner-city-region.selected,#innerCityPanel #innerCityShapes .inner-city-region.selected:hover{fill:#3974f6!important}
+
+/* City daytime-index choropleth: inline data colors take priority; selected district is softly muted like climate maps. */
+#innerCityPanel #innerCityShapes .inner-city-region{transition:opacity .16s ease,filter .16s ease}
+#innerCityPanel #innerCityShapes .inner-city-region.selected,#innerCityPanel #innerCityShapes .inner-city-region.selected:hover{opacity:.67!important;filter:blur(.35px)!important}
+#innerCityPanel #innerCityLegend{padding:4px 12px 10px;color:#71809b}
+#innerCityPanel #innerCityDaytime{margin-top:18px}
