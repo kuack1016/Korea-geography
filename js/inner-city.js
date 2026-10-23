@@ -17,8 +17,10 @@ const groups=new Map(cfg.names.map(n=>[n,[]]));
 for(const f of features){const p=f.properties||{};const fullname=String(p.adm_nm||'');const code=String(p.adm_cd||p.adm_cd8||'');if(!(fullname.startsWith(cfg.label+' ')||code.startsWith(cfg.prefix)))continue;const nm=regionName(f);if(groups.has(nm))groups.get(nm).push(f)}
 const present=[...groups].filter(([,fs])=>fs.length);
 if(!present.length){status.textContent='행정구역 자료를 읽지 못했습니다. 다시 시도해 주세요.';return}
-const all=present.flatMap(([,fs])=>fs.flatMap(f=>points(f.geometry)));
-const minx=Math.min(...all.map(p=>p[0])),maxx=Math.max(...all.map(p=>p[0])),miny=Math.min(...all.map(p=>p[1])),maxy=Math.max(...all.map(p=>p[1]));
+const all=[];for(const [,fs] of present)for(const f of fs)for(const point of points(f.geometry))all.push(point);
+let minx=Infinity,maxx=-Infinity,miny=Infinity,maxy=-Infinity;
+for(const p of all){if(p[0]<minx)minx=p[0];if(p[0]>maxx)maxx=p[0];if(p[1]<miny)miny=p[1];if(p[1]>maxy)maxy=p[1]}
+if(!all.length||!Number.isFinite(minx)||maxx===minx||maxy===miny){status.textContent='경계 좌표를 확인할 수 없습니다.';return}
 const w=690,h=480,scale=Math.min(w/(maxx-minx),h/(maxy-miny)),left=(720-(maxx-minx)*scale)/2,top=(510-(maxy-miny)*scale)/2;
 const project=p=>[left+(p[0]-minx)*scale,top+(maxy-p[1])*scale];
 for(const [label,fs] of present){const group=document.createElementNS('http://www.w3.org/2000/svg','g');group.setAttribute('class','inner-city-district');group.setAttribute('role','button');group.setAttribute('tabindex','0');group.setAttribute('aria-label',label);for(const f of fs){const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');group.appendChild(path)}const pick=()=>{if(selected)selected.classList.remove('selected');selected=group;group.classList.add('selected');name.textContent=label;province.textContent=cfg.label};group.addEventListener('click',pick);group.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});g.appendChild(group)}
