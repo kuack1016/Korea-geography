@@ -944,3 +944,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel .inner-city-stat-number{font-size:17px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
 #innerCityPanel .inner-city-stat-number small{font-size:12px;font-weight:400;margin-left:2px;color:#75849a}
 #innerCityPanel .inner-city-stats-empty{padding:15px 0;color:#8792a3;font-size:13px}
+
+/* v21: keep the data-driven color on selection; never reset it to a flat blue. */
+#innerCityPanel #innerCityShapes path.inner-city-region.selected{opacity:.58!important;filter:none!important}
+#innerCityPanel #innerCityShapes path.inner-city-region:not(.selected){opacity:1!important}
