@@ -35,17 +35,23 @@ function render(){
 }
 // Independent SVG viewport gestures: only the map zooms, never the page or the information card.
 const originalView={x:0,y:0,w:720,h:510};let view={...originalView},start=null,dragged=false,suppressClick=false;
-const pointers=new Map();let tapTarget=null;
+const pointers=new Map();let tapTarget=null;let touchStartTarget=null,touchStartX=0,touchStartY=0,touchMoved=false;
 function drawView(){svg.setAttribute('viewBox',[view.x,view.y,view.w,view.h].join(' '))}
 function clampView(v){v.w=Math.max(90,Math.min(720,v.w));v.h=v.w*510/720;v.x=Math.max(-v.w*.4,Math.min(720-v.w*.6,v.x));v.y=Math.max(-v.h*.4,Math.min(510-v.h*.6,v.y));return v}
 function relative(e){const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height}}
 function gesture(){const a=[...pointers.values()];const center=a.length===1?a[0]:{x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};return{center,dist:a.length>1?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0,view:{...view}}}
 function zoomAt(p,factor){const w=view.w*factor,h=view.h*factor;view=clampView({x:view.x+p.x*(view.w-w),y:view.y+p.y*(view.h-h),w,h});drawView()}
-svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointers.set(e.pointerId,relative(e));tapTarget=e.target.closest?.('.inner-city-region')||null;try{svg.setPointerCapture(e.pointerId)}catch(_){}start=gesture();dragged=false;if(e.pointerType==='touch')e.preventDefault()},{passive:false});
+svg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'&&e.button!==0)return;pointers.set(e.pointerId,relative(e));tapTarget=e.target.closest?.('.inner-city-region')||null;start=gesture();dragged=false;if(e.pointerType==='touch')e.preventDefault()},{passive:false});
 svg.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId)||!start)return;pointers.set(e.pointerId,relative(e));const now=gesture(),rect=svg.getBoundingClientRect(),distance=Math.hypot((now.center.x-start.center.x)*rect.width,(now.center.y-start.center.y)*rect.height);if(pointers.size>1||distance>8)dragged=true;if(!dragged)return;const factor=pointers.size>1&&start.dist>0?start.dist/Math.max(.001,now.dist):1;const w=start.view.w*factor,h=start.view.h*factor;view=clampView({x:start.view.x+start.center.x*start.view.w-now.center.x*w,y:start.view.y+start.center.y*start.view.h-now.center.y*h,w,h});drawView();e.preventDefault()},{passive:false});
 function pointerEnd(e){if(!pointers.has(e.pointerId))return;const wasDragged=dragged;const target=tapTarget;pointers.delete(e.pointerId);if(!wasDragged&&e.type==='pointerup'&&target&&pointers.size===0){target.__cityPick?.();suppressClick=true}else if(wasDragged){suppressClick=true}start=pointers.size?gesture():null;if(!pointers.size){dragged=false;tapTarget=null}}
 svg.addEventListener('pointerup',pointerEnd);svg.addEventListener('pointercancel',pointerEnd);svg.addEventListener('lostpointercapture',pointerEnd);
 svg.addEventListener('click',e=>{if(suppressClick){e.preventDefault();e.stopImmediatePropagation();suppressClick=false}},true);
+// Mobile browsers may cancel pointer click synthesis after touch-action:none.
+// Handle a simple finger tap independently of drag/pinch pointer events.
+svg.addEventListener('touchstart',e=>{if(e.touches.length!==1){touchMoved=true;touchStartTarget=null;return}const t=e.touches[0];touchStartX=t.clientX;touchStartY=t.clientY;touchMoved=false;touchStartTarget=e.target.closest?.('.inner-city-region')||null},{passive:true});
+svg.addEventListener('touchmove',e=>{if(e.touches.length!==1){touchMoved=true;return}const t=e.touches[0];if(Math.hypot(t.clientX-touchStartX,t.clientY-touchStartY)>10)touchMoved=true},{passive:true});
+svg.addEventListener('touchend',e=>{if(e.touches.length===0&&!touchMoved&&touchStartTarget){touchStartTarget.__cityPick?.();suppressClick=true}if(e.touches.length===0){touchStartTarget=null;touchMoved=false}},{passive:true});
+svg.addEventListener('touchcancel',()=>{touchStartTarget=null;touchMoved=true},{passive:true});
 svg.addEventListener('wheel',e=>{zoomAt(relative(e),Math.exp(e.deltaY*.0015));e.preventDefault()},{passive:false});
 svg.addEventListener('dblclick',e=>{zoomAt(relative(e),1/1.7);e.preventDefault()});
 function resetView(){view={...originalView};drawView()}
