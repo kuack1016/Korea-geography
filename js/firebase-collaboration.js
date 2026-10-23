@@ -13,7 +13,7 @@ function isAdmin(){return canEdit()&&member.role==='admin'}
 function reflect(){el('kgCoreEdit').hidden=!canEdit();el('kgAdminPanel').hidden=!isAdmin();if(!canEdit())el('kgCoreEditor').hidden=true;
  coreInfo.textContent=!overridesReady?'서버 동기화 연결 중 · 기존 자료를 보여줍니다.':canEdit()?'승인된 편집자 · 저장한 개념은 도감·지도학습·다음 핵심개념 퀴즈에 공유됩니다.':'읽기 전용 · 기존 자료 및 공동 편집 개념을 볼 수 있습니다.';
  if(me)status.textContent=(member?.nickname||me.displayName||'Google 사용자')+' · 로그인됨 ('+(isAdmin()?'관리자':canEdit()?'편집자':'읽기 전용')+')';
- if(current)el('kgCoreEdit').hidden=!canEdit();}
+ if(current)el('kgCoreEdit').hidden=!canEdit();window.dispatchEvent(new Event('kg-city-auth-changed'));}
 function setCurrent(id){current=id;el('kgCoreEditor').hidden=true;coreMsg.textContent='';historyCache=[];el('kgCoreHistory').textContent='기록을 불러오는 중…';reflect();if(unsubHistory){unsubHistory();unsubHistory=null;}if(!db||!id)return;
  unsubHistory=onSnapshot(query(collection(db,'conceptHistory'),where('regionId','==',id),limit(100)),snap=>{
  historyCache=snap.docs.map(d=>d.data()).sort((a,b)=>(b.at?.seconds||0)-(a.at?.seconds||0)).slice(0,15);
@@ -55,6 +55,25 @@ try{
  import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js')]);
  ({doc,collection,query,where,limit,onSnapshot,runTransaction,serverTimestamp,setDoc,updateDoc}={doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn});
  const app=initializeApp(config);auth=getAuth(app);db=getFirestore(app);initializeDone=true;
+ window.KGCityConcepts={
+  canEdit:()=>canEdit(),
+  subscribe(city,district,callback){
+   const key=city+'_'+district;
+   return onSnapshot(doc(db,'cityConcepts',key),snap=>callback({core:snap.exists()&&Array.isArray(snap.data().core)?snap.data().core:[],canEdit:canEdit()}),err=>callback({error:err.code||err.message,canEdit:canEdit()}));
+  },
+  async save(city,district,lines){
+   if(!canEdit())throw Error('편집 권한이 없습니다. 관리자 또는 승인된 편집자로 로그인해 주세요.');
+   const core=lines.map(cleanText).filter(Boolean);
+   if(!validCore(core))throw Error('최대 40개, 항목당 160자 이내로 입력해 주세요.');
+   const id=city+'_'+district,ref=doc(db,'cityConcepts',id),logref=doc(collection(db,'cityConceptHistory'));
+   await runTransaction(db,async tx=>{
+    const snap=await tx.get(ref),before=snap.exists()&&Array.isArray(snap.data().core)?snap.data().core:[];
+    tx.set(ref,{core,city,district,updatedAt:serverTimestamp(),updatedBy:me.uid,nickname:member.nickname||me.displayName||'편집자'});
+    tx.set(logref,{regionId:id,city,district,before,after:core,uid:me.uid,nickname:member.nickname||me.displayName||'편집자',at:serverTimestamp()});
+   });
+  }
+ };
+ window.dispatchEvent(new Event('kg-city-firebase-ready'));
  window.KGClimateCloud={uid:null,load:async()=>{if(!auth.currentUser)return null;const snap=await getDoc(doc(db,'climateFavorites',auth.currentUser.uid));return snap.exists()?snap.data():null;},save:async data=>{if(!auth.currentUser)throw Error('로그인 필요');await setDoc(doc(db,'climateFavorites',auth.currentUser.uid),data,{merge:true});}};
  login.onclick=async()=>{login.disabled=true;status.textContent='Google 로그인 진행 중…';try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(e.code)){try{await signInWithRedirect(auth,new GoogleAuthProvider())}catch(re){status.textContent='로그인 실패: '+(re.code||re.message)}}else status.textContent='로그인 실패: '+(e.code||e.message)}finally{login.disabled=false}};
  logout.onclick=()=>signOut(auth).catch(e=>status.textContent='로그아웃 실패: '+e.code);
