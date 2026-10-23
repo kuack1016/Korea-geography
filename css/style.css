@@ -879,3 +879,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel .inner-city-district path{fill:#fbfcfe!important;stroke:none!important;filter:none!important}
 #innerCityPanel .inner-city-district.selected path{fill:#3974f6!important}
 #innerCityPanel .inner-city-district:hover:not(.selected) path{fill:#edf3fc!important}
+
+/* City district map: draw merged district silhouettes, not administrative-dong seams. */
+#innerCityPanel .inner-city-district{filter:none!important;cursor:pointer}
+#innerCityPanel .inner-city-district>path{fill:#fbfcfe!important;stroke:#9aa9bd!important;stroke-width:.65!important;stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important;filter:none!important}
+#innerCityPanel .inner-city-district.selected>path{fill:#3974f6!important}
+#innerCityPanel .inner-city-district:hover:not(.selected)>path{fill:#edf3fc!important}
