@@ -925,3 +925,22 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel #innerCityShapes .inner-city-region.selected,#innerCityPanel #innerCityShapes .inner-city-region.selected:hover{opacity:.67!important;filter:blur(.35px)!important}
 #innerCityPanel #innerCityLegend{padding:4px 12px 10px;color:#71809b}
 #innerCityPanel #innerCityDaytime{margin-top:18px}
+
+/* City daytime population: fixed categorical fills and native-style stat rows */
+#innerCityPanel #innerCityShapes .inner-city-region.selected,
+#innerCityPanel #innerCityShapes .inner-city-region.selected:hover{fill:revert-layer!important;opacity:.68!important;filter:none!important}
+#innerCityPanel #innerCityLegend{padding:12px 18px 18px!important;color:var(--ink)}
+#innerCityPanel .inner-city-legend-title{display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:13px;font-weight:700;margin-bottom:11px}
+#innerCityPanel .inner-city-legend-title span{font-size:11px;font-weight:400;color:#7c899e}
+#innerCityPanel .inner-city-legend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 12px}
+#innerCityPanel .inner-city-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:#617087;white-space:nowrap}
+#innerCityPanel .inner-city-legend-item i{display:inline-block;flex:0 0 19px;height:13px;border-radius:3px}
+#innerCityPanel #innerCityDaytime{margin-top:20px;border-top:1px solid #e4e9f2;padding-top:17px;background:transparent}
+#innerCityPanel .inner-city-stats-title{display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:8px}
+#innerCityPanel .inner-city-stats-title span{font-weight:400;font-size:11px;color:#8490a2}
+#innerCityPanel .inner-city-stat-row{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid #edf0f5}
+#innerCityPanel .inner-city-stat-row:last-child{border-bottom:0}
+#innerCityPanel .inner-city-stat-label{font-size:13px;color:#69788e;font-weight:500}
+#innerCityPanel .inner-city-stat-number{font-size:17px;font-weight:700;color:var(--ink);font-variant-numeric:tabular-nums;white-space:nowrap}
+#innerCityPanel .inner-city-stat-number small{font-size:12px;font-weight:400;margin-left:2px;color:#75849a}
+#innerCityPanel .inner-city-stats-empty{padding:15px 0;color:#8792a3;font-size:13px}
