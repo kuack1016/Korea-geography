@@ -71,7 +71,7 @@ function render(){
  for(const f of present){
   const label=regionName(f),path=document.createElementNS('http://www.w3.org/2000/svg','path');
   path.setAttribute('class','inner-city-region');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');
-  path.setAttribute('role','button');path.setAttribute('tabindex','0');path.setAttribute('aria-label',label);
+  path.setAttribute('aria-label',label);
   const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;showConcept(label)};
   path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
   g.appendChild(path);
