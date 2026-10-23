@@ -61,6 +61,13 @@ try{
    const key=city+'_'+district;
    return onSnapshot(doc(db,'cityConcepts',key),snap=>callback({core:snap.exists()&&Array.isArray(snap.data().core)?snap.data().core:[],canEdit:canEdit()}),err=>callback({error:err.code||err.message,canEdit:canEdit()}));
   },
+  subscribeHistory(city,district,callback){
+   const key=city+'_'+district;
+   return onSnapshot(query(collection(db,'cityConceptHistory'),where('regionId','==',key),limit(100)),snap=>{
+    const rows=snap.docs.map(d=>d.data()).sort((a,b)=>(b.at?.seconds||0)-(a.at?.seconds||0)).slice(0,15);
+    callback({rows});
+   },err=>callback({error:err.code||err.message}));
+  },
   async save(city,district,lines){
    if(!canEdit())throw Error('편집 권한이 없습니다. 관리자 또는 승인된 편집자로 로그인해 주세요.');
    const core=lines.map(cleanText).filter(Boolean);
