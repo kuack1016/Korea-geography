@@ -4,17 +4,21 @@ if(!root||!modes)return;
 const original=root.querySelector('.study-layout'),note=document.getElementById('studyModeNote');
 const tab=document.getElementById('innerCityTab');if(!tab)return;
 const panel=document.createElement('div');panel.id='innerCityPanel';panel.className='study-layout';panel.hidden=true;
-panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div></aside>`;
+panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도 · 주간 인구 지수</div><div class="small" id="innerCityLegend">2020년 주간 인구 지수: 통계 확인 중 · 미확인 지역은 흰색</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div><div class="study-notes-card" id="innerCityDaytime"><b>주간 인구 지수</b><p id="innerCityDaytimeValue">지역을 선택하세요.</p><p class="small">2020년 인구총조사 기준 · 자료 미확인 시 수치를 표시하지 않습니다.</p></div></aside>`;
 original.insertAdjacentElement('beforebegin',panel);
 const svg=panel.querySelector('svg'),g=panel.querySelector('#innerCityShapes'),status=panel.querySelector('#innerCityStatus'),name=panel.querySelector('#innerCityName'),province=panel.querySelector('#innerCityProvince');
 const cities={서울:{prefix:'11',label:'서울특별시',count:25,names:'종로구 중구 용산구 성동구 광진구 동대문구 중랑구 성북구 강북구 도봉구 노원구 은평구 서대문구 마포구 양천구 강서구 구로구 금천구 영등포구 동작구 관악구 서초구 강남구 송파구 강동구'.split(' ')},부산:{prefix:'26',label:'부산광역시',count:16,names:'중구 서구 동구 영도구 부산진구 동래구 남구 북구 해운대구 사하구 금정구 강서구 연제구 수영구 사상구 기장군'.split(' ')},대구:{prefix:'27',label:'대구광역시',count:9,names:'중구 동구 서구 남구 북구 수성구 달서구 달성군 군위군'.split(' ')}};
 let city='서울',features=null,selected=null,request=null;
+const dayData=Object.create(null),dayValue=panel.querySelector('#innerCityDaytimeValue'),legend=panel.querySelector('#innerCityLegend');
+function dayColor(value,min,max){if(!Number.isFinite(value))return '#ffffff';const t=max>min?(value-min)/(max-min):1;const a=[237,243,252],b=[57,116,246];return 'rgb('+a.map((v,i)=>Math.round(v+(b[i]-v)*t)).join(',')+')'}
+function updateDayColors(){const vals=cities[city].names.map(n=>dayData[city+'_'+n]).filter(Number.isFinite);const min=Math.min(...vals),max=Math.max(...vals);g.querySelectorAll('.inner-city-region').forEach(p=>{const v=dayData[city+'_'+p.dataset.district];p.style.setProperty('fill',dayColor(v,min,max),'important')});legend.textContent=vals.length?'2020년 주간 인구 지수 · 최고 '+max.toFixed(1)+' (진한 파랑) / 최저 '+min.toFixed(1)+' (연한 파랑) · 미확인 흰색':'2020년 주간 인구 지수: 구·군별 수치 검증 중 · 미확인 지역은 흰색'}
+
 function points(geometry){const out=[];function visit(x){if(!Array.isArray(x))return;if(typeof x[0]==='number'&&typeof x[1]==='number'){out.push(x);return}x.forEach(visit)}visit(geometry.coordinates);return out}
 function geomPath(geometry,project){const polys=geometry.type==='Polygon'?[geometry.coordinates]:geometry.coordinates;return polys.map(poly=>poly.map(r=>r.map((p,i)=>(i?'L':'M')+project(p).map(n=>n.toFixed(2)).join(',')).join('')+'Z').join('')).join('')}
 function regionName(f){return String((f.properties||{}).SIG_KOR_NM||'').trim()}
 function render(){
  if(!features)return;
- const cfg=cities[city];resetView();selected=null;name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
+ const cfg=cities[city];resetView();selected=null;dayValue.textContent='지역을 선택하세요.';name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
  const present=features.filter(f=>String((f.properties||{}).SIG_CD||'').startsWith(cfg.prefix)&&cfg.names.includes(regionName(f)));
  if(present.length!==cfg.count){status.textContent='경계 자료 확인 필요: '+present.length+'/'+cfg.count+'개 구·군';console.warn('City district count mismatch',city,present.map(regionName));}
  if(!present.length)return;
@@ -27,11 +31,11 @@ function render(){
   const label=regionName(f),path=document.createElementNS('http://www.w3.org/2000/svg','path');
   path.setAttribute('class','inner-city-region');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');
   path.setAttribute('aria-label',label);path.dataset.district=label;
-  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label};
+  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;const v=dayData[city+'_'+label];dayValue.textContent=Number.isFinite(v)?v.toFixed(1):'검증된 통계값 없음'};
   path.__cityPick=pick;path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
   g.appendChild(path);
  }
- if(present.length===cfg.count)status.textContent=present.length+'개 구·군 · 지도를 눌러 선택하세요.';
+ updateDayColors();if(present.length===cfg.count)status.textContent=present.length+'개 구·군 · 지도를 눌러 선택하세요.';
 }
 // Independent SVG viewport gestures: only the map zooms, never the page or the information card.
 const originalView={x:0,y:0,w:720,h:510};let view={...originalView},start=null,dragged=false,suppressClick=false;
