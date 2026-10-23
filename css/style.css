@@ -852,3 +852,15 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 
 /* City districts: merge administrative-dong geometry visually without internal borders */
 #innerCityShapes .inner-city-region{stroke:none!important;filter:url(#innerCityOutline)!important;fill-rule:evenodd}#innerCityPanel .inner-city-toolbar{padding:10px 12px 0}#innerCityPanel .study-map{overflow:hidden}#innerCitySvg{max-height:540px;touch-action:pan-y}#innerCityPanel .inner-city-credit{padding:0 12px 10px}#innerCityPanel .study-info{align-self:start}
+
+/* Rebuilt city internal structure: original map slot, exactly one district boundary per gu/gun */
+#studyPanel.inner-city-active>.study-layout:not(#innerCityPanel){display:none!important}
+#studyPanel:not(.inner-city-active)>#innerCityPanel,#innerCityPanel[hidden]{display:none!important}
+#studyPanel.inner-city-active>#innerCityPanel{display:grid!important}
+#innerCityPanel .inner-city-region{fill:#e5edf8!important;stroke:#92a5be!important;stroke-width:1!important;filter:none!important;cursor:pointer}
+#innerCityPanel .inner-city-region:hover,#innerCityPanel .inner-city-region:focus{fill:#c5d9fb!important}
+#innerCityPanel .inner-city-region.selected{fill:#3974f6!important}
+#innerCityPanel .inner-city-toolbar{padding:10px 12px 0;margin:0}
+#innerCityPanel #innerCitySvg{width:100%;height:auto;max-height:450px;display:block;touch-action:manipulation}
+#innerCityPanel .inner-city-credit{padding:0 12px 10px;margin:0}
+#innerCityPanel .study-info{align-self:start}
