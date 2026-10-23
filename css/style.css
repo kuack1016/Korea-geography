@@ -873,3 +873,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel .study-map{background:#fff!important}
 #innerCityPanel .inner-city-toolbar{padding:12px 12px 0!important}
 #innerCityPanel #innerCitySvg{max-height:510px!important}
+
+/* District groups: seamless dong fills, one outline per district */
+#innerCityPanel .inner-city-district{cursor:pointer;filter:url(#cityDistrictEdge)}
+#innerCityPanel .inner-city-district path{fill:#fbfcfe!important;stroke:none!important;filter:none!important}
+#innerCityPanel .inner-city-district.selected path{fill:#3974f6!important}
+#innerCityPanel .inner-city-district:hover:not(.selected) path{fill:#edf3fc!important}
