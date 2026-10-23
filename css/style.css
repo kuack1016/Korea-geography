@@ -914,3 +914,8 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 
 /* Touch devices must not retain hover-blue district styling after a tap. */
 @media(hover:none){#innerCityPanel .inner-city-region:hover:not(.selected){fill:#fbfcfe!important}}
+
+/* Do not use hover fill on mobile: simulated hover can persist after touch. */
+#innerCityPanel #innerCityShapes .inner-city-region:not(.selected){fill:#fbfcfe!important}
+@media(hover:hover) and (pointer:fine){#innerCityPanel #innerCityShapes .inner-city-region:hover:not(.selected){fill:#edf3fc!important}}
+#innerCityPanel #innerCityShapes .inner-city-region.selected,#innerCityPanel #innerCityShapes .inner-city-region.selected:hover{fill:#3974f6!important}
