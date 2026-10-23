@@ -1,7 +1,7 @@
 (()=>{'use strict';
 const root=document.getElementById('studyPanel'),modes=document.getElementById('studyModes');if(!root||!modes)return;
 const layout=root.querySelector('.study-layout'),head=root.querySelector('.studyhead'),modeNote=document.getElementById('studyModeNote');
-const b=document.createElement('button');b.type='button';b.dataset.smode='inner-city';b.textContent='도시 내부 구조';modes.appendChild(b);
+const b=document.getElementById('innerCityTab')||document.createElement('button');if(!b.parentElement){b.type='button';b.dataset.smode='inner-city';b.textContent='도시 내부 구조';modes.appendChild(b);}
 const panel=document.createElement('div');panel.id='innerCityPanel';panel.className='study-layout';panel.hidden=true;
 panel.innerHTML='<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><label for="innerCitySelect">도시 선택</label><select id="innerCitySelect"><option value="서울">서울</option><option value="부산">부산</option><option value="대구">대구</option></select><button id="innerCityReset" type="button">전체 보기</button></div><svg id="innerCitySvg" viewBox="0 0 720 650" role="img" aria-label="도시 구군 경계 지도"><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">경계 자료: 통계청 SGIS · vuski/admdongkor (CC BY 4.0) · 2026-10-01</div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince"></div><div class="study-notes-card"><b>도시 내부 구조</b><p class="small">서울·부산·대구의 구·군 경계를 선택하여 위치를 익힐 수 있습니다. 주간 인구 지수 등 통계는 추후 추가됩니다.</p></div><div class="small" id="innerCityStatus">지도 불러오는 중…</div></aside>';
 layout.insertAdjacentElement('afterend',panel);
