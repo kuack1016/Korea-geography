@@ -15,13 +15,28 @@ function quizCoreLabel(concept){return newTownGeneration(concept)||concept;}
 // v6.5.8: Filter only quiz questions, leaving atlas and map study data intact.
 function coreQuizExcluded(c){return /(?:[12]\s*기\s*신도시|혁신도시|기업도시|도농\s*(?:통합|복합)\s*시)/i.test(String(c));}
 function quizCoreConcepts(id){const concepts=ATLAS_NOTES[id]?.core||[];const excluded=QUIZ_INDUSTRY_EXCLUSIONS[id]||[];return concepts.filter(c=>!excluded.includes(c)&&!coreQuizExcluded(c));}
-if(quizMode==='core')return BANK.filter(b=>quizCoreConcepts(b.id).length).map(b=>{
-  const concepts=shuffle([...quizCoreConcepts(b.id)]),rawLabel=concepts[0],label=quizCoreLabel(rawLabel);
-  const generation=newTownGeneration(rawLabel);
-  const sameIds=BANK.filter(x=>quizCoreConcepts(x.id).some(c=>quizCoreLabel(c)===label)).map(x=>x.id);
-  const duplicated=sameIds.length>1,hasOtherHints=concepts.length>1;
-  return {label,kind:'핵심개념',ids:generation?sameIds:((duplicated&&!hasOtherHints)?sameIds:[b.id]),hints:concepts.slice(1).map(quizCoreLabel),hintIndex:0,duplicated:generation?false:duplicated,hasOtherHints,multiAccepted:!!generation||(duplicated&&!hasOtherHints),targetId:b.id};
- });
+if(quizMode==='core'){
+  // Each eligible concept is a separate question, not just one random concept per region.
+  const conceptsById=new Map(BANK.map(b=>[b.id,quizCoreConcepts(b.id)]));
+  const idsByLabel=new Map();
+  BANK.forEach(b=>(conceptsById.get(b.id)||[]).forEach(raw=>{
+    const label=quizCoreLabel(raw);
+    if(!idsByLabel.has(label))idsByLabel.set(label,new Set());
+    idsByLabel.get(label).add(b.id);
+  }));
+  return BANK.flatMap(b=>{
+    const concepts=conceptsById.get(b.id)||[];
+    return concepts.map(rawLabel=>{
+      const label=quizCoreLabel(rawLabel);
+      const generation=newTownGeneration(rawLabel);
+      const sameIds=[...(idsByLabel.get(label)||[])];
+      const duplicated=sameIds.length>1;
+      const hints=concepts.filter(c=>c!==rawLabel).map(quizCoreLabel);
+      const hasOtherHints=hints.length>0;
+      return {label,kind:'핵심개념',ids:generation?sameIds:((duplicated&&!hasOtherHints)?sameIds:[b.id]),hints,hintIndex:0,duplicated:generation?false:duplicated,hasOtherHints,multiAccepted:!!generation||(duplicated&&!hasOtherHints),targetId:b.id};
+    });
+  });
+ }
  const groups=new Map();
  const add=(label,id,kind)=>{if(!label)return;const key=kind+'|'+label;if(!groups.has(key))groups.set(key,{label,kind,ids:[]});groups.get(key).ids.push(id)};
  BANK.forEach(b=>{const n=ATLAS_NOTES[b.id]||{};
