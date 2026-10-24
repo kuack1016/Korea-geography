@@ -62,7 +62,7 @@ function render(){
   const label=regionName(f),path=document.createElementNS('http://www.w3.org/2000/svg','path');
   path.setAttribute('class','inner-city-region');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');
   path.setAttribute('aria-label',label);path.dataset.district=label;
-  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;renderDayStats(dayData[city+'_'+label]);
+  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;renderDayStats(dayData[city+'_'+label]);};
   path.__cityPick=pick;path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
   g.appendChild(path);
  }
