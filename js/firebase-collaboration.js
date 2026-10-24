@@ -85,9 +85,18 @@ try{
  login.onclick=async()=>{login.disabled=true;status.textContent='Google 로그인 진행 중…';try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(e.code)){try{await signInWithRedirect(auth,new GoogleAuthProvider())}catch(re){status.textContent='로그인 실패: '+(re.code||re.message)}}else status.textContent='로그인 실패: '+(e.code||e.message)}finally{login.disabled=false}};
  logout.onclick=()=>signOut(auth).catch(e=>status.textContent='로그아웃 실패: '+e.code);
  onSnapshot(collection(db,'concepts'),snap=>{
-  // A missing document means original HTML notes; an existing empty array means intentionally removed all concepts.
+  // Preserve bundled concepts and append Firebase concepts instead of replacing the bundled list.
+  // Keep original ordering and deduplicate exact concept text (after trimming).
   for(const [id,items] of Object.entries(base)){if(!ATLAS_NOTES[id])ATLAS_NOTES[id]={};ATLAS_NOTES[id].core=[...items];}
-  snap.forEach(d=>{if(!/^r\d+$/.test(d.id)||!BANK.some(x=>x.id===d.id))return;const arr=d.data().core;if(validCore(arr)){if(!ATLAS_NOTES[d.id])ATLAS_NOTES[d.id]={};ATLAS_NOTES[d.id].core=[...arr];}});
+  snap.forEach(d=>{
+   if(!/^r\d+$/.test(d.id)||!BANK.some(x=>x.id===d.id))return;
+   const arr=d.data().core;
+   if(validCore(arr)){
+    if(!ATLAS_NOTES[d.id])ATLAS_NOTES[d.id]={};
+    const merged=[...(base[d.id]||[]),...arr].map(cleanText).filter(Boolean);
+    ATLAS_NOTES[d.id].core=[...new Set(merged)];
+   }
+  });
   overridesReady=true;reflect();window.dispatchEvent(new Event('kg-core-changed'));
  },e=>{coreInfo.textContent='공동 자료 동기화 실패: '+e.code+' · 기존 학습 자료만 사용 중';});
  function watchMembers(){if(unsubMembers)unsubMembers();unsubMembers=null;if(!isAdmin())return;
