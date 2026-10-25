@@ -8,6 +8,12 @@ let doc,collection,query,where,limit,onSnapshot,runTransaction,serverTimestamp,s
 let auth,db,me=null,member=null,current=null,overridesReady=false,unsubMember=null,unsubHistory=null,unsubMembers=null,historyCache=[];
 const cleanText=v=>String(v||'').trim();
 const validCore=arr=>Array.isArray(arr)&&arr.length<=40&&arr.every(x=>typeof x==='string'&&x.length>0&&x.length<=160);
+function effectiveCore(id,data){
+ const saved=validCore(data?.core)?data.core:[];
+ const list=data?.replaceBase===true?saved:[...(base[id]||[]),...saved];
+ const unique=[...new Set(list.map(cleanText).filter(Boolean))];
+ return data?.replaceBase===true?unique:unique.filter(c=>id!=='r13'||!['무연탄 생산','한강, 낙동강 발원지'].includes(c.replace(/\s*,\s*/g,', ').replace(/\s+/g,' ')));
+}
 function canEdit(){return !!me&&!!member&&member.active===true&&['admin','editor'].includes(member.role)}
 function isAdmin(){return canEdit()&&member.role==='admin'}
 function reflect(){el('kgCoreEdit').hidden=!canEdit();el('kgAdminPanel').hidden=!isAdmin();if(!canEdit())el('kgCoreEditor').hidden=true;
@@ -39,12 +45,12 @@ el('kgCoreSave').onclick=async()=>{
  try{
   const ref=doc(db,'concepts',id),logref=doc(collection(db,'conceptHistory'));
   await runTransaction(db,async tx=>{
-   const snap=await tx.get(ref);const before=snap.exists()?snap.data().core:(base[id]||[]);
+   const snap=await tx.get(ref);const before=effectiveCore(id,snap.exists()?snap.data():null);
    if(!validCore(before))throw Error('기존 데이터 형식 오류');
    if(JSON.stringify(before)===JSON.stringify(arr))throw Error('변경 내용이 없어.');
    const removed=before.filter(x=>!arr.includes(x)),added=arr.filter(x=>!before.includes(x));
    const action=removed.length&&!added.length?'삭제':added.length&&!removed.length?'추가':'수정';
-   tx.set(ref,{core:arr,logId:logref.id,updatedAt:serverTimestamp(),updatedBy:me.uid,nickname:member.nickname||me.displayName||'편집자'});
+   tx.set(ref,{core:arr,replaceBase:true,logId:logref.id,updatedAt:serverTimestamp(),updatedBy:me.uid,nickname:member.nickname||me.displayName||'편집자'});
    tx.set(logref,{regionId:id,before,after:arr,action,uid:me.uid,nickname:member.nickname||me.displayName||'편집자',at:serverTimestamp()});
   });coreMsg.textContent='저장했어. 다른 사용자에게도 반영돼.';el('kgCoreEditor').hidden=true;
  }catch(err){coreMsg.textContent='저장 실패: '+(err.code||err.message)}finally{saveBusy=false;el('kgCoreSave').disabled=false;}
@@ -85,17 +91,13 @@ try{
  login.onclick=async()=>{login.disabled=true;status.textContent='Google 로그인 진행 중…';try{await signInWithPopup(auth,new GoogleAuthProvider())}catch(e){if(['auth/popup-blocked','auth/operation-not-supported-in-this-environment'].includes(e.code)){try{await signInWithRedirect(auth,new GoogleAuthProvider())}catch(re){status.textContent='로그인 실패: '+(re.code||re.message)}}else status.textContent='로그인 실패: '+(e.code||e.message)}finally{login.disabled=false}};
  logout.onclick=()=>signOut(auth).catch(e=>status.textContent='로그아웃 실패: '+e.code);
  onSnapshot(collection(db,'concepts'),snap=>{
-  // Preserve bundled concepts and append Firebase concepts instead of replacing the bundled list.
-  // Keep original ordering and deduplicate exact concept text (after trimming).
+  // Legacy documents are merged once; newly edited documents fully replace the region's list.
   for(const [id,items] of Object.entries(base)){if(!ATLAS_NOTES[id])ATLAS_NOTES[id]={};ATLAS_NOTES[id].core=[...items];}
   snap.forEach(d=>{
    if(!/^r\d+$/.test(d.id)||!BANK.some(x=>x.id===d.id))return;
-   const arr=d.data().core;
-   if(validCore(arr)){
-    if(!ATLAS_NOTES[d.id])ATLAS_NOTES[d.id]={};
-    const merged=[...(base[d.id]||[]),...arr].map(cleanText).filter(Boolean);
-    ATLAS_NOTES[d.id].core=[...new Set(merged)].filter(c=>d.id!=='r13'||!['무연탄 생산','한강, 낙동강 발원지'].includes(cleanText(c).replace(/\s*,\s*/g,', ').replace(/\s+/g,' ')));
-   }
+   if(!validCore(d.data().core))return;
+   if(!ATLAS_NOTES[d.id])ATLAS_NOTES[d.id]={};
+   ATLAS_NOTES[d.id].core=effectiveCore(d.id,d.data());
   });
   overridesReady=true;reflect();window.dispatchEvent(new Event('kg-core-changed'));
  },e=>{coreInfo.textContent='공동 자료 동기화 실패: '+e.code+' · 기존 학습 자료만 사용 중';});
