@@ -94,7 +94,7 @@ try{
    if(validCore(arr)){
     if(!ATLAS_NOTES[d.id])ATLAS_NOTES[d.id]={};
     const merged=[...(base[d.id]||[]),...arr].map(cleanText).filter(Boolean);
-    ATLAS_NOTES[d.id].core=[...new Set(merged)].filter(c=>d.id!=='r13'||!['무연탄 생산','한강, 낙동강 발원지'].includes(c));
+    ATLAS_NOTES[d.id].core=[...new Set(merged)].filter(c=>d.id!=='r13'||!['무연탄 생산','한강, 낙동강 발원지'].includes(cleanText(c).replace(/\s*,\s*/g,', ').replace(/\s+/g,' ')));
    }
   });
   overridesReady=true;reflect();window.dispatchEvent(new Event('kg-core-changed'));
