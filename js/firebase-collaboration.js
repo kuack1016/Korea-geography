@@ -45,13 +45,13 @@ el('kgCoreSave').onclick=async()=>{
  try{
   const ref=doc(db,'concepts',id),logref=doc(collection(db,'conceptHistory'));
   await runTransaction(db,async tx=>{
-   const snap=await tx.get(ref);const before=effectiveCore(id,snap.exists()?snap.data():null);
+   const snap=await tx.get(ref);const storedBefore=snap.exists()&&validCore(snap.data().core)?snap.data().core:[];const before=effectiveCore(id,snap.exists()?snap.data():null);
    if(!validCore(before))throw Error('기존 데이터 형식 오류');
    if(JSON.stringify(before)===JSON.stringify(arr))throw Error('변경 내용이 없어.');
    const removed=before.filter(x=>!arr.includes(x)),added=arr.filter(x=>!before.includes(x));
    const action=removed.length&&!added.length?'삭제':added.length&&!removed.length?'추가':'수정';
    tx.set(ref,{core:arr,replaceBase:true,logId:logref.id,updatedAt:serverTimestamp(),updatedBy:me.uid,nickname:member.nickname||me.displayName||'편집자'});
-   tx.set(logref,{regionId:id,before,after:arr,action,uid:me.uid,nickname:member.nickname||me.displayName||'편집자',at:serverTimestamp()});
+   tx.set(logref,{regionId:id,before:storedBefore,after:arr,action,uid:me.uid,nickname:member.nickname||me.displayName||'편집자',at:serverTimestamp()});
   });coreMsg.textContent='저장했어. 다른 사용자에게도 반영돼.';el('kgCoreEditor').hidden=true;
  }catch(err){coreMsg.textContent='저장 실패: '+(err.code||err.message)}finally{saveBusy=false;el('kgCoreSave').disabled=false;}
 };
