@@ -2,3 +2,10 @@
 #renewableTabs[hidden],#metricWrap[hidden]{display:none!important}.subtabs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 0}.subtabs button{flex:1;min-width:68px;padding:10px 12px;border-radius:10px;font-size:14px}.map-panel{padding-top:20px}#energyMap path:focus{outline:none}
 
 #energySubtabs[hidden]{display:none!important}#energySubtabs button{flex:1 1 110px}#modes button{flex:1}#energyMap path:focus-visible{outline:none}
+
+/* Consistent fixed-width subtab grid, including incomplete last row. */
+#energySubtabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+#energySubtabs button{width:100%;min-width:0;min-height:48px;flex:none;padding:9px 5px;white-space:nowrap}
+#energyMap{touch-action:none;user-select:none;-webkit-user-select:none}
+#energyMap path{touch-action:none}
+@media(max-width:550px){#energySubtabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
