@@ -4,7 +4,7 @@ if(!root||!modes)return;
 const original=root.querySelector('.study-layout'),note=document.getElementById('studyModeNote');
 const tab=document.getElementById('innerCityTab');if(!tab)return;
 const panel=document.createElement('div');panel.id='innerCityPanel';panel.className='study-layout';panel.hidden=true;
-panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도 · 주간 인구 지수</div><div id="innerCityLegend" class="inner-city-legend"></div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div><div class="study-notes-card inner-city-population-notes" id="innerCityDaytime"><div class="inner-city-population-heading">주간 인구 <span>2020년 인구총조사</span></div><div id="innerCityDaytimeValue" class="study-note-tags">지역을 선택하세요.</div></div></aside>`;
+panel.innerHTML=`<section class="card study-map inner-city-map-card"><div class="inner-city-toolbar"><div class="mode-tabs" id="innerCityChoices"><button type="button" data-city="서울" class="active">서울</button><button type="button" data-city="부산">부산</button><button type="button" data-city="대구">대구</button></div></div><svg id="innerCitySvg" viewBox="0 0 720 510" role="group" aria-label="구·군 행정구역 경계"><defs><filter id="cityDistrictEdge" x="-3%" y="-3%" width="106%" height="106%"><feMorphology in="SourceAlpha" operator="dilate" radius="0.65" result="expanded"/><feComposite in="expanded" in2="SourceAlpha" operator="out" result="edge"/><feFlood flood-color="#9aa9bd" result="edgeColor"/><feComposite in="edgeColor" in2="edge" operator="in" result="stroke"/><feMerge><feMergeNode in="SourceGraphic"/><feMergeNode in="stroke"/></feMerge></filter></defs><g id="innerCityShapes"></g></svg><div class="small inner-city-credit">시·군·구 경계 지도 · 주간 인구 지수</div><div id="innerCityLegend" class="inner-city-legend"></div></section><aside class="card study-info"><div class="small">선택한 자치구·군</div><div class="study-name" id="innerCityName">지도를 눌러보세요</div><div class="study-province" id="innerCityProvince">서울특별시</div><div id="innerCityStatus" class="small" aria-live="polite"></div><div class="study-notes-card inner-city-population-notes" id="innerCityDaytime"><div class="inner-city-population-heading">주간 인구 <span>2020년 인구총조사</span></div><div id="innerCityDaytimeValue" class="study-note-tags">지역을 선택하세요.</div></div><div id="innerCityRankings" class="inner-city-rankings" aria-label="도시별 인구 순위"></div></aside>`;
 original.insertAdjacentElement('beforebegin',panel);
 const svg=panel.querySelector('svg'),g=panel.querySelector('#innerCityShapes'),status=panel.querySelector('#innerCityStatus'),name=panel.querySelector('#innerCityName'),province=panel.querySelector('#innerCityProvince');
 const cities={서울:{prefix:'11',label:'서울특별시',count:25,names:'종로구 중구 용산구 성동구 광진구 동대문구 중랑구 성북구 강북구 도봉구 노원구 은평구 서대문구 마포구 양천구 강서구 구로구 금천구 영등포구 동작구 관악구 서초구 강남구 송파구 강동구'.split(' ')},부산:{prefix:'26',label:'부산광역시',count:16,names:'중구 서구 동구 영도구 부산진구 동래구 남구 북구 해운대구 사하구 금정구 강서구 연제구 수영구 사상구 기장군'.split(' ')},대구:{prefix:'27',label:'대구광역시',count:9,names:'중구 동구 서구 남구 북구 수성구 달서구 달성군 군위군'.split(' ')}};
@@ -69,12 +69,33 @@ function renderDayStats(v){
  dayValue.innerHTML=rows.map(([label,value])=>'<div class="study-note-row"><span class="study-note-label">'+label+'</span><span class="study-note-value">'+value+'</span></div>').join('');
 }
 
+const rankings=panel.querySelector('#innerCityRankings');
+const rankingTypes=[{key:'index',title:'주간 인구 지수',format:v=>v.toFixed(1)},{key:'daytime',title:'주간 인구',format:v=>v.toLocaleString('ko-KR')+'명'},{key:'resident',title:'상주인구',format:v=>v.toLocaleString('ko-KR')+'명'}];
+function renderRankings(){
+ const cfg=cities[city];
+ const records=cfg.names.map(district=>({district,values:dayData[city+'_'+district]})).filter(x=>x.values);
+ rankings.innerHTML='<div class="inner-city-rankings-heading">'+cfg.label+' 인구 순위 <span>2020년 인구총조사</span></div>'+rankingTypes.map(type=>{
+  const ordered=[...records].sort((a,b)=>b.values[type.key]-a.values[type.key]||a.district.localeCompare(b.district,'ko'));
+  return '<section class="inner-city-ranking-section"><h3>'+type.title+' 랭킹</h3><div class="inner-city-ranking-scroll">'+ordered.map((item,i)=>'<button type="button" class="inner-city-ranking-row" data-rank-district="'+item.district+'"><span class="inner-city-ranking-pos">'+(i+1)+'위</span><span class="inner-city-ranking-name">'+item.district+'</span><strong>'+type.format(item.values[type.key])+'</strong></button>').join('')+'</div></section>';
+ }).join('');
+ markRankingSelection();
+}
+function markRankingSelection(){
+ const label=selected?.dataset?.district;
+ rankings.querySelectorAll('[data-rank-district]').forEach(b=>b.classList.toggle('is-selected',!!label&&b.dataset.rankDistrict===label));
+}
+rankings.addEventListener('click',e=>{
+ const button=e.target.closest('[data-rank-district]');
+ if(!button)return;
+ const path=[...g.querySelectorAll('.inner-city-region')].find(p=>p.dataset.district===button.dataset.rankDistrict);
+ path?.__cityPick?.();
+});
 function points(geometry){const out=[];function visit(x){if(!Array.isArray(x))return;if(typeof x[0]==='number'&&typeof x[1]==='number'){out.push(x);return}x.forEach(visit)}visit(geometry.coordinates);return out}
 function geomPath(geometry,project){const polys=geometry.type==='Polygon'?[geometry.coordinates]:geometry.coordinates;return polys.map(poly=>poly.map(r=>r.map((p,i)=>(i?'L':'M')+project(p).map(n=>n.toFixed(2)).join(',')).join('')+'Z').join('')).join('')}
 function regionName(f){return String((f.properties||{}).SIG_KOR_NM||'').trim()}
 function render(){
  if(!features)return;
- const cfg=cities[city];resetView();selected=null;dayValue.textContent='지역을 선택하세요.';name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();
+ const cfg=cities[city];resetView();selected=null;dayValue.textContent='지역을 선택하세요.';name.textContent='지도를 눌러보세요';province.textContent=cfg.label;g.replaceChildren();renderRankings();
  const present=features.filter(f=>String((f.properties||{}).SIG_CD||'').startsWith(cfg.prefix)&&cfg.names.includes(regionName(f)));
  if(present.length!==cfg.count){status.textContent='경계 자료 확인 필요: '+present.length+'/'+cfg.count+'개 구·군';console.warn('City district count mismatch',city,present.map(regionName));}
  if(!present.length)return;
@@ -87,7 +108,7 @@ function render(){
   const label=regionName(f),path=document.createElementNS('http://www.w3.org/2000/svg','path');
   path.setAttribute('class','inner-city-region');path.setAttribute('d',geomPath(f.geometry,project));path.setAttribute('fill-rule','evenodd');
   path.setAttribute('aria-label',label);path.dataset.district=label;
-  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;renderDayStats(dayData[city+'_'+label]);};
+  const pick=()=>{if(selected)selected.classList.remove('selected');selected=path;path.classList.add('selected');name.textContent=label;province.textContent=cfg.label;renderDayStats(dayData[city+'_'+label]);markRankingSelection();};
   path.__cityPick=pick;path.addEventListener('click',pick);path.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();pick()}});
   g.appendChild(path);
  }
