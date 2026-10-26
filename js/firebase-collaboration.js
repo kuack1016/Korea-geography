@@ -57,7 +57,7 @@ el('kgCoreSave').onclick=async()=>{
 };
 let initializeDone=false;
 try{
- const [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut},{getFirestore,getDoc,doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn}]=await Promise.all([
+ const [{initializeApp},{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,onAuthStateChanged,signOut},{getFirestore,getDoc,getDocFromServer,doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn}]=await Promise.all([
  import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js'),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js'),import('https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js')]);
  ({doc,collection,query,where,limit,onSnapshot,runTransaction,serverTimestamp,setDoc,updateDoc}={doc:docFn,collection:collectionFn,query:queryFn,where:whereFn,limit:limitFn,onSnapshot:onSnapshotFn,runTransaction:runTransactionFn,serverTimestamp:serverTimestampFn,setDoc:setDocFn,updateDoc:updateDocFn});
  const app=initializeApp(config);auth=getAuth(app);db=getFirestore(app);initializeDone=true;
@@ -116,7 +116,18 @@ try{
   unsubMember=onSnapshot(myRef,snap=>{if(auth.currentUser?.uid!==user.uid)return;received=true;member=snap.exists()?snap.data():null;reflect();watchMembers();},e=>{if(auth.currentUser?.uid!==user.uid)return;received=true;member=null;reflect();status.textContent='권한 확인 실패: '+(e.code||e.message)+' · Firestore 규칙의 members 자기 문서 읽기 확인';});
   // Retry a direct member read if a snapshot listener is delayed (e.g. iPad Safari networking).
   getDoc(myRef).then(snap=>{if(received||auth.currentUser?.uid!==user.uid)return;member=snap.exists()?snap.data():null;reflect();watchMembers();}).catch(e=>{if(received||auth.currentUser?.uid!==user.uid)return;reflect();status.textContent='권한 확인 실패: '+(e.code||e.message)+' · Firestore 규칙의 members 자기 문서 읽기 확인';});
-  setTimeout(()=>{if(!received&&auth.currentUser?.uid===user.uid&&!member)status.textContent='권한 확인 지연 · 네트워크/Firestore 규칙 확인 필요 (새로고침 후 재시도)';},8000);
+  setTimeout(async()=>{
+   if(received||auth.currentUser?.uid!==user.uid||member)return;
+   status.textContent='권한 확인 지연 · 서버에 다시 연결 중…';
+   try{
+    const snap=await getDocFromServer(myRef);
+    if(received||auth.currentUser?.uid!==user.uid)return;
+    received=true;member=snap.exists()?snap.data():null;reflect();watchMembers();
+   }catch(e){
+    if(received||auth.currentUser?.uid!==user.uid)return;
+    status.textContent='권한 재확인 실패: '+(e.code||e.message)+' · 연결 상태 및 Firestore 권한 확인 필요';
+   }
+  },8000);
  },e=>status.textContent='로그인 확인 실패: '+e.code);
  getRedirectResult(auth).catch(e=>status.textContent='로그인 결과 오류: '+e.code);
 }catch(e){status.textContent='Firebase 초기화 실패: '+(e.code||e.message);coreInfo.textContent='기존 학습 자료는 계속 이용할 수 있어.';login.hidden=false;}
