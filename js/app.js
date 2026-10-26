@@ -33,7 +33,7 @@ if(quizMode==='core'){
       const duplicated=sameIds.length>1;
       const hints=concepts.filter(c=>c!==rawLabel).map(quizCoreLabel);
       const hasOtherHints=hints.length>0;
-      return {label,kind:'핵심개념',ids:sameIds.slice(),baseIds:sameIds.slice(),hints,hintIndex:0,duplicated:generation?false:duplicated,hasOtherHints,multiAccepted:sameIds.length>1,targetId:b.id};
+      return {label,kind:'핵심개념',ids:generation?sameIds:((duplicated&&!hasOtherHints)?sameIds:[b.id]),hints,hintIndex:0,duplicated:generation?false:duplicated,hasOtherHints,multiAccepted:!!generation||(duplicated&&!hasOtherHints),targetId:b.id};
     });
   });
  }
@@ -59,7 +59,7 @@ function placeCoreFeedback(){
   feedback.classList.remove('core-feedback-visible');coreFeedbackHome.appendChild(feedback);
  }
 }
-function next(){clearFlash();if(idx>=queue.length){locked=true;clearInterval(timer);$('#question').textContent='완료!';$('#feedback').innerHTML=`최종 <b>${score}</b>점 · 오답 ${logs.filter(x=>!x.ok).length}개`;$('#bar').style.width='100%';renderLog();return}answer=queue[idx];placeCoreFeedback();$('#question').innerHTML=(quizMode==='location'?'':`<div class="quiz-kind">${esc(answer.kind)}</div>`)+esc(answer.label);const hb=$('#otherCoreHint');hb.style.display=quizMode==='core'?'inline-block':'none';hb.disabled=false;hb.removeAttribute('aria-disabled');if(answer)answer.hintIndex=0;if(quizMode==='core'&&answer.duplicated&&answer.hasOtherHints){$('#feedback').innerHTML='<b>여러 지역에 해당하는 핵심개념입니다.</b> <b>다른 힌트 보기</b>를 눌러 지역을 좁힐 수 있으며, 같은 조건을 만족하는 지역은 모두 정답입니다.'}else if(quizMode==='core'&&answer.multiAccepted){$('#feedback').innerHTML='여러 지역에 공통으로 해당하는 핵심개념입니다. <b>다른 힌트 보기</b>로 조건을 확인할 수 있으며, 표시된 조건에 해당하는 지역은 모두 정답입니다.'}else{$('#feedback').textContent='지도에서 해당 지역을 눌러주세요.'}stats()}
+function next(){clearFlash();if(idx>=queue.length){locked=true;clearInterval(timer);$('#question').textContent='완료!';$('#feedback').innerHTML=`최종 <b>${score}</b>점 · 오답 ${logs.filter(x=>!x.ok).length}개`;$('#bar').style.width='100%';renderLog();return}answer=queue[idx];$('#question').innerHTML=(quizMode==='location'?'':`<div class="quiz-kind">${esc(answer.kind)}</div>`)+esc(answer.label);const hb=$('#otherCoreHint');hb.style.display=quizMode==='core'?'inline-block':'none';if(answer)answer.hintIndex=0;if(quizMode==='core'&&answer.duplicated&&answer.hasOtherHints){$('#feedback').innerHTML='<b>여러 지역에 해당하는 핵심개념입니다.</b> 이 지역에는 다른 핵심개념도 있습니다. <b>다른 힌트 보기</b>를 눌러 지역을 더 좁혀보세요.'}else if(quizMode==='core'&&answer.multiAccepted){$('#feedback').innerHTML='여러 지역에 공통으로 해당하는 핵심개념이며 이 지역에는 다른 힌트가 없습니다. <b>해당되는 지역 중 하나</b>를 누르면 정답입니다.'}else{$('#feedback').textContent='지도에서 해당 지역을 눌러주세요.'}stats()}
 function answerNames(a){return a.ids.map(id=>BANK.find(b=>b.id===id)?.display).filter(Boolean)}
 function finish(p,ok,clicked){let names=answerNames(answer);logs.push({ok,q:answer.label,clicked,answers:names,mode:quizMode});renderLog();if(ok){p.classList.add('flash-correct');score+=100+Math.min(streak,5)*20;streak++;$('#feedback').innerHTML='정답! '+clicked+(names.length>1?`<div class="quiz-answers">가능한 정답: ${names.map(esc).join(' · ')}</div>`:'')}else{answer.ids.forEach(id=>$('#'+id)?.classList.add('flash-answer'));streak=0;$('#feedback').innerHTML='정답: '+names.map(esc).join(' · ')}stats();setTimeout(()=>{clearFlash();if(ok){p.classList.add('seen-correct')}else{answer.ids.forEach(id=>$('#'+id)?.classList.add('seen-wrong'))}idx++;locked=false;next()},900)}
 const GEOM={};
@@ -73,14 +73,6 @@ function ringHas(r,x,y){let inside=false;for(let i=0,j=r.length-1;i<r.length;j=i
 function regionHas(id,x,y){let inside=false;(GEOM[id]||[]).forEach(r=>{if(ringHas(r,x,y))inside=!inside});return inside}
 function svgPoint(ev){let svg=ev.currentTarget,pt=svg.createSVGPoint(),src=ev;if(ev.changedTouches&&ev.changedTouches.length)src=ev.changedTouches[0];else if(ev.touches&&ev.touches.length)src=ev.touches[0];pt.x=src.clientX;pt.y=src.clientY;let ctm=svg.getScreenCTM();return ctm?pt.matrixTransform(ctm.inverse()):{x:0,y:0}}
 function bindTap(el,fn){if(window.PointerEvent)el.addEventListener('pointerup',fn,{passive:true});else{el.addEventListener('touchend',fn,{passive:true});el.addEventListener('click',fn)}}
-// Grading only: resolve all regions matching the question and revealed hints.
-function refreshCoreAcceptedIds(){
- if(quizMode!=='core'||!answer)return;
- const base=answer.baseIds||answer.ids;
- const shown=[...new Set((answer.hints||[]).slice(0,answer.hintIndex||0).map(quizCoreLabel))];
- const matches=base.filter(id=>{const labels=quizCoreConcepts(id).map(quizCoreLabel);return shown.every(h=>labels.includes(h))});
- answer.ids=matches.length?matches:base.slice();
-}
 function hitCoord(ev){
   if(locked||!answer)return;
   let q=svgPoint(ev),dot=$('#touchdot');dot.setAttribute('cx',q.x);dot.setAttribute('cy',q.y);
@@ -96,7 +88,7 @@ function hitCoord(ev){
     hits.forEach(h=>{let s=offsets.reduce((a,o)=>a+(regionHas(h.id,q.x+o[0],q.y+o[1])?1:0),0);if(s>best){best=s;clicked=h}});
   }
   if(!clicked){$('#feedback').textContent='지도 영역 안쪽을 눌러주세요.';return}
-  refreshCoreAcceptedIds();locked=true;finish($('#'+clicked.id),answer.ids.includes(clicked.id),clicked.display);
+  locked=true;finish($('#'+clicked.id),answer.ids.includes(clicked.id),clicked.display);
 }
 // Quiz map shares the study map pan/zoom engine. The engine stops pointerup on drag/pinch,
 // while short taps reach this quiz-region picker as usual.
@@ -108,8 +100,8 @@ locationQuizSvg.addEventListener('click',ev=>{
   hitCoord(ev);
 });
 $('#start').onclick=start;
-$('#otherCoreHint').onclick=()=>{if(quizMode!=='core'||!answer)return;const hs=answer.hints||[];if(!hs.length){$('#feedback').textContent='다른 힌트가 없는 지역입니다.';return}if(answer.hintIndex>=hs.length){$('#feedback').textContent='다른 힌트가 없습니다.';return}const shown=hs.slice(0,++answer.hintIndex);$('#feedback').innerHTML=`<b>다른 힌트</b><div style="margin-top:6px;display:grid;gap:4px">${shown.map((h,i)=>`<div>${i+1}. ${esc(h)}</div>`).join('')}</div>${answer.duplicated?'<div style="margin-top:8px">처음 제시된 개념은 여러 지역에 공통이므로, 위 힌트까지 함께 보고 한 지역을 선택하세요.</div>':''}`;};
-$('#skip').onclick=()=>{if(locked||!answer)return;refreshCoreAcceptedIds();locked=true;logs.push({ok:false,q:answer.label,clicked:'정답 보기',answers:answerNames(answer),mode:quizMode});renderLog();answer.ids.forEach(id=>$('#'+id)?.classList.add('flash-answer'));streak=0;$('#feedback').innerHTML='정답: '+answerNames(answer).map(esc).join(' · ');setTimeout(()=>{clearFlash();answer.ids.forEach(id=>$('#'+id)?.classList.add('seen-wrong'));idx++;locked=false;next()},900)};
+$('#otherCoreHint').onclick=()=>{if(quizMode!=='core'||!answer)return;const hs=answer.hints||[];if(!hs.length){$('#feedback').textContent='다른 힌트가 없는 지역입니다.';return}if(answer.hintIndex>=hs.length)return;const shown=hs.slice(0,++answer.hintIndex);$('#feedback').innerHTML=`<b>다른 힌트</b><div style="margin-top:6px;display:grid;gap:4px">${shown.map((h,i)=>`<div>${i+1}. ${esc(h)}</div>`).join('')}</div>${answer.duplicated?'<div style="margin-top:8px">처음 제시된 개념은 여러 지역에 공통이므로, 위 힌트까지 함께 보고 한 지역을 선택하세요.</div>':''}`;};
+$('#skip').onclick=()=>{if(locked||!answer)return;locked=true;logs.push({ok:false,q:answer.label,clicked:'정답 보기',answers:answerNames(answer),mode:quizMode});renderLog();answer.ids.forEach(id=>$('#'+id)?.classList.add('flash-answer'));streak=0;$('#feedback').innerHTML='정답: '+answerNames(answer).map(esc).join(' · ');setTimeout(()=>{clearFlash();answer.ids.forEach(id=>$('#'+id)?.classList.add('seen-wrong'));idx++;locked=false;next()},900)};
 $('#alllog').onclick=()=>{logMode='all';renderLog()};$('#wronglog').onclick=()=>{logMode='wrong';renderLog()};
 $$('#quizModes button').forEach(b=>b.onclick=()=>{quizMode=b.dataset.qmode;placeCoreFeedback();$('#quizModes button').forEach(x=>x.classList.toggle('active',x===b));const notes={location:'지역명이 문제로 나오면 지도에서 위치를 선택합니다.',festival:'축제명이 문제로 나오면 해당 지역을 지도에서 선택합니다.',gi:'지리적 표시제가 문제로 나오며, 같은 항목의 복수 지역 중 하나를 선택하면 정답입니다.',heritage:'세계문화유산·세계자연유산·람사르 습지를 통합해 출제합니다.',core:'1·2기 신도시·혁신도시·기업도시·도농통합시는 출제에서 제외됩니다. 핵심개념 하나가 문제로 나옵니다. 공통 개념인데 다른 힌트가 없는 경우에는 해당 지역 중 하나를 선택하면 정답이며, 다른 힌트가 있는 경우에는 힌트를 함께 보고 한 지역을 찾습니다.'};$('#quizModeNote').textContent=notes[quizMode];locked=true;clearInterval(timer);clearSeen();queue=[];idx=0;score=0;streak=0;$('#question').textContent='새 게임을 눌러주세요';$('#feedback').textContent='퀴즈 종류를 선택했습니다.';updateCountOptions();stats()});updateCountOptions();
 // Firebase can replace the bundled core lists asynchronously; refresh the ALL count on sync.
