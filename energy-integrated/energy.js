@@ -12,20 +12,95 @@ function updateMetric(){
 q('#modes').addEventListener('click',e=>{const b=e.target.closest('button[data-mode]');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('#modes button').forEach(x=>x.classList.toggle('active',x===b));updateMetric()});
 q('#energySubtabs').addEventListener('click',e=>{const b=e.target.closest('button[data-source]');if(!b)return;choice[mode]=b.dataset.source;updateMetric()});
 q('#mapg').addEventListener('click',e=>{const el=e.target.closest('path[data-id]');if(!el)return;const place=BANK.find(b=>b.id===el.dataset.id);if(!place)return;document.querySelectorAll('#mapg path').forEach(x=>{x.classList.remove('selected');x.style.removeProperty('fill');x.style.removeProperty('stroke');});el.classList.add('selected');q('#region').textContent=place.display;q('#province').textContent=place.province;selected=place.id});updateMetric();
-// Map gestures: wheel/pinch zoom and pointer drag pan; prevent accidental selection after a move.
-(() => {
- const svg=q('#energyMap'), pointers=new Map();
- const origin={x:0,y:0,width:720,height:900};
- let view={...origin}, moved=false, lastTapSuppressed=0,gestureStart=null;
- function apply(){svg.setAttribute('viewBox',[view.x,view.y,view.width,view.height].join(' '));}
- function point(ev){const rect=svg.getBoundingClientRect();const aspect=720/900;let w=rect.width,h=rect.height;let left=rect.left,top=rect.top;if(w/h>aspect){w=h*aspect;left+=(rect.width-w)/2}else{h=w/aspect;top+=(rect.height-h)/2}return {x:(ev.clientX-left)/w,y:(ev.clientY-top)/h};}
- function clamp(){view.width=Math.max(90,Math.min(720,view.width));view.height=view.width*900/720;view.x=Math.max(0,Math.min(720-view.width,view.x));view.y=Math.max(0,Math.min(900-view.height,view.y));}
- function zoom(scale,mid){const x=view.x+mid.x*view.width,y=view.y+mid.y*view.height;view.width*=scale;view.height*=scale;clamp();view.x=x-mid.x*view.width;view.y=y-mid.y*view.height;clamp();apply();}
- svg.addEventListener('wheel',ev=>{ev.preventDefault();zoom(ev.deltaY>0?1.16:1/1.16,point(ev));},{passive:false});
- svg.addEventListener('pointerdown',ev=>{pointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});gestureStart=null;});
- svg.addEventListener('pointermove',ev=>{if(!pointers.has(ev.pointerId))return;const old=[...pointers.values()];pointers.set(ev.pointerId,{x:ev.clientX,y:ev.clientY});const now=[...pointers.values()];if(now.length===1){const dx=now[0].x-old[0].x,dy=now[0].y-old[0].y;if(Math.abs(dx)+Math.abs(dy)<1)return;const rect=svg.getBoundingClientRect();const scale=Math.max(rect.width/720,rect.height/900);view.x-=dx/scale*(view.width/720);view.y-=dy/scale*(view.height/900);clamp();apply();moved=true;}else if(now.length===2&&old.length===2){const dist=a=>Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y);const before=dist(old),after=dist(now);const mid={clientX:(now[0].x+now[1].x)/2,clientY:(now[0].y+now[1].y)/2};if(before&&after)zoom(before/after,point(mid));moved=true;} });
- function finish(ev){if(!pointers.has(ev.pointerId))return;pointers.delete(ev.pointerId);if(moved)lastTapSuppressed=Date.now();if(!pointers.size){moved=false;gestureStart=null;}}
- svg.addEventListener('pointerup',finish);svg.addEventListener('pointercancel',finish);
- svg.addEventListener('click',ev=>{if(Date.now()-lastTapSuppressed<450){ev.stopImmediatePropagation();ev.preventDefault();}},true);
- svg.addEventListener('dblclick',ev=>{ev.preventDefault();zoom(.65,point(ev));});
+// Reuse the exact map learning gesture engine; no separate energy-specific zoom logic.
+(function(){
+'use strict';
+function bind(svg){
+ if(!svg||svg.dataset.mapGestureBound)return;
+ svg.dataset.mapGestureBound='1';
+ const base=svg.viewBox.baseVal;
+ const original={x:base.x,y:base.y,w:base.width||720,h:base.height||900};
+ let view={...original},initial=null,moved=false,gestureWasDrag=false;
+ const touches=new Map();
+ const bound=(v)=>{
+  const minW=original.w/8,maxW=original.w*1.15;
+  v.w=Math.max(minW,Math.min(maxW,v.w));
+  v.h=v.w*original.h/original.w;
+  // Leave a small margin beyond the base map for comfortable dragging.
+  v.x=Math.max(original.x-v.w*.65,Math.min(original.x+original.w-v.w*.35,v.x));
+  v.y=Math.max(original.y-v.h*.65,Math.min(original.y+original.h-v.h*.35,v.y));
+  return v;
+ };
+ function render(){svg.setAttribute('viewBox',`${view.x} ${view.y} ${view.w} ${view.h}`)}
+ // Restore the default map viewport on reload, including Safari back-forward cache restoration.
+ window.addEventListener('pageshow',()=>{view={...original};initial=null;moved=false;gestureWasDrag=false;touches.clear();render();});
+ function coords(e){
+  const r=svg.getBoundingClientRect();
+  return{x:(e.clientX-r.left)/r.width,y:(e.clientY-r.top)/r.height};
+ }
+ function center(){
+  const a=[...touches.values()];
+  if(a.length===1)return a[0];
+  return{x:(a[0].x+a[1].x)/2,y:(a[0].y+a[1].y)/2};
+ }
+ function dist(){
+  const a=[...touches.values()];
+  return a.length>1?Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y):0;
+ }
+ function snapshot(){
+  if(!touches.size){initial=null;return}
+  initial={center:center(),dist:dist(),view:{...view}};
+ }
+ svg.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  touches.set(e.pointerId,coords(e));
+  try{svg.setPointerCapture(e.pointerId)}catch(_){}
+  snapshot();moved=false;gestureWasDrag=false;
+  if(e.pointerType==='touch')e.preventDefault();
+ },{passive:false});
+ svg.addEventListener('pointermove',e=>{
+  if(!touches.has(e.pointerId)||!initial)return;
+  touches.set(e.pointerId,coords(e));
+  const c=center(),v=initial.view;
+  const rect=svg.getBoundingClientRect();
+  const travel=Math.hypot((c.x-initial.center.x)*rect.width,(c.y-initial.center.y)*rect.height);
+  // Ignore touch jitter; only intentional drags/pinches suppress map selection.
+  if(touches.size>1 || travel>9) { moved=true; gestureWasDrag=true; }
+  if(!moved)return;
+  let w=v.w,h=v.h;
+  if(touches.size>1&&initial.dist>0){
+   w=v.w*initial.dist/Math.max(.001,dist());h=w*original.h/original.w;
+  }
+  view=bound({
+   x:v.x+initial.center.x*v.w-c.x*w,
+   y:v.y+initial.center.y*v.h-c.y*h,w,h
+  });
+  render();e.preventDefault();
+ },{passive:false});
+ function up(e){
+  if(!touches.has(e.pointerId))return;
+  touches.delete(e.pointerId);snapshot();
+  if(!touches.size) moved=false;
+ }
+ svg.addEventListener('pointerup',e=>{
+  if(gestureWasDrag&&touches.has(e.pointerId)){e.stopImmediatePropagation();e.preventDefault()}
+ },true);
+ svg.addEventListener('pointerup',up);
+ svg.addEventListener('pointercancel',up);
+ svg.addEventListener('lostpointercapture',up);
+ // Suppress accidental region selections at the end of a drag, but preserve normal taps.
+ svg.addEventListener('click',e=>{if(gestureWasDrag){e.stopImmediatePropagation();e.preventDefault();gestureWasDrag=false;moved=false}},true);
+ svg.addEventListener('wheel',e=>{
+  const c=coords(e),scale=Math.exp(e.deltaY*.0015);
+  const w=view.w*scale,h=view.h*scale;
+  view=bound({x:view.x+c.x*(view.w-w),y:view.y+c.y*(view.h-h),w,h});
+  render();e.preventDefault();
+ },{passive:false});
+ svg.addEventListener('dblclick',e=>{
+  const c=coords(e),w=view.w/1.5,h=view.h/1.5;
+  view=bound({x:view.x+c.x*(view.w-w),y:view.y+c.y*(view.h-h),w,h});
+  render();e.preventDefault();
+ });
+}
+bind(document.getElementById('energyMap'));
 })();
