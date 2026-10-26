@@ -985,3 +985,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #kgAdminPanel .kg-admin-toggle{border:1px solid #d9e3f2;border-radius:10px;background:#f7faff;color:#3267b8;padding:7px 12px;font-size:12px;font-weight:750;cursor:pointer;white-space:nowrap}
 #kgAdminPanel #kgAdminBody[hidden]{display:none!important}
 #kgAdminPanel #kgAdminBody:not([hidden]){margin-top:12px}
+
+/* Show core quiz hint response right beside its button */
+#coreHintInline:not([hidden]){display:inline-block;align-self:center;max-width:340px;padding:8px 11px;border:1px solid #cbdcf8;border-radius:9px;background:#eff5ff;color:#2254a5;font-size:13px;font-weight:700;line-height:1.5;overflow-wrap:anywhere}
+#coreHintInline[hidden]{display:none!important}
