@@ -204,7 +204,7 @@ function renderStudyNotes(region){
   }
   if(n.core?.length)tags.push(['핵심 개념',n.core.map(esc).join('<br>')]);
   if(n.festival)tags.push(['지역 축제',n.festival]);
-  if(n.gi)tags.push(['지리적 표시제',n.gi]);
+  const giItems=studyGIItems(region.id);if(giItems.length)tags.push(['지리적 표시제',giItems.join(', ')]);
   if(n.heritage)tags.push(['세계문화유산',n.heritage]);
   if(n.naturalHeritage)tags.push(['세계자연유산',n.naturalHeritage]);
   if(n.ramsar)tags.push(['람사르협약 등재 습지',n.ramsar]);
@@ -229,7 +229,9 @@ function cityStudyItems(){return CITY_STUDY[cityStudyMode]?.items||{}}
 function cityStudyLabels(id){return cityStudyItems()[id]||[]}
 
 let studyMode='general',memoryMode=false;
-function hasStudyType(n,mode,id){if(mode==='festival')return !!n.festival;if(mode==='gi')return !!n.gi;if(mode==='heritage')return !!(n.heritage||n.naturalHeritage||n.ramsar);if(mode==='city')return !!cityStudyItems()[id];return true}
+const STUDY_GI_ADDITIONS={r115:'대파',r25:'쌀',r71:'자두'};
+function studyGIItems(id){const values=splitGI(ATLAS_NOTES[id]?.gi);const extra=STUDY_GI_ADDITIONS[id];if(extra&&!values.includes(extra))values.push(extra);return values;}
+function hasStudyType(n,mode,id){if(mode==='festival')return !!n.festival;if(mode==='gi')return studyGIItems(id).length>0;if(mode==='heritage')return !!(n.heritage||n.naturalHeritage||n.ramsar);if(mode==='city')return !!cityStudyItems()[id];return true}
 function paintStudyMap(){
  const overlay=$('#studyOverlayg');overlay.innerHTML='';
  $$('#studyMapg path').forEach(p=>{const n=ATLAS_NOTES[p.dataset.id]||{};p.classList.remove('study-dim','study-theme','study-cultural','study-natural','study-selected','study-city-first','study-city-second','study-city-innovation','study-city-company','study-city-donong','study-city-fez');
