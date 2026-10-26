@@ -960,3 +960,17 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel #innerCityShapes path.inner-city-region,
 #innerCityPanel #innerCityShapes path.inner-city-region.selected{stroke:#64748b!important;stroke-width:1.05px!important;stroke-opacity:1!important;stroke-linejoin:round!important;vector-effect:non-scaling-stroke!important;paint-order:stroke fill!important}
 @media(max-width:640px){#innerCityPanel #innerCityDaytimeValue .study-note-row{grid-template-columns:102px minmax(0,1fr)!important}}
+
+/* 도시 내부 구조: 선택 도시의 세 가지 인구 랭킹 */
+#innerCityPanel .inner-city-rankings{margin-top:24px;display:grid;gap:16px}
+#innerCityPanel .inner-city-rankings-heading{font-size:16px;font-weight:800;color:#17243b;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:5px}
+#innerCityPanel .inner-city-rankings-heading span{font-size:11px;color:#8190aa;font-weight:500}
+#innerCityPanel .inner-city-ranking-section{border:1px solid #dbe5f4;border-radius:16px;overflow:hidden;background:#f8fbff}
+#innerCityPanel .inner-city-ranking-section h3{font-size:14px;color:#264e8e;margin:0;padding:14px 16px;border-bottom:1px solid #dbe5f4}
+#innerCityPanel .inner-city-ranking-scroll{max-height:340px;overflow-y:auto;overscroll-behavior:contain}
+#innerCityPanel .inner-city-ranking-row{display:grid;grid-template-columns:32px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;padding:10px 13px;border:0;border-bottom:1px solid #e8eef8;background:transparent;text-align:left;color:#27364d;font-size:13px;cursor:pointer}
+#innerCityPanel .inner-city-ranking-row:last-child{border-bottom:0}
+#innerCityPanel .inner-city-ranking-row:hover,#innerCityPanel .inner-city-ranking-row.is-selected{background:#e7f0ff}
+#innerCityPanel .inner-city-ranking-pos{font-size:12px;color:#6080b0}
+#innerCityPanel .inner-city-ranking-name{font-weight:650}
+#innerCityPanel .inner-city-ranking-row strong{font-size:12px;font-variant-numeric:tabular-nums;white-space:nowrap}
