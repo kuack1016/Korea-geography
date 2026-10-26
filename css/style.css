@@ -979,3 +979,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #studyPanel.inner-city-active #innerCityPanel>.inner-city-ranking-card{grid-column:2;grid-row:2;display:block!important;align-self:start;padding:18px;min-width:0;background:#fff}
 #innerCityPanel>.inner-city-ranking-card .inner-city-rankings{display:grid!important;gap:16px;margin:0}
 @media(max-width:720px){#studyPanel.inner-city-active #innerCityPanel>.inner-city-ranking-card{grid-column:1;grid-row:auto}}
+
+/* Compact friend editor permissions: collapsed by default */
+#kgAdminPanel .kg-admin-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+#kgAdminPanel .kg-admin-toggle{border:1px solid #d9e3f2;border-radius:10px;background:#f7faff;color:#3267b8;padding:7px 12px;font-size:12px;font-weight:750;cursor:pointer;white-space:nowrap}
+#kgAdminPanel #kgAdminBody[hidden]{display:none!important}
+#kgAdminPanel #kgAdminBody:not([hidden]){margin-top:12px}
