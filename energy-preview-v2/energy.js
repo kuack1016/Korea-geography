@@ -11,7 +11,7 @@ function updateMetric(){
 }
 q('#modes').addEventListener('click',e=>{const b=e.target.closest('button[data-mode]');if(!b)return;mode=b.dataset.mode;document.querySelectorAll('#modes button').forEach(x=>x.classList.toggle('active',x===b));updateMetric()});
 q('#energySubtabs').addEventListener('click',e=>{const b=e.target.closest('button[data-source]');if(!b)return;choice[mode]=b.dataset.source;updateMetric()});
-q('#mapg').addEventListener('click',e=>{const el=e.target.closest('path[data-id]');if(!el)return;const place=BANK.find(b=>b.id===el.dataset.id);if(!place)return;document.querySelectorAll('#mapg path').forEach(x=>x.classList.remove('selected'));el.classList.add('selected');q('#region').textContent=place.display;q('#province').textContent=place.province;selected=place.id});updateMetric();
+q('#mapg').addEventListener('click',e=>{const el=e.target.closest('path[data-id]');if(!el)return;const place=BANK.find(b=>b.id===el.dataset.id);if(!place)return;document.querySelectorAll('#mapg path').forEach(x=>{x.classList.remove('selected');x.style.removeProperty('fill');x.style.removeProperty('stroke');});el.classList.add('selected');q('#region').textContent=place.display;q('#province').textContent=place.province;selected=place.id});updateMetric();
 // Map gestures: wheel/pinch zoom and pointer drag pan; prevent accidental selection after a move.
 (() => {
  const svg=q('#energyMap'), pointers=new Map();
