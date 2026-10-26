@@ -84,6 +84,8 @@ function markRankingSelection(){
  const label=selected?.dataset?.district;
  rankings.querySelectorAll('[data-rank-district]').forEach(b=>b.classList.toggle('is-selected',!!label&&b.dataset.rankDistrict===label));
 }
+// Populate the rankings immediately, even before the GeoJSON map has loaded.
+renderRankings();
 rankings.addEventListener('click',e=>{
  const button=e.target.closest('[data-rank-district]');
  if(!button)return;
@@ -150,5 +152,5 @@ async function load(){
 function activate(on){root.classList.toggle('inner-city-active',on);original.style.setProperty('display',on?'none':'grid','important');panel.hidden=!on;tab.classList.toggle('active',on);const memory=document.getElementById('memoryToggle');if(memory)memory.style.visibility=on?'hidden':'';if(on){original.setAttribute('aria-hidden','true');modes.querySelectorAll('button').forEach(x=>{if(x!==tab)x.classList.remove('active')});['citySubModes','cityLegend','heritageLegend'].forEach(id=>{const e=document.getElementById(id);if(e)e.style.display='none'});note.textContent='서울·부산·대구의 구·군 경계를 선택해 학습합니다.';load()}else{original.removeAttribute('aria-hidden')}}
 tab.addEventListener('click',()=>activate(true));
 modes.querySelectorAll('button').forEach(btn=>{if(btn!==tab)btn.addEventListener('click',()=>activate(false))});
-panel.querySelectorAll('[data-city]').forEach(btn=>btn.addEventListener('click',()=>{city=btn.dataset.city;panel.querySelectorAll('[data-city]').forEach(x=>x.classList.toggle('active',x===btn));if(features)render();else load()}));
+panel.querySelectorAll('[data-city]').forEach(btn=>btn.addEventListener('click',()=>{city=btn.dataset.city;panel.querySelectorAll('[data-city]').forEach(x=>x.classList.toggle('active',x===btn));renderRankings();if(features)render();else load()}));
 })();
