@@ -9,7 +9,7 @@ const DATA={
  seoulyangyang:{name:'서울양양선',color:'#E99A22',stops:['서울','춘천','홍천','인제','양양']},
  yeongdong:{name:'영동선',color:'#06A6D8',stops:['인천','원주','평창','강릉']},
  gyeongin:{name:'경인선',color:'#D95B9A',stops:['서울','인천']},
- seohaean:{name:'서해안선',color:'#B1BE29',stops:['서울','당진','서산','보령','서천','군산','무안','목포']},
+ seohaean:{name:'서해안선',color:'#B1BE29',stops:['서울','당진','서산','보령','서천','군산','무안']},
  honam:{name:'호남선',color:'#A05DD7',stops:['논산','익산','전주','광주','순천']}
 };
 const names={'서울':'서울특별시','대전':'대전광역시','대구':'대구광역시','울산':'울산광역시','부산':'부산광역시','광주':'광주광역시','인천':'인천광역시'};
@@ -19,7 +19,9 @@ const stations={'아산':'천안아산역','청주':'오송역','서울':'서울
 // Coordinates use the same 720 × 900 viewBox as the embedded city/county map.
 const overrides={
  '인천':{x:207,y:376}, // mainland Incheon, immediately west of Bucheon/Seoul
- '여수':{x:290,y:698}  // urban Yeosu, south of Suncheon
+ '여수':{x:290,y:698}, // urban Yeosu, south of Suncheon
+ '보령':{x:204.3,y:505.7}, // mainland polygon area centroid; excludes offshore islands
+ '군산':{x:218.0,y:551.0}  // mainland polygon area centroid; excludes offshore islands
 };
 const rail=$('railRoadContent'),svg=$('roadSvg'),world=$('roadWorld'),lines=$('roadLines'),stopsLayer=$('roadStops'),vehicle=$('roadVehicle');
 if(!rail||!svg)return;
