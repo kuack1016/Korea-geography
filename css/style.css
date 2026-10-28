@@ -996,3 +996,6 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #innerCityPanel>.inner-city-sidebar>.inner-city-ranking-card{display:block!important;align-self:stretch;padding:18px;min-width:0;background:#fff}
 #innerCityPanel>.inner-city-sidebar>.inner-city-ranking-card .inner-city-rankings{display:grid!important;gap:16px;margin:0}
 @media(max-width:720px){#studyPanel.inner-city-active #innerCityPanel>.inner-city-sidebar{grid-column:1;grid-row:auto}}
+
+/* Restore full sidebar width for the district info card; preserve compact card spacing. */
+#studyPanel.inner-city-active #innerCityPanel>.inner-city-sidebar>.study-info{align-self:stretch!important;width:100%!important;box-sizing:border-box!important}
