@@ -5,7 +5,7 @@ if(!root||!modes||!original||!Array.isArray(window.KG_DAYTIME_2020)||window.KG_D
 const innerTab=document.getElementById('innerCityTab');
 const tab=document.createElement('button');tab.type='button';tab.dataset.smode='daytime';tab.textContent='주간인구지수';
 modes.insertBefore(tab,innerTab);
-const colors=[['200 이상',200,'#3974f6'],['150~200 미만',150,'#5b8bf7'],['125~150 미만',125,'#81a6f9'],['110~125 미만',110,'#a6c1fb'],['100~110 미만',100,'#bfd3fc'],['90~100 미만',90,'#d5e2fd'],['90 미만',-Infinity,'#eaf1ff']];
+const colors=[['115 이상',115,'#2456d3'],['110~115 미만',110,'#4478ee'],['105~110 미만',105,'#77a1f6'],['100~105 미만',100,'#aec8fc'],['95~100 미만',95,'#dce7fc'],['90~95 미만',90,'#edf3fd'],['90 미만',-Infinity,'#fafcff']];
 const shade=v=>colors.find(x=>v>=x[1])?.[2]||'#fff';
 const panel=document.createElement('div');panel.id='nationalDaytimePanel';panel.className='study-layout';panel.hidden=true;
 panel.innerHTML='<section class="card study-map national-daytime-map"><svg id="nationalDaytimeSvg" viewBox="0 0 720 900" aria-label="전국 시군구 주간인구지수 지도"><g id="nationalDaytimeShapes"></g></svg><div class="small national-daytime-caption">2020년 인구총조사 · 시군 단위 · 지역을 눌러 선택하세요.</div><div class="national-daytime-legend"><strong>주간인구지수</strong><span>2020년 기준</span><div class="national-daytime-legend-grid">'+colors.map(c=>'<div><i style="background:'+c[2]+'"></i>'+c[0]+'</div>').join('')+'</div></div></section><aside class="card study-info national-daytime-info"><div class="small">선택한 지역</div><div id="nationalDaytimeName" class="study-name">지도를 눌러보세요</div><div id="nationalDaytimeProvince" class="study-province"></div><div class="study-notes-card"><div class="national-daytime-stat"><span>주간인구지수</span><b id="nationalDaytimeIndex">—</b></div><div class="national-daytime-stat"><span>주간인구</span><b id="nationalDaytimeDay">—</b></div><div class="national-daytime-stat"><span>상주인구</span><b id="nationalDaytimeResident">—</b></div></div></aside>';
@@ -36,7 +36,7 @@ function populate(){
   p.style.setProperty('--daytime-color',shade(d[1]/d[0]*100),'important');
   p.style.setProperty('fill',shade(d[1]/d[0]*100),'important');
   p.setAttribute('stroke','#9aa9bd');
-  p.setAttribute('stroke-width','0.58');
+  p.setAttribute('stroke-width','0.42');
   p.setAttribute('vector-effect','non-scaling-stroke');
   p.setAttribute('fill-rule','evenodd');
   p.addEventListener('click',()=>choose(i));
