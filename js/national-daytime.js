@@ -26,7 +26,7 @@ function populate(){
  const source=document.getElementById('studyMapg');if(!source)return;
  g.replaceChildren();let total=0;
  source.querySelectorAll('path').forEach(path=>{
-  const match=path.id.match(/^study_r(\\d+)$/);if(!match)return;
+  const match=path.id.match(/^study_r(\d+)$/);if(!match)return;
   const i=Number(match[1]),d=data[i];if(!d)return;
   const p=path.cloneNode(true);
   p.removeAttribute('style');p.removeAttribute('id');p.removeAttribute('class');
@@ -61,7 +61,7 @@ const base=[0,0,720,900];let view=[...base],pointers=new Map(),gesture=null;
 function draw(){svg.setAttribute('viewBox',view.join(' '))}
 function coord(ev){const r=svg.getBoundingClientRect();return[(ev.clientX-r.left)/r.width,(ev.clientY-r.top)/r.height]}
 svg.addEventListener('wheel',e=>{e.preventDefault();const [x,y]=coord(e),factor=Math.exp(e.deltaY*.0015),w=Math.max(90,Math.min(720,view[2]*factor)),h=w*900/720;view=[view[0]+x*(view[2]-w),view[1]+y*(view[3]-h),w,h];draw()},{passive:false});
-svg.addEventListener('pointerdown',e=>{pointers.set(e.pointerId,coord(e));svg.setPointerCapture?.(e.pointerId);gesture=null});
+svg.addEventListener('pointerdown',e=>{pointers.set(e.pointerId,coord(e));gesture=null});
 svg.addEventListener('pointermove',e=>{if(!pointers.has(e.pointerId))return;const prev=pointers.get(e.pointerId),next=coord(e);pointers.set(e.pointerId,next);if(pointers.size===1){view[0]-=(next[0]-prev[0])*view[2];view[1]-=(next[1]-prev[1])*view[3];draw()}else if(pointers.size===2){const a=[...pointers.values()];const dx=a[0][0]-a[1][0],dy=a[0][1]-a[1][1],dist=Math.hypot(dx,dy);if(gesture){const factor=gesture/dist,w=Math.max(90,Math.min(720,view[2]*factor)),h=w*900/720;view[0]+=(view[2]-w)/2;view[1]+=(view[3]-h)/2;view[2]=w;view[3]=h;draw()}gesture=dist}});
 for(const e of ['pointerup','pointercancel'])svg.addEventListener(e,ev=>{pointers.delete(ev.pointerId);gesture=null});
 svg.addEventListener('dblclick',()=>{view=[...base];draw()});
