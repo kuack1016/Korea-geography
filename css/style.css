@@ -1022,3 +1022,9 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #nationalDaytimePanel .national-daytime-stat span{color:#315ea8;font-weight:750;font-size:13px}
 #nationalDaytimePanel .national-daytime-stat b{color:#243247;font-size:14px;font-variant-numeric:tabular-nums}
 @media(max-width:720px){#studyPanel.national-daytime-active #nationalDaytimePanel{grid-template-columns:minmax(0,1fr);gap:12px}#nationalDaytimePanel #nationalDaytimeSvg{height:68vh;min-height:400px}}
+
+/* Nationwide daytime: exactly the general study-map boundary styling and explicit thematic fills. */
+#nationalDaytimePanel #nationalDaytimeSvg{height:min(78vh,810px);min-height:0}
+#nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region{fill:var(--daytime-color,#eaf1ff)!important;stroke:#9aa9bd!important;stroke-width:.58!important;stroke-opacity:1!important;opacity:1!important;vector-effect:non-scaling-stroke!important;stroke-linejoin:round!important;paint-order:normal!important}
+#nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region.selected{stroke:#9aa9bd!important;stroke-width:.58!important;filter:brightness(.9)!important}
+@media(max-width:720px){#nationalDaytimePanel #nationalDaytimeSvg{height:68vh;min-height:520px}}
