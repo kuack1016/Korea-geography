@@ -28,14 +28,15 @@ function populate(){
  source.querySelectorAll('path').forEach(path=>{
   const match=path.id.match(/^study_r(\d+)$/);if(!match)return;
   const i=Number(match[1]),d=data[i];if(!d)return;
-  const p=path.cloneNode(true);
+  const p=path.cloneNode(false);
   p.removeAttribute('style');p.removeAttribute('id');p.removeAttribute('class');
   p.classList.add('national-daytime-region');
   p.dataset.daytimeId='r'+i;
   p.setAttribute('fill',shade(Math.round(d[1]/d[0]*1000)/10));
-  p.style.setProperty('fill',shade(Math.round(d[1]/d[0]*1000)/10),'important');
-  p.setAttribute('stroke','#64748b');
-  p.setAttribute('stroke-width','0.8');
+  p.style.setProperty('--daytime-color',shade(d[1]/d[0]*100),'important');
+  p.style.setProperty('fill',shade(d[1]/d[0]*100),'important');
+  p.setAttribute('stroke','#9aa9bd');
+  p.setAttribute('stroke-width','0.58');
   p.setAttribute('vector-effect','non-scaling-stroke');
   p.setAttribute('fill-rule','evenodd');
   p.addEventListener('click',()=>choose(i));
