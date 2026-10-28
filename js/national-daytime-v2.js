@@ -14,8 +14,19 @@ const g=panel.querySelector('#nationalDaytimeShapes'),svg=panel.querySelector('s
 const data=window.KG_DAYTIME_2020,fmt=n=>n.toLocaleString('ko-KR')+'명';
 function choose(i){
  const r=window.KG_DAYTIME_REGIONS?.[i],d=data[i];if(!r||!d)return;
- g.querySelectorAll('.national-daytime-region.selected').forEach(p=>p.classList.remove('selected'));
- g.querySelector('[data-daytime-id="r'+i+'"]')?.classList.add('selected');
+ // Change the actual path fill, not element opacity/filter/class (avoids iOS SVG rectangle compositing).
+ g.querySelectorAll('[data-daytime-selected="true"]').forEach(p=>{
+   p.style.setProperty('fill',p.dataset.originalFill,'important');
+   p.removeAttribute('data-daytime-selected');
+ });
+ const target=g.querySelector('[data-daytime-id="r'+i+'"]');
+ if(target){
+   const hex=target.dataset.originalFill;
+   const c=[1,3,5].map(pos=>parseInt(hex.slice(pos,pos+2),16));
+   const mixed='#'+c.map(x=>Math.round(x*.58+255*.42).toString(16).padStart(2,'0')).join('');
+   target.style.setProperty('fill',mixed,'important');
+   target.dataset.daytimeSelected='true';
+ }
  panel.querySelector('#nationalDaytimeName').textContent=r.name;
  panel.querySelector('#nationalDaytimeProvince').textContent=r.province;
  panel.querySelector('#nationalDaytimeIndex').textContent=(d[1]/d[0]*100).toFixed(1);
@@ -38,6 +49,7 @@ function populate(){
   p.classList.add('national-daytime-region');
   p.dataset.daytimeId='r'+i;
   p.setAttribute('fill',shade(d[1]/d[0]*100));
+  p.dataset.originalFill=shade(d[1]/d[0]*100);
   p.style.setProperty('--daytime-color',shade(d[1]/d[0]*100),'important');
   p.style.setProperty('fill',shade(d[1]/d[0]*100),'important');
   if(baseline)for(const key of copiedStroke){
@@ -46,6 +58,7 @@ function populate(){
   }
   p.setAttribute('fill-rule','evenodd');
   p.addEventListener('click',()=>choose(i));
+  p.addEventListener('pointerdown',e=>e.preventDefault(),{passive:false});
   g.appendChild(p);total++;
  });
  if(!total)panel.querySelector('.national-daytime-caption').textContent='지도 경계를 불러오지 못했습니다.';
