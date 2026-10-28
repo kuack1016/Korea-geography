@@ -1036,8 +1036,8 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 /* The national thematic map inherits the *actual* general map path styling from JS. Only fill differs. */
 #nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region{fill:var(--daytime-color,#fafcff)!important}
 
-/* Same selected-region visual treatment as inner-city map, preserve original data fill. */
-#nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region.selected{opacity:1!important;filter:none!important;fill:color-mix(in srgb,var(--daytime-color,#fafcff) 58%,white)!important;outline:none!important;-webkit-tap-highlight-color:transparent!important}
-#nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region:not(.selected){opacity:1!important}
 
 #nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region:focus{outline:none!important;-webkit-tap-highlight-color:transparent!important}
+
+/* iPad Safari: disable SVG tap highlight rectangles; selected shape uses direct fill in JS. */
+#nationalDaytimePanel #nationalDaytimeSvg,#nationalDaytimePanel #nationalDaytimeShapes,#nationalDaytimePanel #nationalDaytimeShapes>path{outline:none!important;-webkit-tap-highlight-color:transparent!important;-webkit-user-select:none!important;user-select:none!important}
