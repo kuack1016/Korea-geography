@@ -999,3 +999,26 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 
 /* Restore full sidebar width for the district info card; preserve compact card spacing. */
 #studyPanel.inner-city-active #innerCityPanel>.inner-city-sidebar>.study-info{align-self:stretch!important;width:100%!important;box-sizing:border-box!important}
+
+/* 2020 nationwide daytime population map: same 7-color legend as inner-city. */
+#studyPanel.national-daytime-active>#nationalDaytimePanel{display:grid!important}
+#studyPanel:not(.national-daytime-active)>#nationalDaytimePanel,#nationalDaytimePanel[hidden]{display:none!important}
+#studyPanel.national-daytime-active>.study-layout:not(#nationalDaytimePanel){display:none!important}
+#nationalDaytimePanel{grid-template-columns:minmax(0,1fr) 330px;gap:12px;align-items:start}
+#nationalDaytimePanel>.national-daytime-info{align-self:start;min-width:0;width:100%;box-sizing:border-box}
+#nationalDaytimePanel #nationalDaytimeSvg{display:block;width:100%;height:min(76vh,790px);min-height:480px;touch-action:none;user-select:none}
+#nationalDaytimePanel .national-daytime-region{cursor:pointer;stroke:#64748b;stroke-width:.8;vector-effect:non-scaling-stroke;stroke-linejoin:round}
+#nationalDaytimePanel .national-daytime-region.selected{stroke:#1d4ed8;stroke-width:2.2;paint-order:stroke fill}
+#nationalDaytimePanel .national-daytime-caption{padding:10px 12px;color:#74829a}
+#nationalDaytimePanel .national-daytime-legend{padding:14px;border-top:1px solid #e5eaf2}
+#nationalDaytimePanel .national-daytime-legend>strong{font-size:14px;color:#17243b}
+#nationalDaytimePanel .national-daytime-legend>span{float:right;font-size:12px;color:#8894a7}
+#nationalDaytimePanel .national-daytime-legend-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 12px;margin-top:14px}
+#nationalDaytimePanel .national-daytime-legend-grid>div{display:flex;align-items:center;gap:9px;color:#617087;font-size:12px}
+#nationalDaytimePanel .national-daytime-legend-grid i{display:inline-block;width:20px;height:14px;border-radius:3px;flex-shrink:0}
+#nationalDaytimePanel .national-daytime-info .study-notes-card{margin-top:18px;padding:16px;background:#f8fbff;border:1px solid #dfe7f2;border-radius:14px}
+#nationalDaytimePanel .national-daytime-stat{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px 0;border-bottom:1px solid #e8edf5}
+#nationalDaytimePanel .national-daytime-stat:last-child{border-bottom:0}
+#nationalDaytimePanel .national-daytime-stat span{color:#315ea8;font-weight:750;font-size:13px}
+#nationalDaytimePanel .national-daytime-stat b{color:#243247;font-size:14px;font-variant-numeric:tabular-nums}
+@media(max-width:720px){#studyPanel.national-daytime-active #nationalDaytimePanel{grid-template-columns:minmax(0,1fr);gap:12px}#nationalDaytimePanel #nationalDaytimeSvg{height:68vh;min-height:400px}}
