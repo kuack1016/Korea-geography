@@ -1035,3 +1035,7 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 
 /* The national thematic map inherits the *actual* general map path styling from JS. Only fill differs. */
 #nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region{fill:var(--daytime-color,#fafcff)!important}
+
+/* Same selected-region visual treatment as inner-city map, preserve original data fill. */
+#nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region.selected{opacity:.58!important;filter:none!important}
+#nationalDaytimePanel #nationalDaytimeShapes>path.national-daytime-region:not(.selected){opacity:1!important}
