@@ -13,7 +13,7 @@ original.insertAdjacentElement('beforebegin',panel);
 const g=panel.querySelector('#nationalDaytimeShapes'),svg=panel.querySelector('svg');
 const data=window.KG_DAYTIME_2020,fmt=n=>n.toLocaleString('ko-KR')+'명';
 function choose(i){
- const r=BANK[i],d=data[i];if(!r||!d)return;
+ const r=window.KG_DAYTIME_REGIONS?.[i],d=data[i];if(!r||!d)return;
  g.querySelectorAll('.national-daytime-region.selected').forEach(p=>p.classList.remove('selected'));
  g.querySelector('[data-daytime-id="r'+i+'"]')?.classList.add('selected');
  panel.querySelector('#nationalDaytimeName').textContent=r.name;
@@ -33,6 +33,7 @@ function populate(){
   p.classList.add('national-daytime-region');
   p.dataset.daytimeId='r'+i;
   p.setAttribute('fill',shade(Math.round(d[1]/d[0]*1000)/10));
+  p.style.setProperty('fill',shade(Math.round(d[1]/d[0]*1000)/10),'important');
   p.setAttribute('stroke','#64748b');
   p.setAttribute('stroke-width','0.8');
   p.setAttribute('vector-effect','non-scaling-stroke');
@@ -44,7 +45,7 @@ function populate(){
 }
 let active=false;
 function toggle(on){
- active=on;root.classList.toggle('national-daytime-active',on);
+ active=on;if(on){root.classList.remove('inner-city-active');if(inner)inner.hidden=true;}root.classList.toggle('national-daytime-active',on);
  panel.hidden=!on;tab.classList.toggle('active',on);
  if(on){
   original.style.setProperty('display','none','important');
