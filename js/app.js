@@ -359,19 +359,19 @@ $$('#metricTabs button').forEach(btn=>btn.onclick=()=>{$$('#metricTabs button').
 
 
 const CLIMATE_MAP_METRICS={
- jan:{label:'1월 평균기온',unit:'℃',palette:['#315b9a','#6f9fd0','#d9e5ef','#e8ad78','#c96555']},
- aug:{label:'8월 평균기온',unit:'℃',palette:['#315b9a','#6f9fd0','#d9e5ef','#e8ad78','#c96555']},
- range:{label:'기온 연교차',unit:'℃',palette:['#f3e8ff','#dcc4f2','#bd91df','#985fc7','#7136a3']},
- annualP:{label:'연 강수량',unit:'mm',palette:['#e7f0f7','#bdd8e9','#8abbd8','#579bc5','#286f9e']},
- summerP:{label:'여름 강수량',unit:'mm',palette:['#e7f0f7','#bdd8e9','#8abbd8','#579bc5','#286f9e']},
- winterP:{label:'겨울 강수량',unit:'mm',palette:['#e7f0f7','#bdd8e9','#8abbd8','#579bc5','#286f9e']},
- summerShare:{label:'여름 강수 집중률',unit:'%',palette:['#e7f0f7','#bdd8e9','#8abbd8','#579bc5','#286f9e']},
- winterShare:{label:'겨울 강수 집중률',unit:'%',palette:['#e7f0f7','#bdd8e9','#8abbd8','#579bc5','#286f9e']}
+ jan:{label:'1월 평균기온',unit:'℃',palette:['#2857a2','#5485c8','#8eb7dc','#e4e9e9','#f0b7a0','#de806d','#bc4d52']},
+ aug:{label:'8월 평균기온',unit:'℃',palette:['#2857a2','#5485c8','#8eb7dc','#e4e9e9','#f0b7a0','#de806d','#bc4d52']},
+ range:{label:'기온 연교차',unit:'℃',palette:['#f5effb','#e9d9f6','#d6b7ed','#bb91df','#9969ce','#7648b3','#512989']},
+ annualP:{label:'연 강수량',unit:'mm',palette:['#f0f7fc','#d9ebf7','#b6d8ed','#88bbdc','#559ac9','#3077af','#174c85']},
+ summerP:{label:'여름 강수량',unit:'mm',palette:['#f0f7fc','#d9ebf7','#b6d8ed','#88bbdc','#559ac9','#3077af','#174c85']},
+ winterP:{label:'겨울 강수량',unit:'mm',palette:['#f0f7fc','#d9ebf7','#b6d8ed','#88bbdc','#559ac9','#3077af','#174c85']},
+ summerShare:{label:'여름 강수 집중률',unit:'%',palette:['#f0f7fc','#d9ebf7','#b6d8ed','#88bbdc','#559ac9','#3077af','#174c85']},
+ winterShare:{label:'겨울 강수 집중률',unit:'%',palette:['#f0f7fc','#d9ebf7','#b6d8ed','#88bbdc','#559ac9','#3077af','#174c85']}
 };
 let climateMapMetric='jan';
 function fmtClimateValue(v,unit){return unit==='mm'?Number(v).toLocaleString('ko-KR',{maximumFractionDigits:1})+' mm':Number(v).toFixed(1)+unit}
-function climateBins(key){let vals=Object.values(CLIMATE1991_2020).map(d=>d&&d[key]).filter(v=>v!==null&&v!==undefined).map(Number);let min=Math.min(...vals),max=Math.max(...vals),step=(max-min)/5;return {min,max,step,cuts:[min,min+step,min+2*step,min+3*step,min+4*step,max]}}
-function climateBinIndex(v,b){if(v>=b.max)return 4;return Math.max(0,Math.min(4,Math.floor((v-b.min)/(b.step||1))))}
+function climateBins(key){let vals=Object.values(CLIMATE1991_2020).map(d=>d&&d[key]).filter(v=>v!==null&&v!==undefined).map(Number);let min=Math.min(...vals),max=Math.max(...vals),count=7,step=(max-min)/count;return {min,max,step,cuts:Array.from({length:count+1},(_,i)=>i===count?max:min+i*step)}}
+function climateBinIndex(v,b){if(v>=b.max)return 6;return Math.max(0,Math.min(6,Math.floor((v-b.min)/(b.step||1))))}
 function renderClimateMap(selectedId){
  if(selectedId!==undefined)climateSelectedId=selectedId;
  const cfg=CLIMATE_MAP_METRICS[climateMapMetric], b=climateBins(climateMapMetric); $('#climateMapTitle').textContent=cfg.label;
