@@ -64,16 +64,30 @@ function populate(){
  if(!total)panel.querySelector('.national-daytime-caption').textContent='지도 경계를 불러오지 못했습니다.';
 }
 let active=false;
+// Other study modes may reset the shared map's inline display after a tab switch.
+// Keep the shared map hidden only while this dedicated map is selected.
+function syncOriginalVisibility(){
+ if(!active)return;
+ if(!original.hidden)original.hidden=true;
+ if(original.style.getPropertyValue('display')!=='none'||original.style.getPropertyPriority('display')!=='important'){
+  original.style.setProperty('display','none','important');
+ }
+}
+const originalVisibilityObserver=new MutationObserver(syncOriginalVisibility);
+originalVisibilityObserver.observe(original,{attributes:true,attributeFilter:['style','hidden']});
 function toggle(on){
  active=on;if(on){root.classList.remove('inner-city-active');if(inner)inner.hidden=true;}root.classList.toggle('national-daytime-active',on);
  panel.hidden=!on;tab.classList.toggle('active',on);
  if(on){
-  original.style.setProperty('display','none','important');
+  syncOriginalVisibility();
   modes.querySelectorAll('button').forEach(b=>{if(b!==tab)b.classList.remove('active')});
   document.getElementById('studyModeNote').textContent='2020년 전국 시군별 주간인구지수를 표시합니다.';
   for(const id of ['citySubModes','cityLegend','heritageLegend']){const x=document.getElementById(id);if(x)x.style.display='none'}
   populate();
- }else if(!root.classList.contains('inner-city-active'))original.style.removeProperty('display');
+ }else if(!root.classList.contains('inner-city-active')){
+  original.hidden=false;
+  original.style.removeProperty('display');
+ }
 }
 modes.querySelectorAll('button').forEach(b=>{if(b!==tab)b.addEventListener('click',()=>toggle(false))});
 tab.addEventListener('click',()=>toggle(true));
