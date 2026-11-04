@@ -293,15 +293,71 @@ paintStudyMap();
 let atlasSelected=null;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
 function showAtlasDetail(b){
- atlasSelected=b;const n=ATLAS_NOTES[b.id]||{};$('#atlasDetailName').textContent=b.name;$('#atlasDetailProvince').textContent=b.province;
- let parts=[];parts.push(`<div class="atlas-section kg-core-section"><h3>핵심 개념</h3><ul>${(n.core||[]).map(x=>`<li>${esc(x)}</li>`).join('')||'<li class="small">등록된 핵심개념이 없습니다.</li>'}</ul><div id="atlasCoreMount"></div></div>`);
- if(n.festival)parts.push(`<div class="atlas-section"><h3>지역 축제</h3><div class="single">${esc(n.festival)}</div></div>`);
- if(n.gi)parts.push(`<div class="atlas-section"><h3>지리적 표시제</h3><div class="single">${esc(n.gi)}</div></div>`);
- if(n.heritage)parts.push(`<div class="atlas-section"><h3>세계문화유산</h3><div class="single">${esc(n.heritage)}</div></div>`);
- if(n.naturalHeritage)parts.push(`<div class="atlas-section"><h3>세계자연유산</h3><div class="single">${esc(n.naturalHeritage)}</div></div>`);
- if(n.ramsar)parts.push(`<div class="atlas-section"><h3>람사르협약 등재 습지</h3><div class="single">${esc(n.ramsar)}</div></div>`);
- if(!parts.length)parts.push('<div class="atlas-section"><h3>지역 핵심 내용</h3><div class="small">아직 정리된 내용이 없습니다.</div></div>');
- const coreCard=$('#kgCoreCard');if(coreCard)$('#atlasDetail').appendChild(coreCard);$('#atlasDetailSections').innerHTML=parts.join('');if(coreCard)$('#atlasCoreMount').appendChild(coreCard);window.KGCore?.selectRegion(b.id);$('#atlasDetail').classList.remove('hidden');$('#atlasDetail').scrollIntoView({behavior:'smooth',block:'nearest'});
+ if(!b)return;
+ atlasSelected=b;
+ const n=ATLAS_NOTES[b.id]||{}, detail=$('#atlasDetail');
+ $('#atlasDetailName').textContent=b.name;
+ $('#atlasDetailProvince').textContent=b.province;
+ const sections=[];
+ const num=x=>Number(x).toLocaleString('ko-KR');
+ const section=(title,body,sub='')=>sections.push('<section class="atlas-section"><h3>'+esc(title)+'</h3>'+(sub?'<div class="small">'+esc(sub)+'</div>':'')+body+'</section>');
+ const rows=entries=>'<div class="study-note-tags">'+entries.map(([label,value])=>'<div class="study-note-row"><span class="study-note-label">'+esc(label)+'</span><span class="study-note-value">'+esc(String(value))+'</span></div>').join('')+'</div>';
+ const core=n.core||[];
+ sections.push('<section class="atlas-section kg-core-section"><h3>핵심 개념</h3><ul>'+ (core.length?core.map(x=>'<li>'+esc(x)+'</li>').join(''):'<li class="small">기본 등록 개념이 없습니다.</li>') +'</ul><div id="atlasCoreMount"></div></section>');
+ const tags=[];
+ for(const key of ['first','second','innovation','company','donong','fez']){
+   const cfg=CITY_STUDY[key],items=cfg?.items?.[b.id]||[];
+   if(items.length)tags.push([cfg.label,items.join(' · ')]);
+ }
+ if(n.festival)tags.push(['지역 축제',n.festival]);
+ const gi=studyGIItems(b.id);if(gi.length)tags.push(['지리적 표시제',gi.join(', ')]);
+ if(n.heritage)tags.push(['세계문화유산',n.heritage]);
+ if(n.naturalHeritage)tags.push(['세계자연유산',n.naturalHeritage]);
+ if(n.ramsar)tags.push(['람사르협약 등재 습지',n.ramsar]);
+ if(tags.length)section('도시·문화·지역 특성',rows(tags));
+ const don=DONONG_STUDY[b.id];
+ if(don)section('도농통합시',rows([['유형',don.type],['통합 이전',don.before],['통합 연도',don.year+'년']]));
+ const pop=POP2024[b.id],age=AGE2024[b.id];
+ if(pop){
+   const m=pop.male/pop.total*100,f=pop.female/pop.total*100;
+   const pr=[['총인구',num(pop.total)+'명'],['남자',num(pop.male)+'명 ('+m.toFixed(1)+'%)'],['여자',num(pop.female)+'명 ('+f.toFixed(1)+'%)'],['성비',(pop.male/pop.female*100).toFixed(1)+' (여자 100명당 남자)']];
+   if(age)for(const [label,key] of [['유소년층 (0~14세)','youth'],['청장년층 (15~64세)','adult'],['노년층 (65세 이상)','old']])pr.push([label,num(age[key])+'명 ('+(age[key]/age.total*100).toFixed(1)+'%)']);
+   section('2024 주민등록인구',rows(pr),'2024년 12월 기준 · 행정안전부·KOSIS');
+ }
+ const climate=CLIMATE1991_2020[b.id];
+ if(climate){
+   const v=(k,u)=>climate[k]==null?'자료 없음':num(climate[k])+u;
+   section('기후 평년값',rows([['대표 관측지점',climate.station+' ('+climate.stationNo+')'],['1월 평균기온',v('jan','℃')],['8월 평균기온',v('aug','℃')],['기온 연교차',v('range','℃')],['연 강수량',v('annualP','mm')],['여름 강수량',v('summerP','mm')],['겨울 강수량',v('winterP','mm')],['여름 강수 집중률',v('summerShare','%')],['겨울 강수 집중률',v('winterShare','%')]]),'1991~2020년 · 해당 지역 내 관측지점만 사용');
+ }else section('기후 평년값','<div class="small">지역 내부에 해당하는 관측지점 자료가 없습니다.</div>');
+ const key=industryKeyForRegion(b),major=INDUSTRY_MAJOR[key]||[];
+ const ranks=[];
+ Object.entries(INDUSTRY_CITY_RANK).forEach(([type,list])=>{const i=list.indexOf(key);if(i>=0)ranks.push(type+' '+(i+1)+'위')});
+ if(major.length||ranks.length)section('공업',rows([...(major.length?[['주요 공업',major.join(' · ')]]:[]),...(ranks.length?[['공업 시군 순위',ranks.join(' · ')]]:[])]),'2023년 공업 자료');
+ const daytime=window.KG_DAYTIME_2020?.[Number(b.id.slice(1))];
+ if(daytime&&daytime[0]>0)section('주간인구',rows([['상주인구',num(daytime[0])+'명'],['주간인구',num(daytime[1])+'명'],['주간인구지수',(daytime[1]/daytime[0]*100).toFixed(1)]]),'2020년 · 주간인구지수 = 주간인구 / 상주인구 × 100');
+ try{
+   const raw=document.getElementById('popHistoryData')?.textContent;
+   const history=raw?JSON.parse(raw):null;
+   const item=history?.municipalities?.find(x=>x.id===b.id);
+   if(item?.values){
+     const points=(history.years||[]).map(y=>[Number(y),Number(item.values[y])]).filter(x=>Number.isFinite(x[1])&&x[1]>=0);
+     if(points.length>1){
+       const ys=points.map(x=>x[1]),lo=Math.min(...ys),hi=Math.max(...ys),span=hi-lo||1;
+       const poly=points.map((p,i)=>(16+i*288/(points.length-1)).toFixed(1)+','+(99-(p[1]-lo)/span*74).toFixed(1)).join(' ');
+       const plot='<svg viewBox="0 0 320 115" width="100%" role="img" aria-label="1970년부터 2025년까지 인구 추이"><line x1="16" y1="100" x2="304" y2="100" stroke="#cbd5e1"/><polyline fill="none" stroke="#3974f6" stroke-width="3" stroke-linejoin="round" points="'+poly+'"/></svg>';
+       section('인구추이',plot+rows([['시작 ('+points[0][0]+'년)',num(points[0][1])+'명'],['최근 ('+points[points.length-1][0]+'년)',num(points[points.length-1][1])+'명']])+'<details><summary>연도별 인구 보기</summary>'+rows(points.map(([y,v])=>[y+'년',num(v)+'명']))+'</details>','행정구역 통폐합 및 경계 변경으로 직접 비교에 주의');
+     }
+   }
+ }catch(e){console.warn('지역도감 인구추이 표시 오류',e)}
+ const coreCard=$('#kgCoreCard');
+ if(coreCard)detail.appendChild(coreCard);
+ $('#atlasDetailSections').innerHTML=sections.join('');
+ if(coreCard)$('#atlasCoreMount').appendChild(coreCard);
+ window.KGCore?.selectRegion(b.id);
+ detail.classList.remove('hidden');
+ // 검색/시도 선택부 바로 아래에 상세 카드를 배치하고, 목록은 그 아래에 둔다.
+ $('#atlasPanel').insertBefore(detail,$('#atlasGrid'));
+ detail.scrollIntoView({behavior:'smooth',block:'start'});
 }
 $('#atlasDetailClose').onclick=()=>$('#atlasDetail').classList.add('hidden');
 $('#atlasDetailMap').onclick=()=>{if(atlasSelected){selectStudyRegion(atlasSelected);openTab('study')}};
