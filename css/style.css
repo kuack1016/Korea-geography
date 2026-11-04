@@ -1050,3 +1050,15 @@ html,body{width:100%;max-width:100%;overflow-x:hidden!important}
 #atlasDetailSections .pop-basis,#atlasDetailSections .climate-basis{font-size:11px}
 #atlasDetailSections .kg-core-section li{font-family:inherit!important;font-size:13px!important;font-weight:650;line-height:1.6;color:#243247;letter-spacing:normal}
 #atlasDetailSections .kg-core-section ul{margin:7px 0 0;padding-left:20px}
+
+/* 2026-11-04: daytime mode only shows its own map, regardless of mobile study-layout overrides or DOM relocation */
+#studyPanel.national-daytime-active #generalStudyLayout,
+#studyPanel.national-daytime-active #generalStudyLayout.study-layout,
+#studyPanel.national-daytime-active #generalStudyLayout[style] {
+ display:none!important;
+ visibility:hidden!important;
+}
+#studyPanel.national-daytime-active #nationalDaytimePanel:not([hidden]){
+ display:grid!important;
+ visibility:visible!important;
+}
