@@ -357,7 +357,15 @@ function showAtlasDetail(b){
  detail.classList.remove('hidden');
  // 검색/시도 선택부 바로 아래에 상세 카드를 배치하고, 목록은 그 아래에 둔다.
  $('#atlasPanel').insertBefore(detail,$('#atlasGrid'));
- detail.scrollIntoView({behavior:'smooth',block:'start'});
+ // 애니메이션으로 이동하면 모바일 브라우저의 스크롤 앵커 때문에 이전 목록 위치가 남을 수 있음.
+ // 선택 즉시 상세정보 위치를 동기적으로 맞추고, 레이아웃 갱신 후 한 번 더 보정한다.
+ const moveAtlasDetailToTop=()=>{
+   const y=Math.max(0,detail.getBoundingClientRect().top+window.scrollY-12);
+   window.scrollTo({top:y,behavior:'instant'});
+   document.scrollingElement?.scrollTo({top:y,behavior:'instant'});
+ };
+ moveAtlasDetailToTop();
+ requestAnimationFrame(moveAtlasDetailToTop);
 }
 $('#atlasDetailClose').onclick=()=>$('#atlasDetail').classList.add('hidden');
 $('#atlasDetailMap').onclick=()=>{if(atlasSelected){selectStudyRegion(atlasSelected);openTab('study')}};
