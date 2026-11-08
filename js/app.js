@@ -474,8 +474,13 @@ function climateSelectCategory(scope,category){
  container.querySelectorAll('button').forEach(btn=>{const active=btn.dataset.category===category;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',active?'true':'false')});
  if(scope==='map'){
   const sel=document.getElementById('climateMapMetric');
-  [...sel.options].forEach(opt=>{opt.hidden=!CLIMATE_CATEGORIES[category].includes(opt.value);opt.disabled=opt.hidden});
-  if(!CLIMATE_CATEGORIES[category].includes(sel.value)){sel.value=CLIMATE_CATEGORIES[category][0];climateMapMetric=sel.value}
+  // iOS Safari의 기본 select는 hidden/disabled option도 메뉴에 표시할 수 있으므로
+  // 선택된 분류의 option만 실제 DOM에 남겨 드롭다운을 구성한다.
+  const available=CLIMATE_CATEGORIES[category];
+  const current=available.includes(sel.value)?sel.value:(available.includes(climateMapMetric)?climateMapMetric:available[0]);
+  sel.replaceChildren(...available.map(key=>{const option=document.createElement('option');option.value=key;option.textContent=CLIMATE_MAP_METRICS[key].label;return option;}));
+  sel.value=current;
+  climateMapMetric=current;
   document.getElementById('climateWindTools').classList.toggle('hidden',category!=='wind');
   renderClimateMap();
  }else{
@@ -490,7 +495,7 @@ function climateSelectCategory(scope,category){
 }
 function initClimateThreeCategoryUI(){
  const makeCategories=(target,scope)=>{
-  const div=document.createElement('div');div.id=scope==='map'?'climateMapCategories':'climateRankCategories';div.className='climate-category-tabs';div.setAttribute('role','group');div.setAttribute('aria-label',scope==='map'?'기후 지도 분류':'기후 랭킹 분류');
+  const div=document.createElement('div');div.id=scope==='map'?'climateMapCategories':'climateRankCategories';div.className='climate-view-tabs climate-category-tabs';div.setAttribute('role','group');div.setAttribute('aria-label',scope==='map'?'기후 지도 분류':'기후 랭킹 분류');
   for(const [category,label] of [['temp','기온'],['rain','강수'],['wind','바람']]){
    const b=document.createElement('button');b.type='button';b.dataset.category=category;b.textContent=label;b.onclick=()=>climateSelectCategory(scope,category);div.appendChild(b);
   }
@@ -503,11 +508,11 @@ function initClimateThreeCategoryUI(){
  makeCategories(tools,'map');makeCategories(rankTabs.parentElement,'rank');
  const windTools=document.createElement('section');
  windTools.id='climateWindTools';windTools.className='climate-wind-tools hidden';
- windTools.innerHTML='<label class="climate-wind-switch"><input type="checkbox" id="climateWindDifference"> <span>연평균 대비 풍속 차이 보기</span></label><div id="climateWindNote" class="small" aria-live="polite"></div><details class="climate-wind-guide"><summary>계절풍·산맥 영향 공부하기</summary><p><b>겨울:</b> 대체로 북서계절풍의 영향이 강하지만 지역의 실제 우세풍향은 관측해야 합니다.</p><p><b>여름:</b> 남·남서풍 계열이 나타나며 장마·태풍과 지형의 영향을 받습니다.</p><p><b>산맥:</b> 바람받이에서는 상승·강수가, 바람그늘에서는 하강·건조가 나타날 수 있습니다. 지형과 풍향을 함께 비교해야 합니다.</p><p><b>주의:</b> 풍속만으로 시군별 바람 방향을 판단할 수 없습니다. 우세풍향 화살표 지도는 계절별 풍향 관측값 확보 후 추가합니다.</p></details>';
+ windTools.innerHTML='<label class="climate-wind-switch"><input type="checkbox" id="climateWindDifference"> <span>연평균 대비 풍속 차이 보기</span></label><p id="climateWindDifferenceGuide" class="small" style="line-height:1.65;margin:8px 0">보정 지도는 <b>해당 계절 평균풍속 − 같은 지역의 연평균 풍속</b>입니다. <b>붉은색(+)</b>은 평소보다 강한 계절, <b>푸른색(−)</b>은 평소보다 약한 계절, <b>흰색에 가까운 색(0)</b>은 비슷하다는 뜻입니다. 절대 풍속이나 풍향을 뜻하지 않으며, 지역 간 절대 풍속 비교는 보정을 끄고 확인하세요.</p><div id="climateWindNote" class="small" aria-live="polite"></div><details class="climate-wind-guide"><summary>계절풍·산맥 영향 공부하기</summary><p><b>겨울:</b> 대체로 북서계절풍의 영향이 강하지만 지역의 실제 우세풍향은 관측해야 합니다.</p><p><b>여름:</b> 남·남서풍 계열이 나타나며 장마·태풍과 지형의 영향을 받습니다.</p><p><b>산맥:</b> 바람받이에서는 상승·강수가, 바람그늘에서는 하강·건조가 나타날 수 있습니다. 지형과 풍향을 함께 비교해야 합니다.</p><p><b>주의:</b> 풍속만으로 시군별 바람 방향을 판단할 수 없습니다. 우세풍향 화살표 지도는 계절별 풍향 관측값 확보 후 추가합니다.</p></details>';
  mapCard.appendChild(windTools);
  const switchInput=windTools.querySelector('#climateWindDifference');
  switchInput.onchange=()=>{climateWindDifference=switchInput.checked;renderClimateMap()};
- const style=document.createElement('style');style.textContent='.climate-category-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.climate-category-tabs button{border:1px solid var(--line,#d4dbe3);background:transparent;border-radius:9px;padding:9px 20px;font:inherit;cursor:pointer;color:inherit}.climate-category-tabs button.active{background:var(--accent,#2368a2);color:white;border-color:transparent}.climate-wind-tools{margin:8px 0 0;padding:12px 14px;border:1px solid var(--line,#d4dbe3);border-radius:12px}.climate-wind-switch{display:flex;align-items:center;gap:8px;font-size:14px}.climate-wind-guide{margin-top:10px;font-size:13px;line-height:1.6}.climate-wind-guide p{margin:8px 0}.climate-wind-tools.hidden{display:none}';document.head.appendChild(style);
+ const style=document.createElement('style');style.textContent='.climate-category-tabs{margin:0 0 10px!important}.climate-map-tools .climate-category-tabs{width:100%}.climate-wind-tools{margin:8px 0 0;padding:12px 14px;border:1px solid var(--line,#d4dbe3);border-radius:12px}.climate-wind-switch{display:flex;align-items:center;gap:8px;font-size:14px}.climate-wind-guide{margin-top:10px;font-size:13px;line-height:1.6}.climate-wind-guide p{margin:8px 0}.climate-wind-tools.hidden{display:none}';document.head.appendChild(style);
  climateSelectCategory('map','temp');climateSelectCategory('rank','temp');
 }
 
@@ -522,7 +527,7 @@ function renderClimateMap(selectedId){
  const fmtWindRange=i=>i===0?'0.8 미만':i===6?'3.2 이상':WIND_FIXED_CUTS[i].toFixed(1)+' ~ '+WIND_FIXED_CUTS[i+1].toFixed(1);
  const fmtDiffRange=i=>i===0?'−0.6 미만':i===6?'+0.6 이상':WIND_DIFF_CUTS[i].toFixed(1)+' ~ '+WIND_DIFF_CUTS[i+1].toFixed(1);
  $('#climateLegend').innerHTML=(isDiff?WIND_DIFF_COLORS:cfg.palette).map((c,i)=>{let lo=b.cuts[i],hi=b.cuts[i+1],unit=cfg.unit;let f=x=>unit==='mm'?Math.round(x).toLocaleString('ko-KR'):x.toFixed(1);let label=isDiff?fmtDiffRange(i)+' m/s':isWind?fmtWindRange(i)+' m/s':f(lo)+' ~ '+f(hi)+' '+unit;return '<div class="climate-legend-row"><span class="climate-swatch" style="background:'+c+'"></span><span>'+label+'</span></div>'}).join('');
- if(isWind){const note=document.getElementById('climateWindNote');if(note)note.textContent=WIND_SEASON_NOTES[climateMapMetric]+(isDiff?' · 색은 해당 계절의 평균풍속 − 연평균 풍속(m/s)입니다.':' · 계절 간 비교를 위해 모든 풍속 지도에 동일한 구간을 적용했습니다.');}
+ if(isWind){const note=document.getElementById('climateWindNote');if(note)note.textContent=WIND_SEASON_NOTES[climateMapMetric]+(isDiff?' · 빨강은 연평균보다 강함, 파랑은 약함을 나타냅니다.':' · 계절 간 비교를 위해 모든 풍속 지도에 동일한 구간을 적용했습니다.');const guide=document.getElementById('climateWindDifferenceGuide');if(guide)guide.hidden=!isDiff;}
  if(climateSelectedId){let r=BANK.find(x=>x.id===climateSelectedId),d=CLIMATE1991_2020[climateSelectedId],v=d&&d[climateMapMetric];$('#climateMapSelected').innerHTML=`<hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><b>${r.display}</b>${v===null||v===undefined?'<div class="climate-map-value">자료 없음</div>':`<div class="climate-map-value">${fmtClimateValue(v,cfg.unit)}</div>${isWind?'<div class="climate-map-station">연평균 '+fmtClimateValue(d.windAnnual,'m/s')+' · 계절 차이 '+(Number(v)-Number(d.windAnnual)).toFixed(1)+' m/s</div>':''}<div class="climate-map-station">관측지점 ${d.station} · ${d.stationNo}</div>`}`}
  clqRenderFavUI();
 }
