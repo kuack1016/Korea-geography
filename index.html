@@ -13,7 +13,7 @@
 <button data-tab="climateRanking"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v2M5.6 5.6 7 7M3 12h2M5.6 18.4 7 17M12 19v2M18.4 18.4 17 17M21 12h-2M18.4 5.6 17 7"/><circle cx="12" cy="12" r="4"/></svg><span>기후</span></button>
 <button data-tab="industry"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21V10l6 4V9l6 4V5l6-2v18z"/><path d="M7 18h.01M12 18h.01M17 18h.01"/></svg><span>공업</span></button>
 <button data-tab="energy" type="button"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 5 13h7l-1 9 8-12h-7l1-8z"/></svg><span>에너지</span></button>
-<button data-tab="notes" type="button"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>지엽노트</span></button></nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v.1.1.2</span></div>
+<button data-tab="notes" type="button"><svg class="nav-topic-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h14v18H5z"/><path d="M8 8h8M8 12h8M8 16h5"/></svg><span>지엽노트</span></button></nav><div class="version-label-wrap"><span class="version-label" aria-label="현재 버전">v.1.1.3</span></div>
 <div class="kg-auth" aria-label="Google 로그인">
 <span id="kgAuthStatus" class="kg-auth-status" role="status">Firebase 연결 설정 대기</span>
 <button id="kgSignIn" type="button" hidden>Google 로그인</button>
@@ -384,7 +384,7 @@
  <form id="notesEditor" class="card notes-editor" hidden><h3 id="notesEditorTitle">새 노트</h3><label>제목<input id="notesTitle" required maxlength="120" placeholder="노트 제목"></label><label>분류<input id="notesGroup" maxlength="40" list="notesGroups" placeholder="예: 공업, 인구, 기후, 기타"></label><datalist id="notesGroups"></datalist><label>태그<input id="notesTags" maxlength="180" placeholder="쉼표(,)로 구분"></label><label>본문<textarea id="notesBody" rows="12" maxlength="20000" required placeholder="내용을 자유롭게 적어주세요."></textarea></label><div class="notes-editor-actions"><button class="primary" type="submit" id="notesSave">저장</button><button type="button" id="notesCancel">취소</button><button type="button" id="notesDelete" class="notes-delete" hidden>삭제</button></div><p id="notesEditorMessage" class="small" role="status"></p></form>
  </section>
 
-<script src="js/app.js?v=climate-three-categories-20261108b"></script>
+<script src="js/app.js?v=climate-category-ui-fixed-20261108c"></script>
 
 <script id="v625-panel-structure-script" src="js/panel-structure.js"></script>
 
