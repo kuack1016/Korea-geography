@@ -436,7 +436,7 @@ const CLIMATE_MAP_METRICS={
  if(tabs)for(const [key,label] of opts){const button=document.createElement('button');button.type='button';button.dataset.cmetric=key+'High';button.textContent=label+' 높은 순';tabs.appendChild(button)}
  const settings=document.querySelector('.clq-settings-tools');
  if(settings){const label=document.createElement('label');label.htmlFor='clqToleranceWind';label.textContent='풍속 허용 오차 (±)';const input=document.createElement('input');input.id='clqToleranceWind';input.type='number';input.min='0';input.max='100000';input.step='0.1';input.value='0.5';input.style.maxWidth='100px';const unit=document.createElement('span');unit.className='clq-status';unit.textContent='m/s';settings.append(label,input,unit)}
- const version=document.querySelector('.version-label');if(version)version.textContent='v.1.1.2';
+ const version=document.querySelector('.version-label');if(version)version.textContent='v.1.1.3';
 })();
 let climateMapMetric='jan';
 
