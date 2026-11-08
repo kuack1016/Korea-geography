@@ -439,15 +439,91 @@ const CLIMATE_MAP_METRICS={
  const version=document.querySelector('.version-label');if(version)version.textContent='v.1.1.1';
 })();
 let climateMapMetric='jan';
+
+const CLIMATE_CATEGORIES={
+ temp:['jan','aug','range'],
+ rain:['annualP','summerP','winterP','summerShare','winterShare'],
+ wind:['windAnnual','windSpring','windSummer','windAutumn','windWinter']
+};
+const WIND_FIXED_CUTS=[0.8,1.2,1.6,2.0,2.4,2.8,3.2,Infinity];
+const WIND_DIFF_CUTS=[-Infinity,-0.6,-0.3,-0.1,0.1,0.3,0.6,Infinity];
+const WIND_DIFF_COLORS=['#315a9c','#6190c8','#b2cfe6','#edf0f3','#f1c7ad','#d68c68','#b95640'];
+let climateWindDifference=false;
+const WIND_SEASON_NOTES={
+ windAnnual:'연평균은 계절별 방향 변화를 나타내지 않습니다. 아래에서 계절을 선택해 비교하세요.',
+ windSpring:'봄에는 이동성 고기압과 저기압의 영향으로 풍향 변동이 큽니다. 이 화면의 지도 색은 방향이 아닌 풍속을 나타냅니다.',
+ windSummer:'여름에는 남풍·남서풍 계열의 영향이 나타나지만, 장마·태풍·국지 바람 때문에 지역별 방향이 달라집니다.',
+ windAutumn:'가을은 여름철에서 겨울철 순환으로 전환되는 시기입니다. 지역별 우세풍향은 관측자료가 필요합니다.',
+ windWinter:'겨울에는 대체로 북서계절풍의 영향이 커집니다. 산맥의 바람받이·바람그늘은 지역에 따라 달라집니다.'
+};
+function climateWindBins(){
+ return {min:0.8,max:Infinity,cuts:WIND_FIXED_CUTS,windFixed:true};
+}
+function climateWindBinIndex(v){
+ for(let i=0;i<7;i++)if(v<WIND_FIXED_CUTS[i+1])return i;
+ return 6;
+}
+function climateWindDiffIndex(v){
+ for(let i=0;i<7;i++)if(v<WIND_DIFF_CUTS[i+1])return i;
+ return 6;
+}
+function climateCategoryOf(key){return Object.entries(CLIMATE_CATEGORIES).find(([,keys])=>keys.includes(key))?.[0]||'temp';}
+function climateSelectCategory(scope,category){
+ const container=document.getElementById(scope==='map'?'climateMapCategories':'climateRankCategories');
+ if(!container)return;
+ container.querySelectorAll('button').forEach(btn=>{const active=btn.dataset.category===category;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',active?'true':'false')});
+ if(scope==='map'){
+  const sel=document.getElementById('climateMapMetric');
+  [...sel.options].forEach(opt=>{opt.hidden=!CLIMATE_CATEGORIES[category].includes(opt.value);opt.disabled=opt.hidden});
+  if(!CLIMATE_CATEGORIES[category].includes(sel.value)){sel.value=CLIMATE_CATEGORIES[category][0];climateMapMetric=sel.value}
+  document.getElementById('climateWindTools').classList.toggle('hidden',category!=='wind');
+  renderClimateMap();
+ }else{
+  const buttons=[...document.querySelectorAll('#climateMetricTabs button')];
+  buttons.forEach(btn=>{const visible=CLIMATE_CATEGORIES[category].includes(CLIMATE_RANK_METRICS[btn.dataset.cmetric]?.key);btn.hidden=!visible;btn.style.display=visible?'':'none'});
+  if(!CLIMATE_CATEGORIES[category].includes(CLIMATE_RANK_METRICS[climateRankMetric]?.key)){
+   const next=buttons.find(btn=>!btn.hidden);
+   if(next){climateRankMetric=next.dataset.cmetric;buttons.forEach(btn=>btn.classList.toggle('active',btn===next))}
+  }
+  renderClimateRanking();
+ }
+}
+function initClimateThreeCategoryUI(){
+ const makeCategories=(target,scope)=>{
+  const div=document.createElement('div');div.id=scope==='map'?'climateMapCategories':'climateRankCategories';div.className='climate-category-tabs';div.setAttribute('role','group');div.setAttribute('aria-label',scope==='map'?'기후 지도 분류':'기후 랭킹 분류');
+  for(const [category,label] of [['temp','기온'],['rain','강수'],['wind','바람']]){
+   const b=document.createElement('button');b.type='button';b.dataset.category=category;b.textContent=label;b.onclick=()=>climateSelectCategory(scope,category);div.appendChild(b);
+  }
+  target.prepend(div);
+ };
+ const tools=document.querySelector('#climateMapView .climate-map-tools');
+ const mapCard=document.querySelector('#climateMapView .climate-map-card');
+ const rankTabs=document.getElementById('climateMetricTabs');
+ if(!tools||!mapCard||!rankTabs)return;
+ makeCategories(tools,'map');makeCategories(rankTabs.parentElement,'rank');
+ const windTools=document.createElement('section');
+ windTools.id='climateWindTools';windTools.className='climate-wind-tools hidden';
+ windTools.innerHTML='<label class="climate-wind-switch"><input type="checkbox" id="climateWindDifference"> <span>연평균 대비 풍속 차이 보기</span></label><div id="climateWindNote" class="small" aria-live="polite"></div><details class="climate-wind-guide"><summary>계절풍·산맥 영향 공부하기</summary><p><b>겨울:</b> 대체로 북서계절풍의 영향이 강하지만 지역의 실제 우세풍향은 관측해야 합니다.</p><p><b>여름:</b> 남·남서풍 계열이 나타나며 장마·태풍과 지형의 영향을 받습니다.</p><p><b>산맥:</b> 바람받이에서는 상승·강수가, 바람그늘에서는 하강·건조가 나타날 수 있습니다. 지형과 풍향을 함께 비교해야 합니다.</p><p><b>주의:</b> 풍속만으로 시군별 바람 방향을 판단할 수 없습니다. 우세풍향 화살표 지도는 계절별 풍향 관측값 확보 후 추가합니다.</p></details>';
+ mapCard.appendChild(windTools);
+ const switchInput=windTools.querySelector('#climateWindDifference');
+ switchInput.onchange=()=>{climateWindDifference=switchInput.checked;renderClimateMap()};
+ const style=document.createElement('style');style.textContent='.climate-category-tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px}.climate-category-tabs button{border:1px solid var(--line,#d4dbe3);background:transparent;border-radius:9px;padding:9px 20px;font:inherit;cursor:pointer;color:inherit}.climate-category-tabs button.active{background:var(--accent,#2368a2);color:white;border-color:transparent}.climate-wind-tools{margin:8px 0 0;padding:12px 14px;border:1px solid var(--line,#d4dbe3);border-radius:12px}.climate-wind-switch{display:flex;align-items:center;gap:8px;font-size:14px}.climate-wind-guide{margin-top:10px;font-size:13px;line-height:1.6}.climate-wind-guide p{margin:8px 0}.climate-wind-tools.hidden{display:none}';document.head.appendChild(style);
+ climateSelectCategory('map','temp');climateSelectCategory('rank','temp');
+}
+
 function fmtClimateValue(v,unit){return unit==='mm'?Number(v).toLocaleString('ko-KR',{maximumFractionDigits:1})+' mm':Number(v).toFixed(1)+unit}
-function climateBins(key){let vals=Object.values(CLIMATE1991_2020).map(d=>d&&d[key]).filter(v=>v!==null&&v!==undefined).map(Number);let min=Math.min(...vals),max=Math.max(...vals),count=7,step=(max-min)/count;return {min,max,step,cuts:Array.from({length:count+1},(_,i)=>i===count?max:min+i*step)}}
-function climateBinIndex(v,b){if(v>=b.max)return 6;return Math.max(0,Math.min(6,Math.floor((v-b.min)/(b.step||1))))}
+function climateBins(key){if(WIND_KEYS.includes(key))return climateWindBins();let vals=Object.values(CLIMATE1991_2020).map(d=>d&&d[key]).filter(v=>v!==null&&v!==undefined).map(Number);let min=Math.min(...vals),max=Math.max(...vals),count=7,step=(max-min)/count;return {min,max,step,cuts:Array.from({length:count+1},(_,i)=>i===count?max:min+i*step)}}
+function climateBinIndex(v,b){if(b.windFixed)return climateWindBinIndex(v);if(v>=b.max)return 6;return Math.max(0,Math.min(6,Math.floor((v-b.min)/(b.step||1))))}
 function renderClimateMap(selectedId){
  if(selectedId!==undefined)climateSelectedId=selectedId;
- const cfg=CLIMATE_MAP_METRICS[climateMapMetric], b=climateBins(climateMapMetric); $('#climateMapTitle').textContent=cfg.label;
- $$('#climateMapg path').forEach(p=>{let d=CLIMATE1991_2020[p.dataset.id],v=d&&d[climateMapMetric];p.classList.toggle('climate-nodata',v===null||v===undefined);p.style.fill=(v===null||v===undefined)?'#e5e7eb':cfg.palette[climateBinIndex(Number(v),b)];p.classList.toggle('climate-map-picked',p.dataset.id===climateSelectedId)});
- $('#climateLegend').innerHTML=cfg.palette.map((c,i)=>{let lo=b.cuts[i],hi=b.cuts[i+1],unit=cfg.unit;let f=x=>unit==='mm'?Math.round(x).toLocaleString('ko-KR'):x.toFixed(1);return `<div class="climate-legend-row"><span class="climate-swatch" style="background:${c}"></span><span>${f(lo)} ~ ${f(hi)} ${unit}</span></div>`}).join('');
- if(climateSelectedId){let r=BANK.find(x=>x.id===climateSelectedId),d=CLIMATE1991_2020[climateSelectedId],v=d&&d[climateMapMetric];$('#climateMapSelected').innerHTML=`<hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><b>${r.display}</b>${v===null||v===undefined?'<div class="climate-map-value">자료 없음</div>':`<div class="climate-map-value">${fmtClimateValue(v,cfg.unit)}</div><div class="climate-map-station">관측지점 ${d.station} · ${d.stationNo}</div>`}`}
+ const cfg=CLIMATE_MAP_METRICS[climateMapMetric], b=climateBins(climateMapMetric);const isWind=WIND_KEYS.includes(climateMapMetric),isDiff=isWind&&climateWindDifference;$('#climateMapTitle').textContent=cfg.label+(isDiff?' · 연평균 대비':'');
+ $$('#climateMapg path').forEach(p=>{let d=CLIMATE1991_2020[p.dataset.id],v=d&&d[climateMapMetric];p.classList.toggle('climate-nodata',v===null||v===undefined);p.style.fill=(v===null||v===undefined)?'#e5e7eb':isDiff?WIND_DIFF_COLORS[climateWindDiffIndex(Number(v)-Number(d.windAnnual))]:cfg.palette[climateBinIndex(Number(v),b)];p.classList.toggle('climate-map-picked',p.dataset.id===climateSelectedId)});
+
+ const fmtWindRange=i=>i===0?'0.8 미만':i===6?'3.2 이상':WIND_FIXED_CUTS[i].toFixed(1)+' ~ '+WIND_FIXED_CUTS[i+1].toFixed(1);
+ const fmtDiffRange=i=>i===0?'−0.6 미만':i===6?'+0.6 이상':WIND_DIFF_CUTS[i].toFixed(1)+' ~ '+WIND_DIFF_CUTS[i+1].toFixed(1);
+ $('#climateLegend').innerHTML=(isDiff?WIND_DIFF_COLORS:cfg.palette).map((c,i)=>{let lo=b.cuts[i],hi=b.cuts[i+1],unit=cfg.unit;let f=x=>unit==='mm'?Math.round(x).toLocaleString('ko-KR'):x.toFixed(1);let label=isDiff?fmtDiffRange(i)+' m/s':isWind?fmtWindRange(i)+' m/s':f(lo)+' ~ '+f(hi)+' '+unit;return '<div class="climate-legend-row"><span class="climate-swatch" style="background:'+c+'"></span><span>'+label+'</span></div>'}).join('');
+ if(isWind){const note=document.getElementById('climateWindNote');if(note)note.textContent=WIND_SEASON_NOTES[climateMapMetric]+(isDiff?' · 색은 해당 계절의 평균풍속 − 연평균 풍속(m/s)입니다.':' · 계절 간 비교를 위해 모든 풍속 지도에 동일한 구간을 적용했습니다.');}
+ if(climateSelectedId){let r=BANK.find(x=>x.id===climateSelectedId),d=CLIMATE1991_2020[climateSelectedId],v=d&&d[climateMapMetric];$('#climateMapSelected').innerHTML=`<hr style="border:0;border-top:1px solid var(--line);margin:14px 0"><b>${r.display}</b>${v===null||v===undefined?'<div class="climate-map-value">자료 없음</div>':`<div class="climate-map-value">${fmtClimateValue(v,cfg.unit)}</div>${isWind?'<div class="climate-map-station">연평균 '+fmtClimateValue(d.windAnnual,'m/s')+' · 계절 차이 '+(Number(v)-Number(d.windAnnual)).toFixed(1)+' m/s</div>':''}<div class="climate-map-station">관측지점 ${d.station} · ${d.stationNo}</div>`}`}
  clqRenderFavUI();
 }
 // v6.5.8 기후 지도 즐겨찾기 / 사용자별 기후 퀴즈
@@ -565,6 +641,7 @@ function renderClimateRanking(){
   });
 }
 initClimateRanking();
+initClimateThreeCategoryUI();
 
 
 // 공업 학습 데이터
