@@ -2,36 +2,38 @@
 (function(){
 'use strict';
 const DATA=JSON.parse(document.getElementById('popHistoryData').textContent);
-// 시·도 인구도 시·군 보정과 같은 현행 시·도 구분으로 비교한다.
-// 분리 이전 광역시 인구는 원래 소속 도의 총계에서 이동시키고,
-// 분리 이후에는 시·군 기준으로 보정된 광역시 값과 당시 시·도 원자료의 차액만큼
-// 원 소속 도를 조정한다. 연도별 전국 총계는 항상 보존된다.
-// 세종의 과거 관할구역은 충남·충북 사이의 세부 배분을 검증하지 못했으므로
-// 기존대로 2015년 이후만 표시한다.
+// 특별시·광역시·특별자치시는 시·군 인구추이와 동일한 데이터를 직접 참조한다.
+// 도 단위의 경계 조정은 기존 시·도 통계에서 분리된 도시의 차액만 이동한다.
+// 세종의 과거분은 시·군 통계에 이미 존재하므로 누락하지 않는다.
+// 단, 2015년 이전 세종에 대응하는 충남/충북 경계의 정확한 분할은 별도 검증 대상이다.
 (function normalizeProvinceHistory(){
  const transfers=[
   ['서울','서울특별시','경기도'],['부산','부산광역시','경상남도'],
   ['대구','대구광역시','경상북도'],['인천','인천광역시','경기도'],
   ['광주','광주광역시','전라남도'],['대전','대전광역시','충청남도'],
-  ['울산','울산광역시','경상남도']
+  ['울산','울산광역시','경상남도'],
+  ['세종','세종특별자치시',null]
  ];
  for(const [short,cityName,parentName] of transfers){
   const municipality=DATA.municipalities.find(x=>x.province===short);
   const city=DATA.provinces.find(x=>x.name===cityName);
-  const parent=DATA.provinces.find(x=>x.name===parentName);
-  if(!municipality||!city||!parent)continue;
+  const parent=parentName&&DATA.provinces.find(x=>x.name===parentName);
+  if(!municipality||!city)continue;
   for(const year of DATA.years){
    const adjusted=municipality.values[year];
    if(!Number.isFinite(adjusted))continue;
    const original=city.values[year];
    const delta=adjusted-(Number.isFinite(original)?original:0);
-   parent.values[year]-=delta;
+   if(parent){
+    parent.values[year]-=delta;
+    if(!parent.review)parent.review={};
+    const previous=parent.review[year]?.source;
+    parent.review[year]={category:'PROVINCE_BOUNDARY_ADJUSTED',source:(previous?previous+'; ':'')+cityName+' '+year+'년 경계 이동분 '+delta.toLocaleString('ko-KR')+'명 조정'};
+   }
+   // Same value as the corresponding municipality graph, including 1970~2010 Sejong.
    city.values[year]=adjusted;
    if(!city.review)city.review={};
-   city.review[year]={category:'PROVINCE_BOUNDARY_ADJUSTED',source:year+'년 시·군 보정값을 현재 시·도 구분에 적용 (원 시·도 통계와 원 소속 도 합계 조정)'};
-   if(!parent.review)parent.review={};
-   const previous=parent.review[year]?.source;
-   parent.review[year]={category:'PROVINCE_BOUNDARY_ADJUSTED',source:(previous?previous+'; ':'')+cityName+' '+year+'년 경계 이동분 '+delta.toLocaleString('ko-KR')+'명 조정'};
+   city.review[year]={category:'PROVINCE_BOUNDARY_ADJUSTED',source:'시·군 인구추이의 '+short+' '+year+'년 보정값 직접 사용'+(short==='세종'&&year<2015?' (과거 관할구역 기준 재구성값; 충남·충북 배분은 미검증)':'')};
   }
  }
 })();
@@ -70,7 +72,7 @@ if(rank){
  provinceFilter.addEventListener('change',choices);
  function redraw(){const items=comparison.map(id=>currentList().find(x=>x.id===id)).filter(Boolean);box.querySelector('#popHistoryTags').innerHTML=items.map((x,i)=>'<span class="pop-history-tag" style="border-color:'+COLORS[i%COLORS.length]+'">'+safe(x.name)+' <button type="button" data-phremove="'+safe(x.id)+'" aria-label="'+safe(x.name)+' 제거">×</button></span>').join('');draw(box.querySelector('#popHistoryChart'),items,false);}
  choose.addEventListener('change',()=>{if(choose.value&&!comparison.includes(choose.value))comparison.push(choose.value);choose.value='';redraw()});
- box.addEventListener('click',ev=>{const b=ev.target.closest('[data-phunit],[data-phremove]');if(!b)return;if(b.dataset.phremove){comparison=comparison.filter(x=>x!==b.dataset.phremove);redraw();return}unit=b.dataset.phunit;comparison=[];box.querySelector('.pop-history-desc').textContent=unit==='province'?'시·군 보정값과 시·도 원자료를 이용해 현재 시·도 구분으로 재구성한 5년 간격 인구 추이입니다. 세종은 2015년 이후 표시합니다.':'5년 간격 인구총조사 기반 인구 추이입니다. 행정구역 통폐합 및 경계 변경에 따라 실제 인구 변화와 일부 차이가 있을 수 있습니다.';box.querySelectorAll('[data-phunit]').forEach(x=>x.classList.toggle('active',x===b));choices();redraw()});
+ box.addEventListener('click',ev=>{const b=ev.target.closest('[data-phunit],[data-phremove]');if(!b)return;if(b.dataset.phremove){comparison=comparison.filter(x=>x!==b.dataset.phremove);redraw();return}unit=b.dataset.phunit;comparison=[];box.querySelector('.pop-history-desc').textContent=unit==='province'?'시·군 보정값과 시·도 원자료를 이용해 현재 시·도 구분으로 재구성한 5년 간격 인구 추이입니다. 세종도 시·군 보정값을 이용해 1970년부터 표시하며, 과거 충남·충북과의 경계 배분은 별도 검증이 필요합니다.':'5년 간격 인구총조사 기반 인구 추이입니다. 행정구역 통폐합 및 경계 변경에 따라 실제 인구 변화와 일부 차이가 있을 수 있습니다.';box.querySelectorAll('[data-phunit]').forEach(x=>x.classList.toggle('active',x===b));choices();redraw()});
  choices();redraw();
  const tabRank=document.getElementById('popRankViewBtn'),tabComposition=document.getElementById('popCompositionViewBtn'),tabHistory=document.getElementById('popHistoryViewBtn');
  const composition=document.getElementById('popCompositionView'),existing=document.getElementById('popExistingRanking'),head=document.getElementById('popCompareHead');
