@@ -55,7 +55,7 @@ if(rank){
  function currentList(){return unit==='province'?DATA.provinces:DATA.municipalities}
  function choices(){
   if(unit==='province'){
-   provinceFilter.style.display='none';choose.style.display='block';
+   provinceFilter.style.display='none';choose.style.display='block';choose.disabled=false;
    choose.innerHTML='<option value="">시·도를 선택해 추가하기</option>'+DATA.provinces.slice().sort((a,b)=>a.name.localeCompare(b.name,'ko')).map(x=>'<option value="'+safe(x.id)+'">'+safe(x.name)+'</option>').join('');
    return;
   }
