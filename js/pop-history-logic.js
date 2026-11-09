@@ -2,6 +2,39 @@
 (function(){
 'use strict';
 const DATA=JSON.parse(document.getElementById('popHistoryData').textContent);
+// 시·도 인구도 시·군 보정과 같은 현행 시·도 구분으로 비교한다.
+// 분리 이전 광역시 인구는 원래 소속 도의 총계에서 이동시키고,
+// 분리 이후에는 시·군 기준으로 보정된 광역시 값과 당시 시·도 원자료의 차액만큼
+// 원 소속 도를 조정한다. 연도별 전국 총계는 항상 보존된다.
+// 세종의 과거 관할구역은 충남·충북 사이의 세부 배분을 검증하지 못했으므로
+// 기존대로 2015년 이후만 표시한다.
+(function normalizeProvinceHistory(){
+ const transfers=[
+  ['서울','서울특별시','경기도'],['부산','부산광역시','경상남도'],
+  ['대구','대구광역시','경상북도'],['인천','인천광역시','경기도'],
+  ['광주','광주광역시','전라남도'],['대전','대전광역시','충청남도'],
+  ['울산','울산광역시','경상남도']
+ ];
+ for(const [short,cityName,parentName] of transfers){
+  const municipality=DATA.municipalities.find(x=>x.province===short);
+  const city=DATA.provinces.find(x=>x.name===cityName);
+  const parent=DATA.provinces.find(x=>x.name===parentName);
+  if(!municipality||!city||!parent)continue;
+  for(const year of DATA.years){
+   const adjusted=municipality.values[year];
+   if(!Number.isFinite(adjusted))continue;
+   const original=city.values[year];
+   const delta=adjusted-(Number.isFinite(original)?original:0);
+   parent.values[year]-=delta;
+   city.values[year]=adjusted;
+   if(!city.review)city.review={};
+   city.review[year]={category:'PROVINCE_BOUNDARY_ADJUSTED',source:year+'년 시·군 보정값을 현재 시·도 구분에 적용 (원 시·도 통계와 원 소속 도 합계 조정)'};
+   if(!parent.review)parent.review={};
+   const previous=parent.review[year]?.source;
+   parent.review[year]={category:'PROVINCE_BOUNDARY_ADJUSTED',source:(previous?previous+'; ':'')+cityName+' '+year+'년 경계 이동분 '+delta.toLocaleString('ko-KR')+'명 조정'};
+  }
+ }
+})();
 const YEARS=DATA.years, COLORS=['#3974F6','#A05DD7','#18A078','#E99A22','#D95B9A','#06A6D8','#E76F51','#B1BE29','#D34463','#6656BC','#78624B','#64748B'];
 const DASH=['none','8 4','3 4','11 3 2 3'];
 const byId=new Map(DATA.municipalities.map(x=>[x.id,x]));
@@ -37,7 +70,7 @@ if(rank){
  provinceFilter.addEventListener('change',choices);
  function redraw(){const items=comparison.map(id=>currentList().find(x=>x.id===id)).filter(Boolean);box.querySelector('#popHistoryTags').innerHTML=items.map((x,i)=>'<span class="pop-history-tag" style="border-color:'+COLORS[i%COLORS.length]+'">'+safe(x.name)+' <button type="button" data-phremove="'+safe(x.id)+'" aria-label="'+safe(x.name)+' 제거">×</button></span>').join('');draw(box.querySelector('#popHistoryChart'),items,false);}
  choose.addEventListener('change',()=>{if(choose.value&&!comparison.includes(choose.value))comparison.push(choose.value);choose.value='';redraw()});
- box.addEventListener('click',ev=>{const b=ev.target.closest('[data-phunit],[data-phremove]');if(!b)return;if(b.dataset.phremove){comparison=comparison.filter(x=>x!==b.dataset.phremove);redraw();return}unit=b.dataset.phunit;comparison=[];box.querySelectorAll('[data-phunit]').forEach(x=>x.classList.toggle('active',x===b));choices();redraw()});
+ box.addEventListener('click',ev=>{const b=ev.target.closest('[data-phunit],[data-phremove]');if(!b)return;if(b.dataset.phremove){comparison=comparison.filter(x=>x!==b.dataset.phremove);redraw();return}unit=b.dataset.phunit;comparison=[];box.querySelector('.pop-history-desc').textContent=unit==='province'?'시·군 보정값과 시·도 원자료를 이용해 현재 시·도 구분으로 재구성한 5년 간격 인구 추이입니다. 세종은 2015년 이후 표시합니다.':'5년 간격 인구총조사 기반 인구 추이입니다. 행정구역 통폐합 및 경계 변경에 따라 실제 인구 변화와 일부 차이가 있을 수 있습니다.';box.querySelectorAll('[data-phunit]').forEach(x=>x.classList.toggle('active',x===b));choices();redraw()});
  choices();redraw();
  const tabRank=document.getElementById('popRankViewBtn'),tabComposition=document.getElementById('popCompositionViewBtn'),tabHistory=document.getElementById('popHistoryViewBtn');
  const composition=document.getElementById('popCompositionView'),existing=document.getElementById('popExistingRanking'),head=document.getElementById('popCompareHead');
@@ -78,7 +111,7 @@ function draw(node,items,small){if(!node)return;if(!items.length){node.innerHTML
  const showPoint=(point)=>{if(!point)return;const item=items[Number(point.dataset.phItem)],yr=point.dataset.phYear;
  if(!item)return;const value=item.values[yr],meta=item.review?.[yr],detail=node.querySelector('.pop-history-detail');
  if(!Number.isFinite(value)||!detail)return;
- const status=meta?.category==='EUP_MERGER_REVIEW'?'과거 읍 인구 합산':meta?.category==='MERGER_SUM_REVIEW'?'과거 시·군 통합 합산':meta?.category==='HISTORICAL_NAME_REVIEW'?'과거 지명 기준 자료':'당시 행정구역 기준 인구';
+ const status=meta?.category==='PROVINCE_BOUNDARY_ADJUSTED'?'현재 시·도 구분으로 재구성':meta?.category==='EUP_MERGER_REVIEW'?'과거 읍 인구 합산':meta?.category==='MERGER_SUM_REVIEW'?'과거 시·군 통합 합산':meta?.category==='HISTORICAL_NAME_REVIEW'?'과거 지명 기준 자료':'당시 행정구역 기준 인구';
  detail.innerHTML='<strong>'+safe(item.name)+' · '+yr+'년 · '+fmt(value)+'명</strong><div class="ph-detail-status">'+status+' · 행정구역 변동에 따른 차이 가능</div>'+(meta?.source?'<div class="ph-detail-source">근거: '+safe(meta.source)+'</div>':'<div class="ph-detail-source">출처: 통계청 인구총조사 KOSIS</div>');
  node.querySelectorAll('.ph-point-visible').forEach(p=>p.style.strokeWidth='.8');
  };
