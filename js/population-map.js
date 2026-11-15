@@ -24,8 +24,8 @@ adult:{title:'청장년층 비율',unit:'%',get:r=>{const p=POP2024[r.id],a=AGE2
 old:{title:'노년층 비율',unit:'%',get:r=>{const p=POP2024[r.id],a=AGE2024[r.id];return p?.total>0&&a?100*a.old/p.total:null}},
 daytime:{title:'주간인구지수',unit:'',get:r=>{const d=window.KG_DAYTIME_2020?.[Number(r.id.slice(1))];return d&&d[0]>0?100*d[1]/d[0]:null}}
 };
-const palette=['#f0f5ff','#dce8ff','#b8d0ff','#90b2fb','#6495f4','#4277e9','#2456d3'];
-const dayPalette=['#fafcff','#edf3fd','#dce7fc','#aec8fc','#77a1f6','#4478ee','#2456d3'];
+const palette=['#bc4d52','#de806d','#f0b7a0','#e4e9e9','#8eb7dc','#5485c8','#2857a2'];
+const dayPalette=palette; // Same climate-temperature colors; retain 2020 daytime thresholds.
 const dayCuts=[90,95,100,105,110,115];
 let selected=null,initialized=false,view=[0,0,720,900],points=new Map(),lastDist=null;
 const valid=n=>Number.isFinite(n)&&n>=0;
