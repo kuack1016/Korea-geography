@@ -9,7 +9,7 @@ root.append(wrap);
 const style=document.createElement('style');style.textContent=`
 #popMapView{margin-top:12px}#popMapView.hidden{display:none!important}
 #popMapView #popMapSvg{width:100%;height:min(72vh,780px);min-height:480px;display:block;touch-action:none!important;-webkit-user-select:none;user-select:none}
-#popMapShapes path{cursor:pointer;vector-effect:non-scaling-stroke;stroke:#9aa9bd;stroke-width:.72;stroke-linejoin:round;fill-rule:evenodd}
+#popMapShapes path{cursor:pointer;vector-effect:non-scaling-stroke;stroke:#fff!important;stroke-width:.55!important;stroke-linejoin:round;fill-rule:evenodd}
 #popMapShapes path:focus{outline:none}#popMapView .climate-map-info{align-self:start}
 #popMapView .pop-map-value{font-size:27px;font-weight:950;margin:10px 0 4px}
 #popMapView .pop-map-details{font-size:12px;color:var(--muted);line-height:1.7}
