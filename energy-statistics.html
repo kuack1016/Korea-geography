@@ -33,4 +33,5 @@ function render(){
 function refreshItems(){const sel=document.getElementById("item");sel.innerHTML='<option value="">에너지원 비율 비교</option>';TYPES[active].names.forEach((name,i)=>{const op=document.createElement("option");op.value=i;op.textContent=name+" 비중 높은 순";sel.appendChild(op)});}
 document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>{active=b.dataset.tab;document.querySelectorAll("[data-tab]").forEach(x=>x.classList.toggle("on",x===b));document.getElementById("sort").value="total";refreshItems();render()}));
 document.getElementById("sort").addEventListener("change",()=>{document.getElementById("item").value="";render()});document.getElementById("item").addEventListener("change",render);refreshItems();render();
+try{new ResizeObserver(()=>{const frame=window.parent.document.getElementById("energyContentFrame");if(frame)frame.style.height=(document.documentElement.scrollHeight+8)+"px";}).observe(document.body)}catch(e){}
 </script></body></html>
